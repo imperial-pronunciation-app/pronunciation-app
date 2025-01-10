@@ -26,4 +26,17 @@ jobs:
     - name: Run tests
       run: |
         pytest  
+        
+deploy:
+  needs: build-and-test
+  runs-on: ubuntu-latest
+  if: ${{ success() }}
 
+  steps:
+  - name: Copy files to server
+    run: |
+      scp -r ./* ts1622@cloud-vm-41-85.doc.ic.ac.uk:/usr/code
+
+  - name: Restart API service
+    run: |
+      ssh ts1622@cloud-vm-41-85.doc.ic.ac.uk 'sudo systemctl restart flask_app.service'
