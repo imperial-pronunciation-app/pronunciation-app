@@ -18,6 +18,21 @@ jobs:
       with:
         python-version: '3.x'
 
+    - name: Set up SSH key
+      run: |
+        # Setup SSH key for GitHub Actions
+        mkdir -p ~/.ssh/
+        echo "${{ secrets.CLOUD_VM_PRIV_SSH_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        
+        # Disable Strict Host Key Checking (useful for CI/CD environments)
+        echo -e "Host *\n  StrictHostKeyChecking no\n  UserKnownHostsFile /dev/null" > ~/.ssh/config
+
+    - name: Test SSH Connection to Jump Host and Final VM
+      run: |
+        # Check if we can reach the cloud VM via the jump host
+        ssh -o "ProxyJump=et422@shell1.doc.ic.ac.uk" -i ~/.ssh/id_rsa ubuntu@cloud-vm-41-85 "echo Connection Successful"
+  
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -26,7 +41,7 @@ jobs:
     - name: Run tests
       run: |
         pytest  
-        
+
   deploy:
     needs: build-and-test
     runs-on: ubuntu-20.04
@@ -35,8 +50,11 @@ jobs:
     steps:
     - name: Copy files to server
       run: |
-        scp -r ./* ts1622@cloud-vm-41-85.doc.ic.ac.uk:/usr/code
-  
+        # Ensure we're copying files via the jump host to the final VM
+        scp -o "ProxyJump=et422@shell1.doc.ic.ac.uk" -i ~/.ssh/id_rsa -r ./ ubuntu@cloud-vm-41-85:/usr/code
+
     - name: Restart API service
       run: |
-        ssh ts1622@cloud-vm-41-85.doc.ic.ac.uk 'sudo systemctl restart flask_app.service'
+        # SSH via jump host to restart the Flask app service on the cloud VM
+        ssh -o "ProxyJump=et422@shell1.doc.ic.ac.uk" -i ~/.ssh/id_rsa ubuntu@cloud-vm-41-85 'sudo systemctl restart flask_app.service'
+
