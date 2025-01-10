@@ -1,0 +1,93 @@
+name: CI/CD Pipeline for Python API
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Set up SSH key
+      run: |
+        # Setup SSH key for GitHub Actions
+        mkdir -p ~/.ssh/
+        echo "${{ secrets.CLOUD_VM_PRIV_SSH_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        
+        # Disable Strict Host Key Checking (useful for CI/CD environments)
+        echo -e "Host *\n  StrictHostKeyChecking no\n  ForwardAgent yes\n  UserKnownHostsFile /dev/null" > ~/.ssh/config
+
+    - name: Test SSH Connection to Cloud VM
+      run: |
+        ssh -v -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -J et422@shell1.doc.ic.ac.uk ubuntu@cloud-vm-41-85 'echo "Final VM reachable!"'
+  
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run tests
+      run: |
+        pytest  
+  
+    - name: Persist SSH key
+      uses: actions/upload-artifact@v4
+      with:
+        name: ssh-key
+        path: ~/.ssh/id_rsa
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-20.04
+    if: ${{ success() }}
+  
+    steps:
+
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set up SSH key
+      run: |
+        # Setup SSH key for GitHub Actions
+        mkdir -p ~/.ssh/
+        echo "${{ secrets.CLOUD_VM_PRIV_SSH_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        
+        # Disable Strict Host Key Checking (useful for CI/CD environments)
+        echo -e "Host *\n  StrictHostKeyChecking no\n  ForwardAgent yes\n  UserKnownHostsFile /dev/null" > ~/.ssh/config
+        # needs .ssh directory
+    # - name: Fetch SSH key
+    #   uses: actions/download-artifact@v4
+    #   with:
+    #     name: ssh-key
+    #     path: ~/.ssh/id_rsa
+    
+    # - name: Step SSH key permission
+    #   run: |
+    #     chmod 600 ~/.ssh/id_rsa
+    
+    # - name: Confirm SSH key present
+    #   run: |
+    #     if [ ! -f ~/.ssh/id_rsa ]; then
+    #       echo "SSH key not found!"
+    #       exit 1
+    #     fi
+    - name: Git pull new content
+      run: | 
+          ssh -J et422@shell1.doc.ic.ac.uk -i ~/.ssh/id_rsa ubuntu@cloud-vm-41-85 'cd ~/pronunciation-app && git pull'
+    # - name: Restart API service
+    #   run: |
+    #     # SSH via jump host to restart the Flask app service on the cloud VM
+    #     ssh -J et422@shell1.doc.ic.ac.uk -i ~/.ssh/id_rsa ubuntu@cloud-vm-41-85 'sudo systemctl restart flask_app.service'
+
