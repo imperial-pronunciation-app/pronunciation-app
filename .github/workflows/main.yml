@@ -31,7 +31,7 @@ jobs:
     - name: Test SSH Connection to Jump Host and Final VM
       run: |
         # Check if we can reach the cloud VM via the jump host
-        ssh -o "ProxyJump=et422@shell1.doc.ic.ac.uk" -i ~/.ssh/id_rsa ubuntu@cloud-vm-41-85 "echo Connection Successful"
+        ssh -v -o "ProxyJump=et422@shell1.doc.ic.ac.uk" -i ~/.ssh/id_rsa ubuntu@cloud-vm-41-85 "echo Connection Successful"
   
     - name: Install dependencies
       run: |
