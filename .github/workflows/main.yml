@@ -42,7 +42,7 @@ jobs:
         pytest  
   
     - name: Persist SSH key
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ssh-key
         path: ~/.ssh/id_rsa
@@ -57,22 +57,32 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
     
-    - name: Fetch SSH key
-      uses: actions/download-artifact@v3
-      with:
-        name: ssh-key
-        path: ~/.ssh/id_rsa
-    
-    - name: Step SSH key permission
+    - name: Set up SSH key
       run: |
+        # Setup SSH key for GitHub Actions
+        mkdir -p ~/.ssh/
+        echo "${{ secrets.CLOUD_VM_PRIV_SSH_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
+        
+        # Disable Strict Host Key Checking (useful for CI/CD environments)
+        echo -e "Host *\n  StrictHostKeyChecking no\n  ForwardAgent yes\n  UserKnownHostsFile /dev/null" > ~/.ssh/config
+        # needs .ssh directory
+    # - name: Fetch SSH key
+    #   uses: actions/download-artifact@v4
+    #   with:
+    #     name: ssh-key
+    #     path: ~/.ssh/id_rsa
     
-    - name: Confirm SSH key present
-      run: |
-        if [ ! -f ~/.ssh/id_rsa ]; then
-          echo "SSH key not found!"
-          exit 1
-        fi
+    # - name: Step SSH key permission
+    #   run: |
+    #     chmod 600 ~/.ssh/id_rsa
+    
+    # - name: Confirm SSH key present
+    #   run: |
+    #     if [ ! -f ~/.ssh/id_rsa ]; then
+    #       echo "SSH key not found!"
+    #       exit 1
+    #     fi
   
     - name: Copy files to server
       run: |
