@@ -28,18 +28,9 @@ jobs:
         # Disable Strict Host Key Checking (useful for CI/CD environments)
         echo -e "Host *\n  StrictHostKeyChecking no\n  ForwardAgent yes\n  UserKnownHostsFile /dev/null" > ~/.ssh/config
 
-    - name: Test SSH Connection to Jump Host and Final VM
+    - name: Test SSH Connection to Cloud VM
       run: |
-        # Check if we can reach the cloud VM via the jump host
-        ssh -v -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa et422@shell1.doc.ic.ac.uk 'echo "Jump host reachable!"'
-
-        if [ $? -eq 0 ]; then
-          echo "Jump host connection successful"
-          ssh -v -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -J et422@shell1.doc.ic.ac.uk ubuntu@cloud-vm-41-85 'echo "Final VM reachable!"'
-        else
-          echo "Jump host connection failed"
-          exit 1
-        fi
+        ssh -v -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -J et422@shell1.doc.ic.ac.uk ubuntu@cloud-vm-41-85 'echo "Final VM reachable!"'
   
     - name: Install dependencies
       run: |
