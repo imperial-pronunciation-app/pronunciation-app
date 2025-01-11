@@ -26,7 +26,7 @@ jobs:
         chmod 600 ~/.ssh/id_rsa
         
         # Disable Strict Host Key Checking (useful for CI/CD environments)
-        echo -e "Host *\n  StrictHostKeyChecking no\n  UserKnownHostsFile /dev/null" > ~/.ssh/config
+        echo -e "Host *\n  StrictHostKeyChecking no\n  ForwardAgent yes\n  UserKnownHostsFile /dev/null" > ~/.ssh/config
 
     - name: Test SSH Connection to Jump Host and Final VM
       run: |
