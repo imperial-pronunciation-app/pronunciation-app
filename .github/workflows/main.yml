@@ -87,7 +87,7 @@ jobs:
     - name: Copy files to server
       run: |
         # Ensure we're copying files via the jump host to the final VM
-        scp -J et422@shell1.doc.ic.ac.uk -i ~/.ssh/id_rsa -r ${{ github.workspace }} ubuntu@cloud-vm-41-85:/usr/code
+        scp -J et422@shell1.doc.ic.ac.uk -i ~/.ssh/id_rsa -r ${{ github.workspace }} ubuntu@cloud-vm-41-85:/home/ubuntu/
 
     - name: Restart API service
       run: |
