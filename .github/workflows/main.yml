@@ -61,6 +61,7 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: ssh-key
+        path: ~/.ssh/id_rsa
     
     - name: Confirm SSH key present
       run: |
