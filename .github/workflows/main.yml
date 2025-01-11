@@ -40,6 +40,12 @@ jobs:
     - name: Run tests
       run: |
         pytest  
+  
+    - name: Persist SSH key
+      uses: actions/upload-artifact@v3
+      with:
+        name: ssh-key
+        path: ~/.ssh/id_rsa
 
   deploy:
     needs: build-and-test
@@ -47,6 +53,22 @@ jobs:
     if: ${{ success() }}
   
     steps:
+
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Fetch SSH key
+      uses: actions/download-artifact@v3
+      with:
+        name: ssh-key
+    
+    - name: Confirm SSH key present
+      run: |
+        if [ ! -f ~/.ssh/id_rsa ]; then
+          echo "SSH key not found!"
+          exit 1
+        fi
+  
     - name: Copy files to server
       run: |
         # Ensure we're copying files via the jump host to the final VM
