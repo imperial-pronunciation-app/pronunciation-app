@@ -34,7 +34,7 @@ def edit_dist(s1: str, s2: str) -> int:
 def similarity(target: str, transcribed: str) -> float:
     return 1 - edit_dist(target, transcribed) / len(target)
 
-@app.route('/text_similarity/<target>', methods=['POST'])
+@app.route('/text-similarity/<target>', methods=['POST'])
 def text_similarity(target: str):
     audio = request.files['audio']
     with NamedTemporaryFile(delete=True, suffix=".mp3") as temp_audio:

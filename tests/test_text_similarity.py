@@ -32,7 +32,7 @@ def test_text_similarity_perfect_match(client):
         data = {
             'audio': (audio_file, 'hello.mp3')
         }
-        response = client.post('/text_similarity/hello', content_type='multipart/form-data', data=data)
+        response = client.post('/text-similarity/hello', content_type='multipart/form-data', data=data)
     
     # Assertions
     assert response.status_code == 200
@@ -48,7 +48,7 @@ def test_text_similarity_partial_match(client):
         data = {
             'audio': (audio_file, 'hello.mp3')
         }
-        response = client.post('/text_similarity/hell', content_type='multipart/form-data', data=data)
+        response = client.post('/text-similarity/hell', content_type='multipart/form-data', data=data)
     
     # Assertions
     assert response.status_code == 200
@@ -64,7 +64,7 @@ def test_text_similarity_no_match(client):
         data = {
             'audio': (audio_file, 'hello.mp3')
         }
-        response = client.post('/text_similarity/skibidi', content_type='multipart/form-data', data=data)
+        response = client.post('/text-similarity/skibidi', content_type='multipart/form-data', data=data)
     
     # Assertions
     assert response.status_code == 200
