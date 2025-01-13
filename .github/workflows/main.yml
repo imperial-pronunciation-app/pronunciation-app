@@ -84,8 +84,8 @@ jobs:
     #       exit 1
     #     fi
     - name: Delete files from the server
-        run: | 
-            ssh -J et422@shell1.doc.ic.ac.uk -i ~/.ssh/id_rsa ubuntu@cloud-vm-41-85 'cd ~/pronunciation-app && git pull'
+      run: | 
+          ssh -J et422@shell1.doc.ic.ac.uk -i ~/.ssh/id_rsa ubuntu@cloud-vm-41-85 'cd ~/pronunciation-app && git pull'
     # - name: Restart API service
     #   run: |
     #     # SSH via jump host to restart the Flask app service on the cloud VM
