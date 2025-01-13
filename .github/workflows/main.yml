@@ -84,14 +84,8 @@ jobs:
     #       exit 1
     #     fi
     - name: Delete files from the server
-      run: |
-        ssh -J et422@shell1.doc.ic.ac.uk -i ~/.ssh/id_rsa ubuntu@cloud-vm-41-85 'sudo rm -rf /home/ubuntu/pronunciation-app'
-  
-    - name: Copy files to server
-      run: |
-        # Ensure we're copying files via the jump host to the final VM
-        scp -J et422@shell1.doc.ic.ac.uk -i ~/.ssh/id_rsa -r ${{ github.workspace }} ubuntu@cloud-vm-41-85:/home/ubuntu
-
+        run: | 
+            ssh -J et422@shell1.doc.ic.ac.uk -i ~/.ssh/id_rsa ubuntu@cloud-vm-41-85 'cd ~/pronunciation-app && git pull'
     # - name: Restart API service
     #   run: |
     #     # SSH via jump host to restart the Flask app service on the cloud VM
