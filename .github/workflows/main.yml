@@ -83,6 +83,9 @@ jobs:
     #       echo "SSH key not found!"
     #       exit 1
     #     fi
+    - name: Delete files from the server
+      run: |
+        ssh -J et422@shell1.doc.ic.ac.uk -i ~/.ssh/id_rsa ubuntu@cloud-vm-41-85 'sudo rm -rf /home/ubuntu/pronunciation-app'
   
     - name: Copy files to server
       run: |
