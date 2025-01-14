@@ -3,7 +3,7 @@ import string
 from tempfile import NamedTemporaryFile
 import whisper
 
-model = whisper.load_model("base")
+model = whisper.load_model("base.en") # Use English-only model
 
 # Initialize the Flask app
 app = Flask(__name__)
