@@ -1,6 +1,6 @@
 # Build
 
-FROM python:3.11-slim as build
+FROM python:3.11-slim AS build
 
 WORKDIR /app
 
@@ -16,7 +16,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Production
 # Final image only contains required runtime components
-FROM python:3.11-slim as production
+FROM python:3.11-slim
 
 WORKDIR /app
 
