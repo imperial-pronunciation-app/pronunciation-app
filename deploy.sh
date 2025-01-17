@@ -28,6 +28,9 @@ docker run -d \
   --name "$CONTAINER_NAME" \
   --restart unless-stopped \
   -p "${HOST_PORT}:${CONTAINER_PORT}" \
+  -v /etc/ssl/certs/ssl-cert-snakeoil.pem:/etc/ssl/certs/ssl-cert-snakeoil.pem \
+  -v /etc/ssl/private/ssl-cert-snakeoil.key:/etc/ssl/private/ssl-cert-snakeoil.key \
+  -e USE_SSL=true \
   "${IMAGE_NAME}:${IMAGE_TAG}"
 
 echo "🧹 Cleaning up old images..."
