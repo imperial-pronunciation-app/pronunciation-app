@@ -25,7 +25,7 @@ docker pull "${IMAGE_NAME}:${IMAGE_TAG}"
 echo "🛑 Stopping existing container..."
 # docker stop "$CONTAINER_NAME" || true
 # docker rm "$CONTAINER_NAME" || true
-docker-compose -p "$COMPOSE_PROJECT_NAME" -f "$COMPOSE_FILE" down || true
+docker compose -p "$COMPOSE_PROJECT_NAME" -f "$COMPOSE_FILE" down || true
 
 
 echo "🚀 Starting services with Docker Compose..."
@@ -34,7 +34,7 @@ echo "🚀 Starting services with Docker Compose..."
 #   --restart unless-stopped \
 #   -p "${HOST_PORT}:${CONTAINER_PORT}" \
 #   "${IMAGE_NAME}:${IMAGE_TAG}"
-docker-compose -p "$COMPOSE_PROJECT_NAME" -f "$COMPOSE_FILE" up -d --build
+docker compose -p "$COMPOSE_PROJECT_NAME" -f "$COMPOSE_FILE" up -d --build
 
 echo "🧹 Cleaning up unused resources..."
 docker system prune -f
