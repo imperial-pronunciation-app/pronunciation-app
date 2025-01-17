@@ -10,8 +10,8 @@ set -e  # Exit on any error
 
 # Optional configuration with defaults
 CONTAINER_NAME=${CONTAINER_NAME:-"flask-api"}
-CONTAINER_PORT=${CONTAINER_PORT:-443}
-HOST_PORT=${HOST_PORT:-443}
+CONTAINER_PORT=${CONTAINER_PORT:-8000}
+HOST_PORT=${HOST_PORT:-8000}
 
 echo "🔑 Logging into Docker Hub..."
 echo "$DOCKERHUB_ACCESS_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
@@ -28,9 +28,6 @@ docker run -d \
   --name "$CONTAINER_NAME" \
   --restart unless-stopped \
   -p "${HOST_PORT}:${CONTAINER_PORT}" \
-  -v /etc/ssl/certs/ssl-cert-snakeoil.pem:/etc/ssl/certs/ssl-cert-snakeoil.pem \
-  -v /etc/ssl/private/ssl-cert-snakeoil.key:/etc/ssl/private/ssl-cert-snakeoil.key \
-  -e USE_SSL=true \
   "${IMAGE_NAME}:${IMAGE_TAG}"
 
 echo "🧹 Cleaning up old images..."
