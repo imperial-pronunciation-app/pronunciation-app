@@ -87,3 +87,22 @@ jobs:
                       IMAGE_NAME='${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}' \
                       IMAGE_TAG='${{ github.sha }}' \
                       bash ~/deploy.sh"
+
+    - name: Wait for container to be up
+      run: |
+        echo "Waiting for the container to be up..."
+        sleep 30
+
+    - name: Ping the application to check it's alive
+      run: |
+        for i in {1..5}; do
+          if curl -s --head  --request GET https://pronunciation-app-backend.doc.ic.ac.uk | grep "200 OK" > /dev/null; then 
+          echo "Application is up and running!"
+          exit 0
+          else
+          echo "Waiting for the application to be up..."
+          sleep 10
+          fi
+        done
+        echo "Application did not start in time."
+        exit 1
