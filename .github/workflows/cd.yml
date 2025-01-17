@@ -1,4 +1,4 @@
-name: CI/CD Pipeline for Python API
+name: Continuous Deployment
 
 on:
   push:
@@ -10,49 +10,9 @@ env:
   IMAGE_NAME: ${{ vars.DOCKERHUB_IMAGE}}
 
 jobs:
-  CI:
-    name: Build and Test
-    runs-on: ubuntu-20.04
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-    
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ vars.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-  
-    - name: Build and cache Docker image
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        push: false
-        load: true        
-        tags: |
-          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-        cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
-        cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
-
-    - name: Run tests in container
-      run: |
-        docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} pytest
-    
-    - name: Push image if tests pass
-      run: |
-        docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-        docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-
-  CD:
+  deploy:
     name: Deploy to Cloud VM
-    needs: CI
     runs-on: ubuntu-20.04
-    if: ${{ success() }}
   
     steps:
     - name: Checkout code
