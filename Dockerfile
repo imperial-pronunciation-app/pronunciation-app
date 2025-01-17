@@ -37,6 +37,10 @@ ENV PYTHONUNBUFFERED=1 \
     FLASK_APP=app.py \
     FLASK_ENV=production
 
-EXPOSE 5000
+EXPOSE 443
 
-CMD ["gunicorn", "--bind", "0.0.0.0:443", "--workers", "4", "--timeout", "120", "app:app"]
+CMD if [ "$USE_SSL" = "true" ]; then \
+      gunicorn --bind 0.0.0.0:443 --workers 4 --timeout 120 --certfile /etc/ssl/certs/ssl-cert-snakeoil.pem --keyfile /etc/ssl/private/ssl-cert-snakeoil.key app:app; \
+    else \
+      gunicorn --bind 0.0.0.0:443 --workers 4 --timeout 120 app:app; \
+    fi
