@@ -39,4 +39,4 @@ ENV PYTHONUNBUFFERED=1 \
 
 EXPOSE 8000
 
-CMD ["gunicorn", "app:app", "-c", "./gunicorn.conf.py"]
+CMD ["gunicorn", "app.app:app", "-c", "./gunicorn.conf.py"]
