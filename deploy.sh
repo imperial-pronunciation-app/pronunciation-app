@@ -10,8 +10,8 @@ set -e  # Exit on any error
 
 # Optional configuration with defaults
 CONTAINER_NAME=${CONTAINER_NAME:-"flask-api"}
-CONTAINER_PORT=${CONTAINER_PORT:-5000}
-HOST_PORT=${HOST_PORT:-5000}
+CONTAINER_PORT=${CONTAINER_PORT:-443}
+HOST_PORT=${HOST_PORT:-443}
 
 echo "🔑 Logging into Docker Hub..."
 echo "$DOCKERHUB_ACCESS_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin

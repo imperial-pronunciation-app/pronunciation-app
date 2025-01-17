@@ -10,4 +10,5 @@ def home():
 
 # Run the app
 if __name__ == '__main__':
-    app.run(debug=True)
+    context = (r'/etc/ssl/certs/ssl-cert-snakeoil.pem', r'/etc/ssl/private/ssl-cert-snakeoil.key')
+    app.run(debug=True, port=443, ssl_context=context)
