@@ -29,11 +29,10 @@ with Session(engine) as session:
 
 @app.get("/")
 def read_home(session: Session = Depends(get_session)):
-    users = session.exec(select(User)).first()
+    user = session.exec(select(User)).first()
     if not user:
         raise HTTPException(status_code=404, detail="No users found")
     return {"name": user.name}
 
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    pass
