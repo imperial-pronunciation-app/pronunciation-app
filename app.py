@@ -1,44 +1,39 @@
-from flask import Flask, render_template, request, jsonify
-from sqlalchemy import create_engine, inspect, Column, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from fastapi import FastAPI, HTTPException, Depends
+from sqlmodel import Field, SQLModel, create_engine, Session, select
+from typing import Optional
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
 
-database_url = os.getenv('DATABASE_URL')
-
-# Initialize the Flask app
-app = Flask(__name__)
-
+database_url = os.getenv("DATABASE_URL")
 engine = create_engine(database_url)
-Base = declarative_base()
-Session = sessionmaker(bind=engine)
-session = Session()
 
-class User(Base):
-    __tablename__ = 'users'
-    id = Column(Integer, primary_key=True)
-    name = Column(String(50), nullable=False)
+class User(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str
 
-    def __repr__(self):
-        return f'<User {self.name}>'
-    
-# check if the table exists
-inspector = inspect(engine)
-if not inspector.has_table('users'):
-    Base.metadata.create_all(engine)
-    new_user = User(name="James")
-    session.add(new_user)
-    session.commit()
+app = FastAPI()
 
-# Homepage route
-@app.route('/')
-def home():
-    user = session.query(User).first()
-    return f"<h1>{user.name}</h1>"
+def get_session():
+    with Session(engine) as session:
+        yield session
 
-# Run the app
-if __name__ == '__main__':
-    app.run(debug=True, port=8000)
+SQLModel.metadata.create_all(engine)
+
+with Session(engine) as session:
+    if not session.exec(select(User)).first():
+        user = User(name="James")
+        session.add(user)
+        session.commit()
+
+@app.get("/")
+def read_home(session: Session = Depends(get_session)):
+    users = session.exec(select(User)).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="No users found")
+    return {"name": user.name}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
