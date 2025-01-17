@@ -9,9 +9,12 @@ set -e  # Exit on any error
 : "${IMAGE_TAG:?Must set IMAGE_TAG}"
 
 # Optional configuration with defaults
-CONTAINER_NAME=${CONTAINER_NAME:-"flask-api"}
-CONTAINER_PORT=${CONTAINER_PORT:-5000}
-HOST_PORT=${HOST_PORT:-5000}
+# CONTAINER_NAME=${CONTAINER_NAME:-"flask-api"}
+# CONTAINER_PORT=${CONTAINER_PORT:-5000}
+# HOST_PORT=${HOST_PORT:-5000}
+
+COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-"flask-app"}
+COMPOSE_FILE=${COMPOSE_FILE:-"docker-compose.yml"}
 
 echo "🔑 Logging into Docker Hub..."
 echo "$DOCKERHUB_ACCESS_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
@@ -20,17 +23,20 @@ echo "⬇️ Pulling image ${IMAGE_NAME}:${IMAGE_TAG}..."
 docker pull "${IMAGE_NAME}:${IMAGE_TAG}"
 
 echo "🛑 Stopping existing container..."
-docker stop "$CONTAINER_NAME" || true
-docker rm "$CONTAINER_NAME" || true
+# docker stop "$CONTAINER_NAME" || true
+# docker rm "$CONTAINER_NAME" || true
+docker-compose -p "$COMPOSE_PROJECT_NAME" -f "$COMPOSE_FILE" down || true
 
-echo "🚀 Starting new container..."
-docker run -d \
-  --name "$CONTAINER_NAME" \
-  --restart unless-stopped \
-  -p "${HOST_PORT}:${CONTAINER_PORT}" \
-  "${IMAGE_NAME}:${IMAGE_TAG}"
 
-echo "🧹 Cleaning up old images..."
+echo "🚀 Starting services with Docker Compose..."
+# docker run -d \
+#   --name "$CONTAINER_NAME" \
+#   --restart unless-stopped \
+#   -p "${HOST_PORT}:${CONTAINER_PORT}" \
+#   "${IMAGE_NAME}:${IMAGE_TAG}"
+docker-compose -p "$COMPOSE_PROJECT_NAME" -f "$COMPOSE_FILE" up -d --build
+
+echo "🧹 Cleaning up unused resources..."
 docker system prune -f
 
 echo "✅ Deployment complete!"
