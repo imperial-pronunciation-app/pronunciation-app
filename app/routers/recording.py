@@ -1,5 +1,6 @@
 from fastapi import APIRouter
-from schemas.recording import Feedback, RecordingPhoneme, RecordingRequest
+
+from app.schemas.recording import Feedback, RecordingPhoneme, RecordingRequest
 
 router = APIRouter()
 

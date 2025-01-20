@@ -1,5 +1,6 @@
 from fastapi import APIRouter
-from schemas.satisfaction import SatisfactionRequest
+
+from app.schemas.satisfaction import SatisfactionRequest
 
 router = APIRouter()
 

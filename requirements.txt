@@ -5,3 +5,5 @@ fastapi
 sqlmodel
 pydantic
 uvicorn
+httpx
+psycopg2-binary
