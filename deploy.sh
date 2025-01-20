@@ -24,7 +24,7 @@ docker pull "${IMAGE_NAME}:${IMAGE_TAG}"
 echo "🛑 Stopping existing container..."
 # docker stop "$CONTAINER_NAME" || true
 # docker rm "$CONTAINER_NAME" || true
-docker compose -p "$COMPOSE_PROJECT_NAME" down || true
+docker compose -p "$COMPOSE_PROJECT_NAME" --profile prod down || true
 
 echo "🚀 Starting services with Docker Compose..."
 # docker run -d \
