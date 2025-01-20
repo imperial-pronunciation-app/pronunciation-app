@@ -6,9 +6,7 @@ on:
     types:
       - completed
     branches:
-      - '*'
-    # branches:
-    #   - main
+      - main
 
 
 env:
