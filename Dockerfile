@@ -27,6 +27,6 @@ CMD ["fastapi", "run", "app/main.py", "--port", "8000"]
 # ---------------------
 # Production stage
 # ---------------------
-FROM base as production
+FROM base as prod
 
 CMD ["fastapi", "run", "app/main.py", "--port", "8000", "--workers", "4"]
