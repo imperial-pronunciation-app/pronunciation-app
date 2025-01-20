@@ -5,7 +5,7 @@ app = FastAPI()
 
 @app.get("/")
 def read_home():
-    return {"Hello": "World"}
+    return {"Hello": "Euan"}
 
 
 if __name__ == "__main__":

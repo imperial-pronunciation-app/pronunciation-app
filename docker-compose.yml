@@ -1,8 +1,6 @@
-version: '3.8'
-
 services:
   web:
-    image: euanoturner/pronunciation-app:latest
+    image: euanoturner/pronunciation-app:${IMAGE_TAG}
     ports:
       - "8000:8000"
     environment:
