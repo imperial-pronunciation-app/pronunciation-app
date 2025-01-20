@@ -10,6 +10,9 @@ services:
     depends_on:
       - db
     restart: unless-stopped
+    profiles:
+      - dev
+      - prod
   
   db:
     image: postgres:15
@@ -21,6 +24,16 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
+    profiles:
+      - dev
+      - prod
+
+  test:
+    build:
+      context: .
+      target: test
+    profiles:
+      - test
 
 volumes:
   postgres_data:

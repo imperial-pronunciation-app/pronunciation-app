@@ -1,19 +1,13 @@
 import os
 
 from dotenv import load_dotenv
-from sqlalchemy.orm import sessionmaker
-from sqlmodel import create_engine
+from sqlmodel import create_engine, Session
 
 load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL")
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+engine = create_engine(os.getenv("DATABASE_URL", "sqlite:///db.sqlite"))
 
+def get_session():
+    with Session(engine) as session:
+        yield session
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()

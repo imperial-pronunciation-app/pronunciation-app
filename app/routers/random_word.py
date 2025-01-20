@@ -3,7 +3,7 @@ import random
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 
-from app.database import get_db
+from app.database import get_session
 from app.models import Phoneme, Word, WordPhonemes
 from app.schemas.random_word import RandomWord, WordPhoneme
 
@@ -11,7 +11,7 @@ router = APIRouter()
 
 
 @router.get("/api/v1/random_word", response_model=RandomWord)
-async def get_random_word(db: Session = Depends(get_db)):
+async def get_random_word(db: Session = Depends(get_session)):
     query = select(Word)
     words = db.execute(query).all()
     if not words:
