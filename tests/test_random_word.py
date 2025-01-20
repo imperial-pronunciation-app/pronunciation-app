@@ -7,8 +7,6 @@ from fastapi.testclient import TestClient
 
 # client = TestClient(app)
 
-
-@pytest.mark.usefixtures("setup")
 def test_get_random_word(client: TestClient):
     response = client.get("/api/v1/random_word")
     assert response.status_code == 200
