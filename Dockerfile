@@ -1,42 +1,23 @@
-# Build
+FROM python:3.11-slim as base
 
-FROM python:3.11-slim AS build
+WORKDIR /code
 
-WORKDIR /app
+COPY ./requirements.txt /code/requirements.txt
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
+RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
-COPY requirements.txt .
+COPY ./app /code/app
 
-RUN python -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
-RUN pip install --no-cache-dir -r requirements.txt
+# ---------------------
+# Development stage
+# ---------------------
+FROM base as dev-stage
 
-# Production
-# Final image only contains required runtime components
-FROM python:3.11-slim
+CMD ["fastapi", "run", "app/main.py", "--port", "8000"]
 
-WORKDIR /app
+# ---------------------
+# Production stage
+# ---------------------
+FROM base as production-stage
 
-RUN useradd -m -u 1000 appuser
-
-COPY --from=build /opt/venv /opt/venv
-
-ENV PATH="/opt/venv/bin:$PATH"
-
-COPY . .
-
-RUN chown -R appuser:appuser /app
-
-USER appuser
-
-ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    FLASK_APP=app.py \
-    FLASK_ENV=production
-
-EXPOSE 8000
-
-CMD ["gunicorn", "app.app:app", "-c", "./gunicorn.conf.py"]
+CMD ["fastapi", "run", "app/main.py", "--port", "8000", "--workers", "4"]

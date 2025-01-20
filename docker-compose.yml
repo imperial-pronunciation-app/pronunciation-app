@@ -7,8 +7,6 @@ services:
       - "8000:8000"
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
-      - FLASK_APP=app.py
-      - FLASK_ENV=development
     depends_on:
       - db
     restart: unless-stopped
@@ -23,27 +21,6 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: 1m
-      timeout: 10s
-      retries: 3
-  
-  tests:
-    build:
-      context: .
-      dockerfile: Dockerfile.test
-    environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_TEST_DB-test_db}
-    depends_on:
-      db:
-        condition: service_healthy
-    volumes:
-      - .:/app
-    # command: >
-    #   sh -c "psql postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_TEST_DB-test_db} -c 'CREATE DATABASE ${POSTGRES_TEST_DB:-test_db}' || true && pytest"
-
 
 volumes:
   postgres_data:

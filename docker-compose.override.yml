@@ -3,3 +3,4 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: dev-stage
