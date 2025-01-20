@@ -5,16 +5,6 @@ from sqlmodel.pool import StaticPool
 
 from app.database import get_session
 from app.main import app
-from app.models import (  # noqa: F401
-    ModelFeedback,
-    Phoneme,
-    Recording,
-    RecordingFeedback,
-    RecordingPhonemes,
-    User,
-    Word,
-    WordPhonemes,
-)
 
 @pytest.fixture(name="session")  
 def session_fixture():  
