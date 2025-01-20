@@ -32,7 +32,7 @@ echo "🚀 Starting services with Docker Compose..."
 #   --restart unless-stopped \
 #   -p "${HOST_PORT}:${CONTAINER_PORT}" \
 #   "${IMAGE_NAME}:${IMAGE_TAG}"
-docker compose -p "$COMPOSE_PROJECT_NAME" --profile prod up -d --build
+docker compose -p "$COMPOSE_PROJECT_NAME" --profile prod up -d --build --pull always
 
 echo "🧹 Cleaning up unused resources..."
 docker system prune -f
