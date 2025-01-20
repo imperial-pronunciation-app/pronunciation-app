@@ -1,8 +1,9 @@
-from typing import List, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from sqlmodel import Field, Relationship, SQLModel
 
-from .recording import Recording
+if TYPE_CHECKING:
+    from .recording import Recording
 
 
 class User(SQLModel, table=True):
@@ -10,4 +11,5 @@ class User(SQLModel, table=True):
     first_name: str
     last_name: str
     email: str
+
     recordings: List["Recording"] = Relationship(back_populates="user")

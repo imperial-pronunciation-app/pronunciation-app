@@ -1,13 +1,15 @@
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from sqlmodel import Field, Relationship, SQLModel
 
-from .model_feedback import ModelFeedback
-from .recording import Recording
+if TYPE_CHECKING:
+    from .model_feedback import ModelFeedback
+    from .recording import Recording
 
 
 class RecordingFeedback(SQLModel, table=True):
-    recording_id: Optional[int] = Field(foreign_key="recording.id", primary_key=True)
+    id: Optional[int] = Field(default=None, primary_key=True)
+    recording_id: Optional[int] = Field(foreign_key="recording.id")
     feedback: str
     score: int = Field(gt=-1, lt=101)
 
