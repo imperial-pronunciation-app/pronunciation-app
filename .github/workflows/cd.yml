@@ -6,15 +6,18 @@ on:
     types:
       - completed
     branches:
+
       - '*'
     # branches:
     #   - main
+
 
 env:
   REGISTRY: docker.io/${{ vars.DOCKERHUB_USERNAME }}
   IMAGE_NAME: ${{ vars.DOCKERHUB_IMAGE}}
 
 jobs:
+
   build:
     name: Build and Push Docker Image
     runs-on: ubuntu-20.04
@@ -40,7 +43,7 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           target: prod
-
+          
   deploy:
     name: Deploy to Cloud VM
     runs-on: ubuntu-20.04
