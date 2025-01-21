@@ -3,13 +3,11 @@ from typing import Dict
 from fastapi import FastAPI
 
 
-
-
 app = FastAPI()
 
 
 @app.get("/")
-def read_home():  # would be a Pydantic return type normally
+def read_home() -> Dict[str, str]:  # would be a Pydantic return type normally
     return {"Hello": "James"}
 
 
