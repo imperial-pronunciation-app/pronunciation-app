@@ -1,9 +1,7 @@
-gunicorn==23.0.0
 pytest==8.3.4
 python-dotenv
 fastapi[standard]
 sqlmodel
 pydantic
-uvicorn
 httpx
 psycopg2-binary
