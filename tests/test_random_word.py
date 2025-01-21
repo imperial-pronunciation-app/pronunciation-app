@@ -36,4 +36,4 @@ def test_read_random_word_single(seeded_client: TestClient, test_seed_data: Seed
     assert response.status_code == 200
     assert data["word"] == test_seed_data.words[0].word
     # turn on once endpoint also returns phonemes
-    # assert data["word_phonemes"] == test_seed_data.words[0].phonemes
+    assert [phoneme["ipa"] for phoneme in data["word_phonemes"]] == test_seed_data.words[0].phonemes

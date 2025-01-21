@@ -1,11 +1,11 @@
 import random
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlmodel import Session, select
+from sqlmodel import Session, col, select
 
 from app.database import get_session
-from app.models import Word
-from app.schemas.random_word import RandomWord
+from app.models import Phoneme, Word, WordPhonemeLink
+from app.schemas.random_word import RandomWord, WordPhoneme
 
 
 router = APIRouter()
@@ -19,16 +19,20 @@ async def get_random_word(session: Session = Depends(get_session)) -> RandomWord
         raise HTTPException(status_code=404, detail="No words found")
 
     random_word = random.choice(words)
+    
+    # Find phonemes for the random word
+    phoneme_query = (
+        select(Phoneme)
+        .join(WordPhonemeLink)
+        .where(WordPhonemeLink.word_id == random_word.id)
+        .order_by(col(WordPhonemeLink.index))
+        )
+    phonemes = session.exec(phoneme_query).all()
 
-    # # TODO: Return associated phonemes
-    # word_phoneme_entries = db.exec(
-    #     select(WordPhonemes).filter(WordPhonemes.word_id == random_word.id).order_by(WordPhonemes.index)
-    # ).all()
-    # phoneme_ids = [entry.phoneme_id for entry in word_phoneme_entries]
-    # word_phonemes = db.exec(select(Phoneme).filter(Phoneme.id.in_(phoneme_ids))).all()
-    # word_phonemes = [
-    #     WordPhoneme(phoneme_id=phoneme.id, ipa=phoneme.ipa, respelling=phoneme.respelling) for phoneme in word_phonemes
-    # ]
+    word_phonemes = []
+    for phoneme in phonemes:
+        assert phoneme.id is not None
+        word_phonemes.append(WordPhoneme(id=phoneme.id, ipa=phoneme.ipa, respelling=phoneme.respelling))
 
     assert random_word.id is not None
-    return RandomWord(word_id=random_word.id, word=random_word.word, word_phonemes=[])
+    return RandomWord(word_id=random_word.id, word=random_word.word, word_phonemes=word_phonemes)
