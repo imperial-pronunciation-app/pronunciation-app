@@ -18,6 +18,16 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.11'
+    
+    - name: Install pre-commit
+      run: pip install pre-commit
+
+    - name: Run checks
+      run: pre-commit run --all-files
 
     - name: Build and run tests
       run: docker compose --profile test up --build --abort-on-container-exit
