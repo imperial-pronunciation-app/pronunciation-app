@@ -1,4 +1,5 @@
 import os
+import string
 import uuid
 from datetime import datetime
 
@@ -8,9 +9,11 @@ from fastapi import APIRouter, Depends
 from sqlmodel import Session
 
 from app.database import get_session
+from app.main import ml_models
 from app.models.recording import Recording
 from app.models.word import Word
 from app.schemas.recording import RecordingRequest, RecordingResponse
+from app.utils.similarity import similarity
 
 
 dotenv.load_dotenv()
@@ -46,12 +49,20 @@ def upload_wav_to_s3(wav_file: str) -> str:
     return s3_key
 
 def dispatch_to_model(wav_file: str) -> str:
-  # TODO: Future models will return a list of phonemes
-  return "hardware"
+    # TODO: Future models will return a list of phonemes
+    model = ml_models["whisper"]
+    return (
+        str(model(wav_file)["text"])
+        .lower()
+        .strip()
+        .translate(str.maketrans("", "", string.punctuation)) # Remove punctuation
+    )
 
-def form_feedback(model_response: str, word_id: int, session: Session) -> bool:
-  word = session.get(Word, word_id)
-  return word == model_response
+def form_feedback(model_response: str, word_id: int, session: Session) -> int:
+    word = session.get(Word, word_id)
+    if not word:
+        return 0
+    return similarity(word.word, model_response)
 
 @router.post("/api/v1/words/{word_id}/recording", response_model=RecordingResponse)
 async def post_recording(word_id: int, recording_request: RecordingRequest, session: Session = Depends(get_session)) -> RecordingResponse:
@@ -81,5 +92,5 @@ async def post_recording(word_id: int, recording_request: RecordingRequest, sess
     
     # 6. Serve response to user
     assert recording.id is not None
-    return RecordingResponse(recording_id=recording.id, score=int(feedback), recording_phonemes=[])
+    return RecordingResponse(recording_id=recording.id, score=feedback, recording_phonemes=[])
 

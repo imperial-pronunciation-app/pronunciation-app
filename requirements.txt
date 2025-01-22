@@ -7,3 +7,5 @@ pydantic
 httpx
 psycopg2-binary
 boto3
+transformers
+torch
