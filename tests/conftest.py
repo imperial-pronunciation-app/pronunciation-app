@@ -7,7 +7,8 @@ from sqlmodel.pool import StaticPool
 
 from app.database import get_session
 from app.main import app
-from app.seed import SeedData, WordData, seed_data
+from app.seed import SeedData, seed
+from app.seed_data import default_data
 
 
 @pytest.fixture(name="session")
@@ -37,16 +38,13 @@ def client_fixture(session: Session) -> Iterator[TestClient]:
 def test_seed_data(request: pytest.FixtureRequest) -> SeedData:
     """Default test data to seed a test database with
     """
-    return getattr(request, "param", SeedData(words=[
-        WordData(word="software", phonemes=["s", "oʊ", "f", "t", "w", "ɛ", "r"]),
-        WordData(word="hardware", phonemes=["h", "ɑː", "r", "d", "w", "ɛ", "r"]),
-    ]))
+    return getattr(request, "param", default_data)
     
 @pytest.fixture(name="seeded_session")
 def seeded_session_fixture(session: Session, test_seed_data: SeedData) -> Iterator[Session]:
     """Yields an in-memory database session seeded with test data
     """
-    seed_data(session, seed_words=test_seed_data)
+    seed(session, seed_words=test_seed_data)
     yield session
 
 @pytest.fixture(name="seeded_client")

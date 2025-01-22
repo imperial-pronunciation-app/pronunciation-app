@@ -1,7 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from app.seed import SeedData, WordData
+from app.seed_data import SeedData, WordData
 
 
 def test_read_random_word_empty(client: TestClient) -> None:
