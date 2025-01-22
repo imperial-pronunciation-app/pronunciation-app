@@ -5,3 +5,4 @@ sqlmodel
 pydantic
 httpx
 psycopg2-binary
+boto3

@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 # Possible words the user can pronounce
 class Recording(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    recording_url: str
+    recording_s3_key: str
     user_id: int = Field(foreign_key="user.id")
     word_id: int = Field(foreign_key="phoneme.id")
     time_created: datetime

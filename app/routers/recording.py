@@ -1,41 +1,85 @@
-# import random
+import os
+import uuid
+from datetime import datetime
 
-# from fastapi import APIRouter, Depends, HTTPException
-# from sqlmodel import Session, col, select
+import boto3
+import dotenv
+from fastapi import APIRouter, Depends
+from sqlmodel import Session
 
-# from app.database import get_session
-# from app.models import Phoneme, Word, WordPhonemeLink
-# from app.schemas.base import PhonemeSchema
-# from app.schemas.recording import RecordingResponse
+from app.database import get_session
+from app.models.recording import Recording
+from app.models.word import Word
+from app.schemas.recording import RecordingRequest, RecordingResponse
 
 
-# router = APIRouter()
+dotenv.load_dotenv()
 
+router = APIRouter()
 
-# @router.post("/api/v1/words/{word_id}/recording", response_model=RecordingResponse)
-# async def post_recording(session: Session = Depends(get_session)) -> RecordingResponse:
+def create_wav_file(recording_request: RecordingRequest) -> str:
+    filename = f"{recording_request.user_id}.wav"
+    with open(filename, "bx") as f:
+      f.write(recording_request.audio_bytes)
+    return filename
+
+def upload_wav_to_s3(wav_file: str) -> str:
+    # TODO: Handle failure of uploading
+    # TODO: Use async and await properly
+    aws_access_key_id = os.getenv("AWS_ACCESS_KEY_ID")
+    aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY")
+    aws_region = os.getenv("AWS_REGION")
+    bucket_name = os.getenv("BUCKET_NAME")
     
-#     query = select(Word)
-#     words = session.exec(query).all()
-#     if not words:
-#         raise HTTPException(status_code=404, detail="No words found")
-
-#     random_word = random.choice(words)
+    blob_id = uuid.uuid4()
     
-#     # Find phonemes for the random word
-#     phoneme_query = (
-#         select(Phoneme)
-#         .join(WordPhonemeLink)
-#         .where(WordPhonemeLink.word_id == random_word.id)
-#         .order_by(col(WordPhonemeLink.index))
-#         )
-#     phonemes = session.exec(phoneme_query).all()
+    s3_client = boto3.client(
+        "s3",
+        aws_access_key_id=aws_access_key_id,
+        aws_secret_access_key=aws_secret_access_key,
+        region_name=aws_region
+    )
+    
+    s3_key = f"{blob_id}.wav"
+    s3_client.upload_file(wav_file, bucket_name, s3_key)
+  
+    return s3_key
 
-#     word_phonemes = []
-#     for phoneme in phonemes:
-#         assert phoneme.id is not None
-#         word_phonemes.append(PhonemeSchema(id=phoneme.id, ipa=phoneme.ipa, respelling=phoneme.respelling))
+def dispatch_to_model(wav_file: str) -> str:
+  # TODO: Future models will return a list of phonemes
+  return "hardware"
 
-#     assert random_word.id is not None
-#     return RandomWordResponse(word_id=random_word.id, word=random_word.word, word_phonemes=word_phonemes)
+def form_feedback(model_response: str, word_id: int, session: Session) -> bool:
+  word = session.get(Word, word_id)
+  return word == model_response
+
+@router.post("/api/v1/words/{word_id}/recording", response_model=RecordingResponse)
+async def post_recording(word_id: int, recording_request: RecordingRequest, session: Session = Depends(get_session)) -> RecordingResponse:
+    
+    # 1. Send .wav file to blob store
+    wav_file = create_wav_file(recording_request)
+    s3_key = upload_wav_to_s3(wav_file)
+    
+    # 2. Store Recording entry with recording_url from blob store
+    # TODO: Move to CRUD
+    recording = Recording(
+        user_id=recording_request.user_id,
+        word_id=word_id,
+        recording_url=s3_key,
+        time_created=datetime.now()
+    )
+    session.add(recording)
+    session.commit()
+    
+    # 3. Dispatch recording to ML backend
+    model_response = dispatch_to_model(wav_file)
+    
+    # 4. Form feedback based on model response
+    feedback = form_feedback(model_response, word_id, session)
+    
+    # 5. TODO: Store feedback in RecordingFeedback
+    
+    # 6. Serve response to user
+    assert recording.id is not None
+    return RecordingResponse(recording_id=recording.id, score=int(feedback), recording_phonemes=[])
 
