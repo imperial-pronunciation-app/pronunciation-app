@@ -1,87 +1,10 @@
-from dataclasses import dataclass
-from typing import List
-
-from sqlmodel import Session
+from sqlmodel import Session, SQLModel
 
 from app.models import Phoneme, Word, WordPhonemeLink
+from app.seed_data import SeedData, ipa_to_respelling
 
 
-# Maps IPA characters to Wiki respellings
-ipa_to_respelling = {
-    "tʃ": "ch",
-    "ɡ": "g",
-    "h": "h",
-    "hw": "wh",
-    "dʒ": "j",
-    "k": "k",
-    "x": "kh",
-    "ŋ": "ng",
-    "s": "s",
-    "ʃ": "sh",
-    "θ": "th",
-    "ð": "dh",
-    "j": "y",
-    "ʒ": "zh",
-    "b": "b",
-    "d": "d",
-    "f": "f",
-    "l": "l",
-    "m": "m",
-    "n": "n",
-    "p": "p",
-    "r": "r",
-    "t": "t",
-    "v": "v",
-    "w": "w",
-    "z": "z",
-    "æ": "a (arr)",
-    "eɪ": "ay",
-    "ɛər": "air",
-    "ɑː": "ah",
-    "ɑːr": "ar",
-    "ɛ": "e (err)",
-    "i:": "ee",
-    "ɪər": "eer",
-    "ɪ": "i (irr)",
-    "aɪ": "y, eye",
-    "ɒ": "o (orr)",
-    "oʊ": "oh",
-    "ɔː": "aw",
-    "ɔːr": "or",
-    "ɔɪ": "oy",
-    "ʊ": "uu",
-    "ʊər": "oor",
-    "u:": "oo",
-    "aʊ": "ow",
-    "ʌ": "u",
-    "ɜːr": "ur",
-    "ə": "ə",  # I think the Mac respelling of uh for this and the next is better
-    "ər": "ər",
-    "ju:": "ew",
-}
-
-@dataclass
-class WordData:
-    word: str
-    phonemes: List[str] # ordered list of IPA phonemes
-
-    def __str__(self) -> str:
-        """String representation for pytest parameter IDs
-        """
-        return f"{self.word}: {'-'.join(self.phonemes)}"
-
-@dataclass
-class SeedData:
-    """Container for specific seed configuration
-    """
-    words: List[WordData]
-    
-    def __str__(self) -> str:
-        """String representation for pytest parameter IDs
-        """
-        return "_".join([str(word) for word in self.words])
-
-def seed_data(session: Session, seed_words: SeedData) -> None:
+def seed(session: Session, seed_words: SeedData) -> None:
     """Seed a database with sample data
 
     Args:
@@ -113,3 +36,12 @@ def seed_data(session: Session, seed_words: SeedData) -> None:
     session.add_all(word_phoneme_links)
 
     session.commit()
+
+# To seed inside a container
+# docker exec -it <container_id> python -m app.seed
+if __name__ == "__main__":
+    from app.database import engine, get_session
+    from app.seed_data import default_data
+    SQLModel.metadata.create_all(engine)
+    session = next(get_session())
+    seed(session, default_data)
