@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel, create_engine
 
-from app.models import Phoneme, Word, WordPhonemeLink  # noqa: F401
+from app.models import Phoneme, Recording, User, Word, WordPhonemeLink  # noqa: F401
 
 
 def test_create_database() -> None:
