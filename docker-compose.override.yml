@@ -1,5 +1,6 @@
 services:
   web:
+    image: pronunciation-app-dev
     build:
       context: .
       dockerfile: Dockerfile

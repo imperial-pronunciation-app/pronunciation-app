@@ -1,4 +1,4 @@
-from sqlmodel import Session
+from sqlmodel import Session, SQLModel
 
 from app.models import Phoneme, Word, WordPhonemeLink
 from app.seed_data import SeedData, ipa_to_respelling
@@ -36,3 +36,12 @@ def seed(session: Session, seed_words: SeedData) -> None:
     session.add_all(word_phoneme_links)
 
     session.commit()
+
+# To seed inside a container
+# docker exec -it <container_id> python -m app.seed
+if __name__ == "__main__":
+    from app.database import engine, get_session
+    from app.seed_data import default_data
+    SQLModel.metadata.create_all(engine)
+    session = next(get_session())
+    seed(session, default_data)
