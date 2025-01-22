@@ -8,8 +8,9 @@ repos:
   rev: v1.14.1
   hooks:
     - id: mypy
-      # additional_dependencies:
-      #   - types-python-dotenv
-      #   - types-pytest
-      #   - types-psycopg2
-      #   - httpx
+      additional_dependencies:
+        - sqlmodel
+        # - types-python-dotenv
+        # - types-pytest
+        # - types-psycopg2
+        # - httpx
