@@ -2,14 +2,10 @@ from typing import List
 
 from pydantic import BaseModel
 
-
-class WordPhoneme(BaseModel):
-    id: int
-    ipa: str
-    respelling: str
+from app.schemas.base import PhonemeSchema
 
 
-class RandomWord(BaseModel):
+class RandomWordResponse(BaseModel):
     word_id: int
     word: str
-    word_phonemes: List[WordPhoneme]
+    word_phonemes: List[PhonemeSchema]

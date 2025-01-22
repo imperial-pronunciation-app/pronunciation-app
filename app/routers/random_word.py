@@ -5,14 +5,15 @@ from sqlmodel import Session, col, select
 
 from app.database import get_session
 from app.models import Phoneme, Word, WordPhonemeLink
-from app.schemas.random_word import RandomWord, WordPhoneme
+from app.schemas.base import PhonemeSchema
+from app.schemas.random_word import RandomWordResponse
 
 
 router = APIRouter()
 
 
-@router.get("/api/v1/random_word", response_model=RandomWord)
-async def get_random_word(session: Session = Depends(get_session)) -> RandomWord:
+@router.get("/api/v1/random_word", response_model=RandomWordResponse)
+async def get_random_word(session: Session = Depends(get_session)) -> RandomWordResponse:
     query = select(Word)
     words = session.exec(query).all()
     if not words:
@@ -32,7 +33,7 @@ async def get_random_word(session: Session = Depends(get_session)) -> RandomWord
     word_phonemes = []
     for phoneme in phonemes:
         assert phoneme.id is not None
-        word_phonemes.append(WordPhoneme(id=phoneme.id, ipa=phoneme.ipa, respelling=phoneme.respelling))
+        word_phonemes.append(PhonemeSchema(id=phoneme.id, ipa=phoneme.ipa, respelling=phoneme.respelling))
 
     assert random_word.id is not None
-    return RandomWord(word_id=random_word.id, word=random_word.word, word_phonemes=word_phonemes)
+    return RandomWordResponse(word_id=random_word.id, word=random_word.word, word_phonemes=word_phonemes)
