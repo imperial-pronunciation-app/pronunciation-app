@@ -1,7 +1,11 @@
 pytest==8.3.4
+pytest_mock
 python-dotenv
 fastapi[standard]
 sqlmodel
 pydantic
 httpx
 psycopg2-binary
+boto3
+transformers
+torch

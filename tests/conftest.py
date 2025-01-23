@@ -7,6 +7,7 @@ from sqlmodel.pool import StaticPool
 
 from app.database import get_session
 from app.main import app
+from app.models import Phoneme, Recording, Word, WordPhonemeLink  # noqa: F401
 from app.seed import SeedData, seed
 from app.seed_data import default_data
 
@@ -17,6 +18,7 @@ def session_fixture() -> Iterator[Session]:
     """
     engine = create_engine("sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool)
     SQLModel.metadata.create_all(engine)
+
     with Session(engine) as session:
         yield session
 
