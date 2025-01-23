@@ -18,4 +18,4 @@ def edit_dist(s1: str, s2: str) -> int:
 
 
 def similarity(target: str, transcribed: str) -> int:
-    return int((1 - edit_dist(target, transcribed) / len(target)) * 100)
+    return int(round((1 - edit_dist(target, transcribed) / max(len(transcribed), len(target))) * 100))

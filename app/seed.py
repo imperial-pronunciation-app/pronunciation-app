@@ -1,6 +1,6 @@
 from sqlmodel import Session, SQLModel
 
-from app.models import Phoneme, Word, WordPhonemeLink
+from app.models import Phoneme, Recording, Word, WordPhonemeLink  # noqa: F401
 from app.seed_data import SeedData, ipa_to_respelling
 
 
