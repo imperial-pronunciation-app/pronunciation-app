@@ -51,17 +51,8 @@ async def post_recording(word_id: int, audio_file: UploadFile, session: Session 
     s3_key = upload_wav_to_s3(wav_file)
     
     # # 2. Store Recording entry with recording_url from blob store
-    # TODO: Move to CRUD
-    recording = Recording(
-        # user_id=recording_request.user_id,
-        word_id=word_id,
-        recording_s3_key=s3_key,
-        time_created=datetime.now()
-    )
-    # session.add(recording)
-    # session.commit()
     recording_repository = RecordingRepository(session)
-    recording_repository.create(recording)
+    recording_repository.create(word_id, s3_key)
     
     # 3. Dispatch recording to ML backend
     model_response = dispatch_to_model(wav_file)
