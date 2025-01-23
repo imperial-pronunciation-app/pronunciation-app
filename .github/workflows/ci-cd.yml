@@ -7,11 +7,7 @@ on:
 
 env:
   REGISTRY: docker.io/${{ vars.DOCKERHUB_USERNAME }}
-  IMAGE_NAME: ${{ vars.DOCKERHUB_IMAGE}}
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_REGION: ${{ secrets.AWS_REGION }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+  IMAGE_NAME: ${{ vars.DOCKERHUB_IMAGE }}
 
 jobs:
   ci:
@@ -101,10 +97,6 @@ jobs:
                         DOCKERHUB_ACCESS_TOKEN='${{ secrets.DOCKERHUB_ACCESS_TOKEN }}' \
                         IMAGE_NAME='${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}' \
                         IMAGE_TAG='${{ github.sha }}' \
-                        AWS_ACCESS_KEY_ID='${{ secrets.AWS_ACCESS_KEY_ID }}' \
-                        AWS_REGION='${{ secrets.AWS_REGION }}' \
-                        AWS_SECRET_ACCESS_KEY='${{ secrets.AWS_SECRET_ACCESS_KEY }}' \
-                        BUCKET_NAME='${{ secrets.BUCKET_NAME }}' \
                         POSTGRES_PASSWORD='${{ secrets.POSTGRES_PASSWORD }}' \
                         POSTGRES_USER='${{ secrets.POSTGRES_USER }}' \
                         POSTGRES_DB='${{ secrets.POSTGRES_DB }}' \
