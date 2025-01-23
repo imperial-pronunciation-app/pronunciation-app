@@ -1,7 +1,6 @@
 import os
 import string
 import uuid
-from datetime import datetime
 from typing import Dict
 
 import dotenv
@@ -11,7 +10,6 @@ from transformers.pipelines import Pipeline
 
 from app.crud.recording_repository import RecordingRepository
 from app.database import get_session
-from app.models.recording import Recording
 from app.models.word import Word
 from app.schemas.recording import RecordingRequest, RecordingResponse
 from app.utils.s3 import upload_wav_to_s3
@@ -52,7 +50,7 @@ async def post_recording(word_id: int, audio_file: UploadFile, session: Session 
     
     # # 2. Store Recording entry with recording_url from blob store
     recording_repository = RecordingRepository(session)
-    recording_repository.create(word_id, s3_key)
+    recording = recording_repository.create(word_id, s3_key)
     
     # 3. Dispatch recording to ML backend
     model_response = dispatch_to_model(wav_file)
