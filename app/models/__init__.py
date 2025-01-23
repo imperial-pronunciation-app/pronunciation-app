@@ -7,4 +7,4 @@ from .word import Word
 from .word_phoneme_link import WordPhonemeLink
 
 
-__all__ = ["Word", "Phoneme", "WordPhonemeLink", "User", "Recording"]
+__all__ = ["Word", "Phoneme", "WordPhonemeLink", "Recording"]
