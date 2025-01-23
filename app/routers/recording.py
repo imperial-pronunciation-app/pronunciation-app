@@ -26,7 +26,7 @@ def create_wav_file(recording_request: RecordingRequest) -> str:
     temp_file = uuid.uuid4()
     filename = f"{temp_file}.wav"
     with open(filename, "bx") as f:
-      f.write(recording_request.audio_bytes)
+        f.write(recording_request.audio_bytes)
     return filename
 
 def dispatch_to_model(wav_file: str) -> str:
