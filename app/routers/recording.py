@@ -2,14 +2,15 @@ import os
 import string
 import uuid
 from datetime import datetime
+from typing import Dict
 
 import boto3
 import dotenv
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Form, UploadFile
 from sqlmodel import Session
+from transformers.pipelines import Pipeline
 
 from app.database import get_session
-from app.main import ml_models
 from app.models.recording import Recording
 from app.models.word import Word
 from app.schemas.recording import RecordingRequest, RecordingResponse
@@ -19,6 +20,8 @@ from app.utils.similarity import similarity
 dotenv.load_dotenv()
 
 router = APIRouter()
+
+ml_models: Dict[str, Pipeline] = {}
 
 def create_wav_file(recording_request: RecordingRequest) -> str:
     filename = f"{recording_request.user_id}.wav"
@@ -65,8 +68,10 @@ def form_feedback(model_response: str, word_id: int, session: Session) -> int:
     return similarity(word.word, model_response)
 
 @router.post("/api/v1/words/{word_id}/recording", response_model=RecordingResponse)
-async def post_recording(word_id: int, recording_request: RecordingRequest, session: Session = Depends(get_session)) -> RecordingResponse:
-    
+async def post_recording(word_id: int, audio_file: UploadFile, user_id: int = Form(...), session: Session = Depends(get_session)) -> RecordingResponse:
+    audio_bytes = await audio_file.read()
+    recording_request = RecordingRequest(user_id=user_id, audio_bytes=audio_bytes)
+
     # 1. Send .wav file to blob store
     wav_file = create_wav_file(recording_request)
     s3_key = upload_wav_to_s3(wav_file)
@@ -76,7 +81,7 @@ async def post_recording(word_id: int, recording_request: RecordingRequest, sess
     recording = Recording(
         user_id=recording_request.user_id,
         word_id=word_id,
-        recording_url=s3_key,
+        recording_s3_key=s3_key,
         time_created=datetime.now()
     )
     session.add(recording)
