@@ -42,6 +42,7 @@ def seed(session: Session, seed_words: SeedData) -> None:
 if __name__ == "__main__":
     from app.database import engine, get_session
     from app.seed_data import default_data
+    SQLModel.metadata.drop_all(engine)
     SQLModel.metadata.create_all(engine)
     session = next(get_session())
     seed(session, default_data)
