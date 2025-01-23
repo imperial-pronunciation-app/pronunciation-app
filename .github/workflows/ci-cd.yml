@@ -105,6 +105,9 @@ jobs:
                         AWS_REGION='${{ secrets.AWS_REGION }}' \
                         AWS_SECRET_ACCESS_KEY='${{ secrets.AWS_SECRET_ACCESS_KEY }}' \
                         BUCKET_NAME='${{ secrets.BUCKET_NAME }}' \
+                        POSTGRES_PASSWORD='${{ secrets.POSTGRES_PASSWORD }}' \
+                        POSTGRES_USER='${{ secrets.POSTGRES_USER }}' \
+                        POSTGRES_DB='${{ secrets.POSTGRES_DB }}' \
                         bash ~/deploy.sh"
 
       - name: Wait for container to be up

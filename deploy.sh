@@ -40,11 +40,7 @@ docker compose -p "$COMPOSE_PROJECT_NAME" \
   --profile prod \
   up -d \
   --build \
-  --pull always \
-  -e AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID" \
-  -e AWS_REGION="$AWS_REGION" \
-  -e AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" \
-  -e BUCKET_NAME="$BUCKET_NAME"
+  --pull always
 
 echo "🧹 Cleaning up unused resources..."
 docker system prune -f
