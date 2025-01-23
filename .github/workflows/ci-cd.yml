@@ -97,9 +97,6 @@ jobs:
                         DOCKERHUB_ACCESS_TOKEN='${{ secrets.DOCKERHUB_ACCESS_TOKEN }}' \
                         IMAGE_NAME='${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}' \
                         IMAGE_TAG='${{ github.sha }}' \
-                        POSTGRES_PASSWORD='${{ secrets.POSTGRES_PASSWORD }}' \
-                        POSTGRES_USER='${{ secrets.POSTGRES_USER }}' \
-                        POSTGRES_DB='${{ secrets.POSTGRES_DB }}' \
                         bash ~/deploy.sh"
 
       - name: Wait for container to be up
