@@ -16,18 +16,20 @@ def test_create_wav_file(mocker: MockerFixture) -> None:
     mock_file.assert_called_once_with(filename, "bx")
     mock_file().write.assert_called_once_with(recording_request.audio_bytes)
 
-def test_recording_feedback(client: TestClient, mocker: MockerFixture) -> None:
-    wav_file_path = "tests/assets/hardware.wav"
+def test_recording_feedback(seeded_client: TestClient, mocker: MockerFixture) -> None:
+    word = seeded_client.get("/api/v1/random_word").json()
+
+    wav_file_path = f"tests/assets/{word['word']}.wav"
     mocker.patch("app.routers.recording.upload_wav_to_s3", return_value="1.wav")
     
-    with client as _, open(wav_file_path, "rb") as f:
+    with seeded_client as _, open(wav_file_path, "rb") as f:
         data = {
             "user_id": 1,
         }
         files = {
             "audio_file": f
         }
-        recording_response = client.post("/api/v1/words/1/recording", data=data, files=files)
+        recording_response = seeded_client.post(f"/api/v1/words/{word['word_id']}/recording", data=data, files=files)
         assert recording_response.status_code == 200
         assert recording_response.json() == {
             "recording_id": 1,
