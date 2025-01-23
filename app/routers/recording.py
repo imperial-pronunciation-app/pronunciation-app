@@ -6,7 +6,7 @@ from typing import Dict
 
 import boto3
 import dotenv
-from fastapi import APIRouter, Depends, Form, UploadFile
+from fastapi import APIRouter, Depends, UploadFile
 from sqlmodel import Session
 from transformers.pipelines import Pipeline
 
@@ -24,7 +24,8 @@ router = APIRouter()
 ml_models: Dict[str, Pipeline] = {}
 
 def create_wav_file(recording_request: RecordingRequest) -> str:
-    filename = f"{recording_request.user_id}.wav"
+    temp_file = uuid.uuid4()
+    filename = f"{temp_file}.wav"
     with open(filename, "bx") as f:
       f.write(recording_request.audio_bytes)
     return filename
@@ -68,9 +69,9 @@ def form_feedback(model_response: str, word_id: int, session: Session) -> int:
     return similarity(word.word, model_response)
 
 @router.post("/api/v1/words/{word_id}/recording", response_model=RecordingResponse)
-async def post_recording(word_id: int, audio_file: UploadFile, user_id: int = Form(...), session: Session = Depends(get_session)) -> RecordingResponse:
+async def post_recording(word_id: int, audio_file: UploadFile, session: Session = Depends(get_session)) -> RecordingResponse:
     audio_bytes = await audio_file.read()
-    recording_request = RecordingRequest(user_id=user_id, audio_bytes=audio_bytes)
+    recording_request = RecordingRequest(audio_bytes=audio_bytes) # TODO: Clean this up
 
     # 1. Send .wav file to blob store
     wav_file = create_wav_file(recording_request)
@@ -79,7 +80,7 @@ async def post_recording(word_id: int, audio_file: UploadFile, user_id: int = Fo
     # 2. Store Recording entry with recording_url from blob store
     # TODO: Move to CRUD
     recording = Recording(
-        user_id=recording_request.user_id,
+        # user_id=recording_request.user_id,
         word_id=word_id,
         recording_s3_key=s3_key,
         time_created=datetime.now()
@@ -95,7 +96,10 @@ async def post_recording(word_id: int, audio_file: UploadFile, user_id: int = Fo
     
     # 5. TODO: Store feedback in RecordingFeedback
     
-    # 6. Serve response to user
+    # 6. Delete temporary file
+    os.remove(wav_file)
+    
+    # 7. Serve response to user
     assert recording.id is not None
     return RecordingResponse(recording_id=recording.id, score=feedback, recording_phonemes=[])
 

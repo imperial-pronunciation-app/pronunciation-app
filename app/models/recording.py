@@ -12,6 +12,6 @@ if TYPE_CHECKING:
 class Recording(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     recording_s3_key: str
-    user_id: int = Field(foreign_key="user.id")
+    # user_id: int = Field(foreign_key="user.id")
     word_id: int = Field(foreign_key="phoneme.id")
     time_created: datetime

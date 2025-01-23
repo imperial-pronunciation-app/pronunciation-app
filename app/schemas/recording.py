@@ -6,7 +6,7 @@ from app.schemas.base import PhonemeSchema
 
 
 class RecordingRequest(BaseModel):
-    user_id: int
+    # user_id: int
     audio_bytes: bytes
 
 class RecordingResponse(BaseModel):
