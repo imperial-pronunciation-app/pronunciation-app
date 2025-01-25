@@ -53,8 +53,8 @@ ipa_to_respelling = {
     "aʊ": "ow",
     "ʌ": "u",
     "ɜːr": "ur",
-    "ə": "ə",  # I think the Mac respelling of uh for this and the next is better
-    "ər": "ər",
+    "ə": "uh",  # I think the Mac respelling of uh for this and the next is better
+    "ər": "er",
     "ju:": "ew",
 }
 
