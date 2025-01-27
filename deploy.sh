@@ -7,6 +7,13 @@ set -e  # Exit on any error
 : "${DOCKERHUB_ACCESS_TOKEN:?Must set DOCKERHUB_ACCESS_TOKEN}"
 : "${IMAGE_NAME:?Must set IMAGE_NAME}"
 : "${IMAGE_TAG:?Must set IMAGE_TAG}"
+: "${POSTGRES_DB:?Must set POSTGRES_DB}"
+: "${POSTGRES_USER:?Must set POSTGRES_USER}"
+: "${POSTGRES_PASSWORD:?Must set POSTGRES_PASSWORD}"
+: "${AWS_ACCESS_KEY_ID:?Must set AWS_ACCESS_KEY_ID}"
+: "${AWS_SECRET_ACCESS_KEY:?Must set AWS_SECRET_ACCESS_KEY}"
+: "${AWS_REGION:?Must set AWS_REGION}"
+: "${BUCKET_NAME:?Must set BUCKET_NAME}"
 
 # Optional configuration with defaults
 # CONTAINER_NAME=${CONTAINER_NAME:-"flask-api"}
