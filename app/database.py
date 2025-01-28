@@ -1,11 +1,12 @@
 import os
 from typing import Iterator
 
-from app.models.user import User
 from dotenv import load_dotenv
-from sqlmodel import Session, create_engine
 from fastapi import Depends
 from fastapi_users_db_sqlmodel import SQLModelUserDatabase
+from sqlmodel import Session, create_engine
+
+from app.models.user import User
 
 
 load_dotenv()

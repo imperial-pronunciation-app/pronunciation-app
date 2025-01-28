@@ -1,15 +1,16 @@
 import uuid
 
-from fastapi_users import BaseUserManager, FastAPIUsers, models
+from fastapi import Depends
+from fastapi_users import BaseUserManager, FastAPIUsers
 from fastapi_users.authentication import (
     AuthenticationBackend,
     BearerTransport,
     JWTStrategy,
 )
+from fastapi_users_db_sqlmodel import SQLModelUserDatabase
+
 from app.database import get_user_db
 from app.models.user import User
-from fastapi import Depends
-from fastapi_users_db_sqlmodel import SQLModelUserDatabase
 
 
 SECRET = "SECRET"
