@@ -46,6 +46,6 @@ docker compose -p "$COMPOSE_PROJECT_NAME" \
   --pull always
 
 echo "🧹 Cleaning up unused resources..."
-docker system prune -f
+docker system prune -a -f
 
 echo "✅ Deployment complete!"
