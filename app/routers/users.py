@@ -14,5 +14,5 @@ router.include_router(
     fastapi_users.get_register_router(UserRead, UserCreate), prefix="/auth", tags=["auth"]
 )
 router.include_router(
-    fastapi_users.get_users_router(User, UserCreate, UserUpdate), prefix="/users", tags=["users"]
+    fastapi_users.get_users_router(User, UserUpdate), prefix="/users", tags=["users"]
 )

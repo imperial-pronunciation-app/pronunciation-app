@@ -2,7 +2,7 @@ import uuid
 from typing import AsyncGenerator
 
 from fastapi import Depends
-from fastapi_users import BaseUserManager, FastAPIUsers
+from fastapi_users import BaseUserManager, FastAPIUsers, UUIDIDMixin
 from fastapi_users.authentication import (
     AuthenticationBackend,
     BearerTransport,
@@ -16,7 +16,7 @@ from app.models.user import User
 
 SECRET = "SECRET"
 
-class UserManager(BaseUserManager[User, uuid.UUID]):
+class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
     reset_password_token_secret = SECRET
     verification_token_secret = SECRET
 
