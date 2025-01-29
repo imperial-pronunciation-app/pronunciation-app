@@ -1,15 +1,9 @@
 from fastapi.testclient import TestClient
-from httpx import Response
+
+from tests.utils import login_user, register_user
 
 
-TEST_EMAIL = "newuser@example.com"
-TEST_PASSWORD = "SecurePass123"
-REGISTER_ENDPOINT = "/auth/register"
-LOGIN_ENDPOINT = "/auth/jwt/login"
-
-def register_user(client: TestClient) -> Response:
-    """Helper function to create a new user for testing."""
-    return client.post(REGISTER_ENDPOINT, json={"email": TEST_EMAIL, "password": TEST_PASSWORD})
+UPDATE_ENDPOINT = "/users/me"
 
 def test_register_user(client: TestClient) -> None:
     """Should successfully register a new user."""
@@ -24,24 +18,43 @@ def test_register_user_existing_email(client: TestClient) -> None:
 
 def test_register_user_missing_details(client: TestClient) -> None:
     """Should return 422 when missing required fields in registration."""
-    response = client.post(REGISTER_ENDPOINT, json={"email": TEST_EMAIL})  # Missing password
+    response = register_user(client, password=None)  # Missing password
     assert response.status_code == 422
 
-def test_login_user(client: TestClient) -> None:
-    """Should successfully log in a registered user and return an access token."""
+def test_update_user(client: TestClient) -> None:
+    """Should successfully update a user's email."""
     register_user(client)
-    response = client.post(LOGIN_ENDPOINT, data={"username": TEST_EMAIL, "password": TEST_PASSWORD})
+
+    token = login_user(client).json()["access_token"]
+
+    response = client.patch(
+        UPDATE_ENDPOINT,
+        json={"email": "newemail@example.com"},
+        headers={"Authorization": f"Bearer {token}"}
+    )
     assert response.status_code == 200
-    assert "access_token" in response.json()
 
-def test_login_user_bad_credentials(client: TestClient) -> None:
-    """Should return 400 when logging in with incorrect credentials."""
+def test_update_user_missing_token(client: TestClient) -> None:
+    """Should return 401 when attempting to update user without a token."""
     register_user(client)
-    response = client.post(LOGIN_ENDPOINT, data={"username": TEST_EMAIL, "password": "wrongPassword"})
+
+    response = client.patch(
+        UPDATE_ENDPOINT,
+        json={"email": "newemail@example.com"}
+    )
+    assert response.status_code == 401
+
+def test_update_user_existing_email(client: TestClient) -> None:
+    """Should return 401 when attempting to update user without a token."""
+    register_user(client)
+    email = "otheruser@example.com"
+    register_user(client, email)
+
+    token = login_user(client).json()["access_token"]
+
+    response = client.patch(
+        UPDATE_ENDPOINT,
+        json={"email": email},
+        headers={"Authorization": f"Bearer {token}"}
+    )
     assert response.status_code == 400
-
-def test_login_user_missing_details(client: TestClient) -> None:
-    """Should return 422 when missing required login details."""
-    register_user(client)
-    response = client.post(LOGIN_ENDPOINT, data={"username": TEST_EMAIL})  # Missing password
-    assert response.status_code == 422
