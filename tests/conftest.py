@@ -10,6 +10,7 @@ from app.main import app
 from app.models import Phoneme, Recording, Word, WordPhonemeLink  # noqa: F401
 from app.seed import SeedData, seed
 from app.seed_data import default_data
+from tests.utils import login_user, register_user
 
 
 @pytest.fixture(name="session")
@@ -61,3 +62,10 @@ def seeded_client_fixture(seeded_session: Session) -> Iterator[TestClient]:
     client = TestClient(app)
     yield client
     app.dependency_overrides.clear()
+
+@pytest.fixture(name="user_token")
+def user_token_fixture(seeded_client: TestClient) -> str:
+    """Returns a token for a seeded user
+    """
+    register_user(seeded_client)
+    return str(login_user(seeded_client).json()["access_token"])

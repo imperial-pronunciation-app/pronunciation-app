@@ -7,9 +7,7 @@ from app.models.recording import Recording
 from app.models.word import Word
 from app.routers.recording import create_wav_file
 from app.schemas.recording import RecordingRequest
-from app.seed_data import SeedData
 from app.utils.similarity import similarity
-from tests.utils import login_user, register_user
 
 
 def test_create_wav_file(mocker: MockerFixture) -> None:
@@ -43,7 +41,7 @@ def test_recording_feedback(
         seeded_session: Session,
         seeded_client: TestClient,
         mocker: MockerFixture,
-        test_seed_data: SeedData
+        user_token: str
     ) -> None:
     # Check that calls to:
     # create_wav_file, upload_wav_to_s3, dispatch_to_model, similarity are made correctly
@@ -64,15 +62,12 @@ def test_recording_feedback(
 
     wav_file_path = f"tests/assets/{test_word}.wav"
 
-    register_user(seeded_client)
-    token = login_user(seeded_client).json()["access_token"]
-
     with open(wav_file_path, "rb") as f:
         files = {"audio_file": f}
 
         recording_response = seeded_client.post(
             f"/api/v1/words/{word.id}/recording",
-            headers={"Authorization": f"Bearer {token}"},
+            headers={"Authorization": f"Bearer {user_token}"},
             files=files
         )
     assert recording_response.status_code == 200
