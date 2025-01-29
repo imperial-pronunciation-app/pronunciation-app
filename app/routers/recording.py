@@ -10,8 +10,10 @@ from transformers.pipelines import Pipeline
 
 from app.crud.recording_repository import RecordingRepository
 from app.database import get_session
+from app.models.user import User
 from app.models.word import Word
 from app.schemas.recording import RecordingRequest, RecordingResponse
+from app.users import current_active_user
 from app.utils.s3 import upload_wav_to_s3
 from app.utils.similarity import similarity
 
@@ -40,7 +42,12 @@ def dispatch_to_model(wav_file: str) -> str:
     )
 
 @router.post("/api/v1/words/{word_id}/recording", response_model=RecordingResponse)
-async def post_recording(word_id: int, audio_file: UploadFile, session: Session = Depends(get_session)) -> RecordingResponse:
+async def post_recording(
+    word_id: int,
+    audio_file: UploadFile,
+    session: Session = Depends(get_session),
+    user: User = Depends(current_active_user)
+) -> RecordingResponse:
     audio_bytes = await audio_file.read()
     recording_request = RecordingRequest(audio_bytes=audio_bytes) # TODO: Clean this up
 
@@ -50,7 +57,7 @@ async def post_recording(word_id: int, audio_file: UploadFile, session: Session 
     
     # # 2. Store Recording entry with recording_url from blob store
     recording_repository = RecordingRepository(session)
-    recording = recording_repository.create(word_id, s3_key)
+    recording = recording_repository.create(word_id, s3_key, user.id)
     
     # 3. Dispatch recording to ML backend
     model_response = dispatch_to_model(wav_file)
