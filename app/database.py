@@ -1,5 +1,5 @@
 import os
-from typing import Iterator
+from typing import Generator, Iterator
 
 from dotenv import load_dotenv
 from fastapi import Depends
@@ -17,5 +17,5 @@ def get_session() -> Iterator[Session]:
     with Session(engine) as session:
         yield session
 
-def get_user_db(session: Session = Depends(get_session)):
+def get_user_db(session: Session = Depends(get_session)) -> Generator[SQLModelUserDatabase, None, None]:
     yield SQLModelUserDatabase(session, User)

@@ -1,4 +1,5 @@
 import uuid
+from typing import AsyncGenerator
 
 from fastapi import Depends
 from fastapi_users import BaseUserManager, FastAPIUsers
@@ -20,7 +21,7 @@ class UserManager(BaseUserManager[User, uuid.UUID]):
     verification_token_secret = SECRET
 
 
-async def get_user_manager(user_db: SQLModelUserDatabase = Depends(get_user_db)):
+async def get_user_manager(user_db: SQLModelUserDatabase = Depends(get_user_db)) -> AsyncGenerator[UserManager, None]:
     yield UserManager(user_db)
 
 
