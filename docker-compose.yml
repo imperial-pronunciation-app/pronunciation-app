@@ -35,6 +35,13 @@ services:
     build:
       context: .
       target: test
+    environment:
+      - DATABASE_URL=sqlite:///db.sqlite
+      - USER_MANAGER_SECRET=test-secret
+      - AWS_ACCESS_KEY_ID=test-key
+      - AWS_SECRET_ACCESS_KEY=test-secret-key
+      - AWS_REGION=test-region
+      - BUCKET_NAME=test-bucket
     profiles:
       - test
 
