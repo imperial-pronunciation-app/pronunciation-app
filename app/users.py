@@ -10,15 +10,16 @@ from fastapi_users.authentication import (
 )
 from fastapi_users_db_sqlmodel import SQLModelUserDatabase
 
+from app.config import get_settings
 from app.database import get_user_db
 from app.models.user import User
 
 
-SECRET = "SECRET"
+secret = get_settings().USER_MANAGER_SECRET
 
 class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
-    reset_password_token_secret = SECRET
-    verification_token_secret = SECRET
+    reset_password_token_secret = secret
+    verification_token_secret = secret
 
 
 async def get_user_manager(user_db: SQLModelUserDatabase = Depends(get_user_db)) -> AsyncGenerator[UserManager, None]:
@@ -29,7 +30,7 @@ bearer_transport = BearerTransport(tokenUrl="auth/jwt/login")
 
 
 def get_jwt_strategy() -> JWTStrategy:
-    return JWTStrategy(secret=SECRET, lifetime_seconds=3600)
+    return JWTStrategy(secret=secret, lifetime_seconds=3600)
 
 
 auth_backend = AuthenticationBackend(

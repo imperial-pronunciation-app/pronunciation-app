@@ -4,6 +4,7 @@ python-dotenv
 fastapi[standard]
 sqlmodel
 pydantic
+pydantic-settings
 httpx
 psycopg2-binary
 boto3

@@ -9,6 +9,7 @@ services:
       - AWS_REGION=${AWS_REGION}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - BUCKET_NAME=${BUCKET_NAME}
+      - USER_MANAGER_SECRET=${USER_MANAGER_SECRET}
     depends_on:
       - db
     restart: unless-stopped
