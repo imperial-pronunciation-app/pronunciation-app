@@ -1,62 +1,13 @@
 
 
 # Maps IPA characters to Wiki respellings
+import json
 from dataclasses import dataclass
 from typing import List
 
 
-ipa_to_respelling = {
-    "tʃ": "ch",
-    "ɡ": "g",
-    "h": "h",
-    "hw": "wh",
-    "dʒ": "j",
-    "k": "k",
-    "x": "kh",
-    "ŋ": "ng",
-    "s": "s",
-    "ʃ": "sh",
-    "θ": "th",
-    "ð": "dh",
-    "j": "y",
-    "ʒ": "zh",
-    "b": "b",
-    "d": "d",
-    "f": "f",
-    "l": "l",
-    "m": "m",
-    "n": "n",
-    "p": "p",
-    "r": "r",
-    "t": "t",
-    "v": "v",
-    "w": "w",
-    "z": "z",
-    "æ": "a (arr)",
-    "eɪ": "ay",
-    "ɛər": "air",
-    "ɑː": "ah",
-    "ɑːr": "ar",
-    "ɛ": "e (err)",
-    "i:": "ee",
-    "ɪər": "eer",
-    "ɪ": "i (irr)",
-    "aɪ": "y, eye",
-    "ɒ": "o (orr)",
-    "oʊ": "oh",
-    "ɔː": "aw",
-    "ɔːr": "or",
-    "ɔɪ": "oy",
-    "ʊ": "uu",
-    "ʊər": "oor",
-    "u:": "oo",
-    "aʊ": "ow",
-    "ʌ": "u",
-    "ɜːr": "ur",
-    "ə": "uh",  # I think the Mac respelling of uh for this and the next is better
-    "ər": "er",
-    "ju:": "ew",
-}
+with open("app/resources/phoneme_respellings.json") as f:
+    ipa_to_respelling = json.load(f)
 
 @dataclass
 class WordData:
@@ -82,9 +33,9 @@ class SeedData:
 default_data = SeedData(words=[
         WordData(word="software", phonemes=["s", "oʊ", "f", "t", "w", "ɛ", "r"]),
         WordData(word="hardware", phonemes=["h", "ɑː", "r", "d", "w", "ɛ", "r"]),
-        WordData(word="computer", phonemes=["k", "ə", "m", "p", "j", "u:", "t", "ə"]),
+        WordData(word="computer", phonemes=["k", "ə", "m", "p", "j", "uː", "t", "ə"]),
         WordData(word="compilers", phonemes=["k", "ə", "m", "p", "aɪ", "l", "ə", "r"]),
-        WordData(word="keyboard", phonemes=["k", "i:", "b", "ɔː", "d"]),
+        WordData(word="keyboard", phonemes=["k", "iː", "b", "ɔː", "d"]),
         WordData(word="mouse", phonemes=["m", "aʊ", "s"]),
         WordData(word="parrot", phonemes=["p", "æ", "r", "ə", "t"]),
         WordData(word="chocolate", phonemes=["tʃ", "ɒ", "k", "l", "ə", "t"]),
