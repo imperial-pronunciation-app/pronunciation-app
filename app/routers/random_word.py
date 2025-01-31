@@ -26,7 +26,7 @@ async def get_random_word(session: Session = Depends(get_session)) -> RandomWord
         select(Phoneme)
         .join(WordPhonemeLink)
         .where(WordPhonemeLink.word_id == random_word.id)
-        .order_by(col(WordPhonemeLink.index))
+        .order_by(col(WordPhonemeLink.id))
         )
     phonemes = session.exec(phoneme_query).all()
 
