@@ -10,7 +10,7 @@ class RecordingRepository(GenericRepository[Recording]):
     def __init__(self, session: Session) -> None:
         super().__init__(session, Recording)
     
-    def create(self, word_id: int, s3_key: str, user_id: int | None) -> Recording:
+    def create(self, word_id: int, s3_key: str, user_id: int) -> Recording:
         recording = Recording(
             user_id=user_id,
             word_id=word_id,

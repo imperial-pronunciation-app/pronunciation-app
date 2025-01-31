@@ -56,6 +56,7 @@ async def post_recording(
     s3_key = upload_wav_to_s3(wav_file)
     
     # # 2. Store Recording entry with recording_url from blob store
+    assert user.id
     recording_repository = RecordingRepository(session)
     recording = recording_repository.create(word_id, s3_key, user.id)
     
