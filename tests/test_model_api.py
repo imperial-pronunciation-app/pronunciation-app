@@ -1,6 +1,12 @@
+import os
+
+import dotenv
 import responses
 
 from app.routers.recording import dispatch_to_model
+
+
+dotenv.load_dotenv()
 
 
 @responses.activate
@@ -16,7 +22,7 @@ def test_successful_request() -> None:
     
     rsp = responses.Response(
         method="POST",
-        url="http://localhost:8001/api/v1/infer_phonemes",
+        url=f"{os.environ.get('MODEL_API_URL', '')}/api/v1/infer_phonemes",
         json={"phonemes": test_word_phonemes},
     )
     responses.add(rsp)

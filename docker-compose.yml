@@ -43,7 +43,7 @@ services:
       - AWS_SECRET_ACCESS_KEY=test-secret-key
       - AWS_REGION=test-region
       - BUCKET_NAME=test-bucket
-      - MODEL_API_URL=${MODEL_API_URL}
+      - MODEL_API_URL=http://test-model-api.com
     profiles:
       - test
 
