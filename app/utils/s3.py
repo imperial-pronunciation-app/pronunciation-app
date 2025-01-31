@@ -1,27 +1,26 @@
-import os
 import uuid
 
 import boto3
 
+from app.config import get_settings
+
+
+settings = get_settings()
 
 def upload_wav_to_s3(wav_file: str) -> str:
     # TODO: Handle failure of uploading
     # TODO: Use async and await properly
-    aws_access_key_id = os.getenv("AWS_ACCESS_KEY_ID")
-    aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY")
-    aws_region = os.getenv("AWS_REGION")
-    bucket_name = os.getenv("BUCKET_NAME")
     
     blob_id = uuid.uuid4()
     
     s3_client = boto3.client(
         "s3",
-        aws_access_key_id=aws_access_key_id,
-        aws_secret_access_key=aws_secret_access_key,
-        region_name=aws_region
+        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+        region_name=settings.AWS_REGION
     )
     
     s3_key = f"{blob_id}.wav"
-    s3_client.upload_file(wav_file, bucket_name, s3_key)
+    s3_client.upload_file(wav_file, settings.BUCKET_NAME, s3_key)
   
     return s3_key

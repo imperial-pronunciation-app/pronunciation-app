@@ -7,7 +7,6 @@ from app.models.recording import Recording
 from app.models.word import Word
 from app.routers.recording import create_wav_file
 from app.schemas.recording import RecordingRequest
-from app.seed_data import SeedData
 from app.utils.similarity import similarity
 
 
@@ -38,7 +37,12 @@ def test_similarity(s1: str, s2: str, expected: int) -> None:
     assert similarity(s1, s2) == expected
 
 
-def test_recording_feedback(seeded_session: Session, seeded_client: TestClient, mocker: MockerFixture, test_seed_data: SeedData) -> None:
+def test_recording_feedback(
+        seeded_session: Session,
+        seeded_client: TestClient,
+        mocker: MockerFixture,
+        user_token: str
+    ) -> None:
     # Check that calls to:
     # create_wav_file, upload_wav_to_s3, dispatch_to_model, similarity are made correctly
     # Recording entry is added to the table
@@ -60,7 +64,12 @@ def test_recording_feedback(seeded_session: Session, seeded_client: TestClient, 
 
     with open(wav_file_path, "rb") as f:
         files = {"audio_file": f}
-        recording_response = seeded_client.post(f"/api/v1/words/{word.id}/recording", files=files)
+
+        recording_response = seeded_client.post(
+            f"/api/v1/words/{word.id}/recording",
+            headers={"Authorization": f"Bearer {user_token}"},
+            files=files
+        )
     assert recording_response.status_code == 200
     data = recording_response.json()
     assert data["score"] == 100

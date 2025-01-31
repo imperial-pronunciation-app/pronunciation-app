@@ -4,8 +4,11 @@ python-dotenv
 fastapi[standard]
 sqlmodel
 pydantic
+pydantic-settings
 httpx
 psycopg2-binary
 boto3
 transformers
 torch
+fastapi-users
+fastapi-users-db-sqlmodel

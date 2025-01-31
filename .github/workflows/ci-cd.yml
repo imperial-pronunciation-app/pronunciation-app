@@ -104,6 +104,7 @@ jobs:
                         AWS_SECRET_ACCESS_KEY='${{ secrets.AWS_SECRET_ACCESS_KEY }}' \
                         AWS_REGION='${{ secrets.AWS_REGION }}' \
                         BUCKET_NAME='${{ secrets.BUCKET_NAME }}' \
+                        USER_MANAGER_SECRET='${{ secrets.USER_MANAGER_SECRET }}' \
                         bash ~/deploy.sh"
 
       - name: Wait for container to be up

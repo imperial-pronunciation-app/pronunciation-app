@@ -9,6 +9,7 @@ services:
       - AWS_REGION=${AWS_REGION}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - BUCKET_NAME=${BUCKET_NAME}
+      - USER_MANAGER_SECRET=${USER_MANAGER_SECRET}
     depends_on:
       - db
     restart: unless-stopped
@@ -34,6 +35,13 @@ services:
     build:
       context: .
       target: test
+    environment:
+      - DATABASE_URL=sqlite:///db.sqlite
+      - USER_MANAGER_SECRET=test-secret
+      - AWS_ACCESS_KEY_ID=test-key
+      - AWS_SECRET_ACCESS_KEY=test-secret-key
+      - AWS_REGION=test-region
+      - BUCKET_NAME=test-bucket
     profiles:
       - test
 

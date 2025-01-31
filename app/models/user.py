@@ -1,12 +1,11 @@
-# from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
-# from sqlmodel import Field, SQLModel
+from fastapi_users_db_sqlmodel import SQLModelBaseUserDB
+from sqlmodel import Field, SQLModel
 
 
-# if TYPE_CHECKING:
-#     pass
+if TYPE_CHECKING:
+    pass
 
-# class User(SQLModel, table=True):
-#     id: Optional[int] = Field(default=None, primary_key=True)
-#     first_name: str
-#     last_name: str
+class User(SQLModelBaseUserDB, SQLModel, table=True):
+    id: int = Field(default=None, primary_key=True)
