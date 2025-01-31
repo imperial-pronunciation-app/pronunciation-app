@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, UploadFile
 from sqlmodel import Session, col, select
 
 from app.config import get_settings
+from app.crud.phoneme_repository import PhonemeRepository
 from app.crud.recording_repository import RecordingRepository
 from app.database import get_session
 from app.models.phoneme import Phoneme
@@ -28,12 +29,14 @@ def create_wav_file(recording_request: RecordingRequest) -> str:
     return filename
 
 def dispatch_to_model(wav_file: str) -> list[str]:
-    files = {
-        "audio_file": ("audio.wav", open(wav_file, "rb"), "audio/wav")
-    }
+    with open(wav_file, "rb") as f:
+        files = {
+            "audio_file": f
+        }
 
-    print(get_settings().MODEL_API_URL)
-    model_response = requests.post(f"{get_settings().MODEL_API_URL}/api/v1/infer_phonemes", files=files)
+        print(get_settings().MODEL_API_URL)
+        model_response = requests.post(f"{get_settings().MODEL_API_URL}/api/v1/infer_phonemes", files=files)
+
     model_response.raise_for_status()
 
     model_data = InferPhonemesResponse.model_validate(model_response.json())
@@ -59,7 +62,10 @@ async def post_recording(
     recording = recording_repository.create(word_id, s3_key, user.id)
     
     # 3. Dispatch recording to ML backend
-    inferred_phonemes = dispatch_to_model(wav_file)
+    inferred_phoneme_strings = dispatch_to_model(wav_file)
+
+    phoneme_repository = PhonemeRepository(session)
+    inferred_phonemes = list(map(lambda x: phoneme_repository.get_phoneme_by_ipa(x), inferred_phoneme_strings))
     
     # 4. Form feedback based on model response
     phoneme_query = (
@@ -75,14 +81,12 @@ async def post_recording(
         assert phoneme.id is not None
         word_phonemes.append(phoneme.ipa)
 
-    feedback = similarity(word_phonemes, inferred_phonemes)
-    
-    # 5. TODO: Store feedback in RecordingFeedback
+    feedback = similarity(word_phonemes, inferred_phoneme_strings)
     
     # 6. Delete temporary file
     os.remove(wav_file)
     
     # 7. Serve response to user
     assert recording.id is not None
-    return RecordingResponse(recording_id=recording.id, score=feedback, recording_phonemes=[])
+    return RecordingResponse(recording_id=recording.id, score=feedback, recording_phonemes=inferred_phonemes)
 
