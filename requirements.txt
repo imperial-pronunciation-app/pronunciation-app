@@ -8,7 +8,6 @@ pydantic-settings
 httpx
 psycopg2-binary
 boto3
-transformers
-torch
 fastapi-users
 fastapi-users-db-sqlmodel
+requests
