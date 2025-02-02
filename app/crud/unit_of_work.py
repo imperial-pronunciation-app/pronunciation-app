@@ -5,7 +5,10 @@ from fastapi import Depends
 from sqlmodel import Session
 
 from app.crud.leaderboard_user_repository import LeaderboardUserRepository
+from app.crud.phoneme_repository import PhonemeRepository
 from app.crud.recording_repository import RecordingRepository
+from app.crud.user_repository import UserRepository
+from app.crud.word_repository import WordRepository
 from app.database import get_session
 
 
@@ -14,6 +17,9 @@ class UnitOfWork:
         self._session = session
         self.recordings = RecordingRepository(self._session)
         self.leaderboard_users = LeaderboardUserRepository(self._session)
+        self.words = WordRepository(self._session)
+        self.phonemes = PhonemeRepository(self._session)
+        self.users = UserRepository(self._session)
     
     def __enter__(self) -> Self:
         return self

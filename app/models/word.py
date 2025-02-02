@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from app.models.base_model import BaseModel
+from app.models.id_model import IdModel
 
 
 if TYPE_CHECKING:
@@ -8,5 +8,5 @@ if TYPE_CHECKING:
 
 
 # Possible words the user can pronounce
-class Word(BaseModel, table=True):
+class Word(IdModel, table=True):
     word: str

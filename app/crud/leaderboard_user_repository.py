@@ -2,41 +2,24 @@ from typing import Optional, Sequence
 
 from sqlmodel import Session, desc, select
 
+from app.crud.generic_repository import GenericRepository
 from app.models.leaderboard_user import LeaderboardUser, League
 
 
-class LeaderboardUserRepository:
+class LeaderboardUserRepository(GenericRepository[LeaderboardUser]):
 
     def __init__(self, session: Session) -> None:
-        self.session = session
+        super().__init__(session, LeaderboardUser)
     
-    def update_xp(self, user_id: int, league: League, xp_gain: int) -> LeaderboardUser:
-        assert xp_gain >= 0
-        statement = select(LeaderboardUser).where(LeaderboardUser.user_id == user_id, LeaderboardUser.league == league)
-        entry = self.session.exec(statement).first()
-        if entry:
-            assert entry.league == league
-            entry.xp += xp_gain
-        else:
-            entry = LeaderboardUser(user_id=user_id, league=league, xp=xp_gain)
-            self.session.add(entry)
-        self.session.commit()
-        return entry
-    
-    def get_user_entry(self, user_id: int) -> Optional[LeaderboardUser]:
-        statement = select(LeaderboardUser).where(LeaderboardUser.user_id == user_id)
-        return self.session.exec(statement).first()
-    
-    def get_global_leaderboard(self, league: League) -> Sequence[LeaderboardUser]:
-        TOP_K = 5
-        statement = (
+    def find_by_league_order_by_xp_desc_with_limit(self, league: League, limit: int = 3) -> Sequence[LeaderboardUser]:
+        stmt = (
             select(LeaderboardUser)
             .where(LeaderboardUser.league == league)
+            .limit(limit)
             .order_by(desc(LeaderboardUser.xp))
-            .limit(TOP_K)
         )
-        result = self.session.exec(statement).all()
-        return result
+        return self._session.exec(stmt).all()
     
-    def reset_leaderboard(self) -> None:
-        self.session.commit()
+    def find_by_user(self, user_id: int) -> Optional[LeaderboardUser]:
+        stmt = select(LeaderboardUser).where(LeaderboardUser.user_id == user_id)
+        return self._session.exec(stmt).first()

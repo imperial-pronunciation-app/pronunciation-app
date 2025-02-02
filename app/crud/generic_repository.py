@@ -1,12 +1,11 @@
-from typing import Any, Generic, Optional, Sequence, Type, TypeVar
+from typing import Generic, Optional, Sequence, Type, TypeVar
 
-from sqlmodel import Session, and_, select
-from sqlmodel.sql.expression import SelectOfScalar
+from sqlmodel import Session, select
 
-from app.models.base_model import BaseModel
+from app.models.id_model import IdModel
 
 
-T = TypeVar("T", bound=BaseModel)
+T = TypeVar("T", bound=IdModel)
 
 class GenericRepository(Generic[T]):
 
@@ -14,46 +13,31 @@ class GenericRepository(Generic[T]):
         self._session = session
         self._model_cls = model_cls
 
-    def _construct_get_stmt(self, id: int) -> SelectOfScalar:
-        stmt = select(self._model_cls).where(self._model_cls.id == id)
-        return stmt
-
-    def get_by_id(self, id: int) -> Optional[T]:
-        stmt = self._construct_get_stmt(id)
-        return self._session.exec(stmt).first()
-
-    def _construct_list_stmt(self, **filters: Any) -> SelectOfScalar:
+    def get_by_id(self, id: int) -> T:
+        return self._session.get_one(self._model_cls, id)
+    
+    def find_by_id(self, id: int) -> Optional[T]:
+        return self._session.get(self._model_cls, id)
+    
+    def all(self) -> Sequence[T]:
         stmt = select(self._model_cls)
-        where_clauses = []
-        for c, v in filters.items():
-            if not hasattr(self._model_cls, c):
-                raise ValueError(f"Invalid column name {c}")
-            where_clauses.append(getattr(self._model_cls, c) == v)
-
-        if len(where_clauses) == 1:
-            stmt = stmt.where(where_clauses[0])
-        elif len(where_clauses) > 1:
-            stmt = stmt.where(and_(*where_clauses))
-        return stmt
-
-    def list(self, **filters: Any) -> Sequence[T]:
-        stmt = self._construct_list_stmt(**filters)
         return self._session.exec(stmt).all()
 
-    def add(self, record: T) -> T:
+    def upsert(self, record: T) -> T:
         self._session.add(record)
         self._session.flush()
         self._session.refresh(record)
         return record
 
-    def update(self, record: T) -> T:
-        self._session.add(record)
+    def upsert_all(self, records: Sequence[T]) -> Sequence[T]:
+        self._session.add_all(records)
         self._session.flush()
-        self._session.refresh(record)
-        return record
+        for record in records:
+            self._session.refresh(record)
+        return records
 
     def delete(self, id: int) -> None:
-        record = self.get_by_id(id)
-        if record is not None:
+        record = self.find_by_id(id)
+        if record:
             self._session.delete(record)
             self._session.flush()

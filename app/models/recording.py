@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 from sqlmodel import Field
 
-from app.models.base_model import BaseModel
+from app.models.id_model import IdModel
 
 
 if TYPE_CHECKING:
@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 
 # Possible words the user can pronounce
-class Recording(BaseModel, table=True):
+class Recording(IdModel, table=True):
     recording_s3_key: str
     user_id: int = Field(foreign_key="user.id")
     word_id: int = Field(foreign_key="word.id")
