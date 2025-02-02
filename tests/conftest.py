@@ -69,3 +69,10 @@ def user_token_fixture(seeded_client: TestClient) -> str:
     """
     register_user(seeded_client)
     return str(login_user(seeded_client).json()["access_token"])
+
+@pytest.fixture(name="authorised_client")
+def authorised_client_fixture(seeded_client: TestClient, user_token: str) -> TestClient:
+    """Returns a TestClient with a seeded user token
+    """
+    seeded_client.headers = {"Authorization": f"Bearer {user_token}"}
+    return seeded_client
