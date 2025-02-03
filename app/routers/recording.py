@@ -69,6 +69,5 @@ async def post_recording(
     os.remove(wav_file)
     
     # 7. Serve response to user
-    assert recording.id is not None
     return RecordingResponse(recording_id=recording.id, score=feedback, recording_phonemes=inferred_phonemes)
 
