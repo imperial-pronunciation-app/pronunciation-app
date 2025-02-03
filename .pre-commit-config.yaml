@@ -10,6 +10,7 @@ repos:
     - id: mypy
       additional_dependencies:
         - sqlmodel
+        - types-requests
         # - types-python-dotenv
         # - types-pytest
         # - types-psycopg2

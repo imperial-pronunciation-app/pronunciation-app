@@ -20,3 +20,7 @@ class PhonemeRepository(GenericRepository[Phoneme]):
             .order_by(col(WordPhonemeLink.index))
         )
         return self._session.exec(stmt).all()
+
+    def get_phoneme_by_ipa(self, ipa: str) -> Phoneme:
+        phoneme = self._session.exec(select(Phoneme).where(Phoneme.ipa == ipa)).one()
+        return phoneme

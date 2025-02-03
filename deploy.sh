@@ -15,6 +15,7 @@ set -e  # Exit on any error
 : "${AWS_REGION:?Must set AWS_REGION}"
 : "${BUCKET_NAME:?Must set BUCKET_NAME}"
 : "${USER_MANAGER_SECRET:?Must set USER_MANAGER_SECRET}"
+: "${MODEL_API_URL:?Must set MODEL_API_URL}"
 
 # Optional configuration with defaults
 # CONTAINER_NAME=${CONTAINER_NAME:-"flask-api"}

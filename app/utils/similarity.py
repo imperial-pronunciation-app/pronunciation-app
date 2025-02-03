@@ -1,5 +1,5 @@
 # From https://www.geeksforgeeks.org/edit-distance-dp-5/
-def edit_dist(s1: str, s2: str) -> int:
+def edit_dist(s1: list[str], s2: list[str]) -> int:
     m, n = len(s1), len(s2)
     prev = 0  # Stores dp[i-1][j-1]
     curr = list(range(n + 1))  # Stores dp[i][j-1] and dp[i][j]
@@ -17,5 +17,5 @@ def edit_dist(s1: str, s2: str) -> int:
     return curr[n]
 
 
-def similarity(target: str, transcribed: str) -> int:
+def similarity(target: list[str], transcribed: list[str]) -> int:
     return int(round((1 - edit_dist(target, transcribed) / max(len(transcribed), len(target))) * 100))

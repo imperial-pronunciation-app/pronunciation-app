@@ -2,7 +2,7 @@ from typing import List
 
 from pydantic import BaseModel
 
-from app.schemas.base import PhonemeSchema
+from app.models.phoneme import Phoneme
 
 
 class RecordingRequest(BaseModel):
@@ -12,5 +12,5 @@ class RecordingRequest(BaseModel):
 class RecordingResponse(BaseModel):
     recording_id: int
     score: int
-    recording_phonemes: List[PhonemeSchema]
+    recording_phonemes: List[Phoneme]
 

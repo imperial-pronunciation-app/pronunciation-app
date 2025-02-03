@@ -10,9 +10,10 @@ class Settings(BaseSettings):
     AWS_SECRET_ACCESS_KEY: str
     AWS_REGION: str
     BUCKET_NAME: str
+    MODEL_API_URL: str
 
     model_config = SettingsConfigDict(env_file=".env")
 
 @lru_cache
 def get_settings() -> Settings:
-    return Settings()
+    return Settings() # type: ignore[call-arg]

@@ -10,12 +10,15 @@ services:
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - BUCKET_NAME=${BUCKET_NAME}
       - USER_MANAGER_SECRET=${USER_MANAGER_SECRET}
+      - MODEL_API_URL=${MODEL_API_URL}
     depends_on:
       - db
     restart: unless-stopped
     profiles:
       - dev
       - prod
+    networks:
+      - parrot-network
   
   db:
     image: postgres:15
@@ -30,6 +33,8 @@ services:
     profiles:
       - dev
       - prod
+    networks:
+      - parrot-network
 
   test:
     build:
@@ -42,8 +47,14 @@ services:
       - AWS_SECRET_ACCESS_KEY=test-secret-key
       - AWS_REGION=test-region
       - BUCKET_NAME=test-bucket
+      - MODEL_API_URL=http://test-model-api.com
     profiles:
       - test
 
 volumes:
   postgres_data:
+
+networks:
+  parrot-network:
+    name: parrot-network
+    external: true
