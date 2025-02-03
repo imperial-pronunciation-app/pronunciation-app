@@ -12,3 +12,4 @@ fastapi-users
 fastapi-users-db-sqlmodel
 requests
 responses
+APScheduler

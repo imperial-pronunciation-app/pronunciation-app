@@ -1,8 +1,20 @@
-from typing import Dict
+from contextlib import asynccontextmanager
+from typing import AsyncGenerator, Dict
 
 from fastapi import FastAPI
 
+from app.cron import scheduler
 from app.routers import routers
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    # Before app startup
+    scheduler.start()
+    yield
+
+    # After app shutdown
+    scheduler.shutdown()
 
 
 app = FastAPI()
