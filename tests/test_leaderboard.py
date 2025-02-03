@@ -1,12 +1,15 @@
-from fastapi.testclient import TestClient
-from sqlmodel import Session
+from typing import List
 
+from apscheduler.job import Job
+from apscheduler.triggers.cron import CronTrigger
+from fastapi.testclient import TestClient
+
+from app.cron import scheduler, service
 from app.crud.unit_of_work import UnitOfWork
 from app.models.leaderboard_user import LeaderboardUser, League
-from app.models.user import User
 from app.services.leaderboard import LeaderboardService
 from app.services.user import UserService
-from tests.utils import TEST_EMAIL, TEST_PASSWORD
+from tests.utils import TEST_DOMAIN, TEST_EMAIL, TEST_USERNAME, register_users
 
 
 def test_update_xp_existing_record(uow: UnitOfWork) -> None:
@@ -68,27 +71,33 @@ def test_reset_leaderboard(authorised_client: TestClient, uow: UnitOfWork) -> No
     assert json["current"] == [{"rank": 0, "username": TEST_EMAIL, "xp": 0}]
 
 
-def test_get_leaderboard_empty_user_record(session: Session, authorised_client: TestClient) -> None:
-    leaders = [User(
-        email=f"example{i}@gmail.com",
-        hashed_password=TEST_PASSWORD,
-        is_active=True,
-        is_superuser=False,
-        is_verified=True,
-    ) for i in range(10)]
-    session.add_all(leaders)
-    session.flush()
-    for i, leader in enumerate(leaders):
-        session.refresh(leader)
-        session.add(LeaderboardUser(user_id=leader.id, xp=i*2))
-    
+def test_get_leaderboard_empty_user_record(authorised_client: TestClient, uow: UnitOfWork) -> None:
+    # Pre
+    user_service = UserService(uow)
+    register_users(authorised_client)
+    leaders = uow.users.all()
+    for leader in leaders:
+        if leader.email != TEST_EMAIL:
+            user_service.update_xp(leader.id, int(leader.email[7])*2)
+
+    # When
     response = authorised_client.get("/api/v1/leaderboard/global")
+    
+    # Then
     assert response.status_code == 200
     json = response.json()
     assert json["league"] == League.BRONZE
     assert json["leaders"] == [
-        {"rank": 1, "username": "example9@gmail.com", "xp": 18},
-        {"rank": 2, "username": "example8@gmail.com", "xp": 16},
-        {"rank": 3, "username": "example7@gmail.com", "xp": 14},
+        {"rank": 1, "username": f"{TEST_USERNAME}9@{TEST_DOMAIN}", "xp": 18},
+        {"rank": 2, "username": f"{TEST_USERNAME}8@{TEST_DOMAIN}", "xp": 16},
+        {"rank": 3, "username": f"{TEST_USERNAME}7@{TEST_DOMAIN}", "xp": 14},
     ]
     assert json["current"] == [{"rank": 0, "username": TEST_EMAIL, "xp": 0}]
+
+
+def test_reset_leaderboard_cron_job_scheduled() -> None:
+    jobs: List[Job] = scheduler.get_jobs()
+    assert len(jobs) == 1
+    job = jobs[0]
+    assert job.func == service.reset_leaderboard
+    assert job.trigger.__class__ == CronTrigger
