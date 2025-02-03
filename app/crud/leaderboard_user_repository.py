@@ -1,4 +1,4 @@
-from typing import Optional, Sequence
+from typing import Sequence
 
 from sqlmodel import Session, desc, select
 
@@ -20,6 +20,6 @@ class LeaderboardUserRepository(GenericRepository[LeaderboardUser]):
         )
         return self._session.exec(stmt).all()
     
-    def find_by_user(self, user_id: int) -> Optional[LeaderboardUser]:
+    def get_by_user(self, user_id: int) -> LeaderboardUser:
         stmt = select(LeaderboardUser).where(LeaderboardUser.user_id == user_id)
-        return self._session.exec(stmt).first()
+        return self._session.exec(stmt).one()

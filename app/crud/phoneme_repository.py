@@ -17,6 +17,6 @@ class PhonemeRepository(GenericRepository[Phoneme]):
             select(Phoneme)
             .join(WordPhonemeLink)
             .where(WordPhonemeLink.word_id == word_id)
-            .order_by(col(WordPhonemeLink.id))
+            .order_by(col(WordPhonemeLink.index))
         )
         return self._session.exec(stmt).all()

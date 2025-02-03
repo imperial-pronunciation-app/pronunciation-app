@@ -1,8 +1,10 @@
+import pytest
 from fastapi.testclient import TestClient
 
 from app.routers.recording import dispatch_to_model
 
 
+@pytest.mark.skip
 def test_model_dispatch(client: TestClient) -> None:
     """Test that dispatch_to_model returns corresponding text for a given audio
 

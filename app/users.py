@@ -1,6 +1,6 @@
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Optional
 
-from fastapi import Depends
+from fastapi import Depends, Request
 from fastapi_users import BaseUserManager, FastAPIUsers, IntegerIDMixin
 from fastapi_users.authentication import (
     AuthenticationBackend,
@@ -10,7 +10,9 @@ from fastapi_users.authentication import (
 from fastapi_users_db_sqlmodel import SQLModelUserDatabase
 
 from app.config import get_settings
+from app.crud.unit_of_work import UnitOfWork, get_unit_of_work
 from app.database import get_user_db
+from app.models.leaderboard_user import LeaderboardUser
 from app.models.user import User
 
 
@@ -20,9 +22,17 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
     reset_password_token_secret = secret
     verification_token_secret = secret
 
+    def __init__(self, user_db: SQLModelUserDatabase, uow: UnitOfWork) -> None:
+        self.uow = uow
+        super().__init__(user_db)
 
-async def get_user_manager(user_db: SQLModelUserDatabase = Depends(get_user_db)) -> AsyncGenerator[UserManager, None]:
-    yield UserManager(user_db)
+    async def on_after_register(self, user: User, request: Optional[Request] = None) -> None:
+        self.uow.leaderboard_users.upsert(LeaderboardUser(user_id=user.id)) # Defaults to bronze league and 0 xp
+        self.uow.commit()
+
+
+async def get_user_manager(user_db: SQLModelUserDatabase = Depends(get_user_db), uow: UnitOfWork = Depends(get_unit_of_work)) -> AsyncGenerator[UserManager, None]:
+    yield UserManager(user_db, uow)
 
 
 bearer_transport = BearerTransport(tokenUrl="auth/jwt/login")

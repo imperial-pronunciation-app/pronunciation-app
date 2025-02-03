@@ -1,13 +1,8 @@
 from datetime import datetime
-from typing import TYPE_CHECKING
 
 from sqlmodel import Field
 
 from app.models.id_model import IdModel
-
-
-if TYPE_CHECKING:
-    pass
 
 
 # Possible words the user can pronounce

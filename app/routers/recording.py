@@ -53,7 +53,7 @@ async def post_recording(
     wav_file = create_wav_file(recording_request)
     s3_key = upload_wav_to_s3(wav_file)
     
-    # # 2. Store Recording entry with recording_url from blob store
+    # 2. Store Recording entry with recording_url from blob store
     service = RecordingService(uow)
     recording = service.create_recording(word_id, s3_key, user.id)
     

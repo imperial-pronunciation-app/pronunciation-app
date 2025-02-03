@@ -31,7 +31,7 @@ def seed(session: Session, seed_words: SeedData) -> None:
         word_id = word.id
         for i, ipa in enumerate(phonemes):
             phoneme_id = ipa_to_phoneme[ipa].id
-            word_phoneme_links.append(WordPhonemeLink(word_id=word_id, phoneme_id=phoneme_id, id=i))
+            word_phoneme_links.append(WordPhonemeLink(word_id=word_id, phoneme_id=phoneme_id, index=i))
 
     session.add_all(word_phoneme_links)
 

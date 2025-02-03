@@ -1,16 +1,11 @@
 from datetime import datetime
 from enum import Enum
-from typing import TYPE_CHECKING
 
 from sqlalchemy import Column, DateTime
 from sqlalchemy import Enum as SQLEnum
 from sqlmodel import Field
 
 from app.models.id_model import IdModel
-
-
-if TYPE_CHECKING:
-    pass
 
 
 class League(str, Enum):

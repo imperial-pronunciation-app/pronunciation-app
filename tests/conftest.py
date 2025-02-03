@@ -5,6 +5,7 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session, SQLModel, create_engine
 from sqlmodel.pool import StaticPool
 
+from app.crud.unit_of_work import UnitOfWork
 from app.database import get_session
 from app.main import app
 from app.models import Phoneme, Recording, Word, WordPhonemeLink  # noqa: F401
@@ -76,3 +77,10 @@ def authorised_client_fixture(seeded_client: TestClient, user_token: str) -> Tes
     """
     seeded_client.headers = {"Authorization": f"Bearer {user_token}"}
     return seeded_client
+
+@pytest.fixture(name="uow")
+def unit_of_work(session: Session) -> Iterator[UnitOfWork]:
+    """Returns a UnitOfWork instance
+    """
+    with UnitOfWork(session) as uow:
+        yield uow
