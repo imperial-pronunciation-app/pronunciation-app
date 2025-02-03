@@ -3,17 +3,13 @@ import uuid
 
 import requests
 from fastapi import APIRouter, Depends, UploadFile
-from sqlmodel import Session, col, select
 
 from app.config import get_settings
-from app.crud.phoneme_repository import PhonemeRepository
-from app.crud.recording_repository import RecordingRepository
-from app.database import get_session
-from app.models.phoneme import Phoneme
+from app.crud.unit_of_work import UnitOfWork, get_unit_of_work
 from app.models.user import User
-from app.models.word_phoneme_link import WordPhonemeLink
 from app.schemas.model_api import InferPhonemesResponse
 from app.schemas.recording import RecordingRequest, RecordingResponse
+from app.services.recording import RecordingService
 from app.users import current_active_user
 from app.utils.s3 import upload_wav_to_s3
 from app.utils.similarity import similarity
@@ -47,8 +43,8 @@ def dispatch_to_model(wav_file: str) -> list[str]:
 async def post_recording(
     word_id: int,
     audio_file: UploadFile,
-    session: Session = Depends(get_session),
-    user: User = Depends(current_active_user)
+    uow: UnitOfWork = Depends(get_unit_of_work),
+    user: User = Depends(current_active_user),
 ) -> RecordingResponse:
     audio_bytes = await audio_file.read()
     recording_request = RecordingRequest(audio_bytes=audio_bytes) # TODO: Clean this up
@@ -57,30 +53,16 @@ async def post_recording(
     wav_file = create_wav_file(recording_request)
     s3_key = upload_wav_to_s3(wav_file)
     
-    # # 2. Store Recording entry with recording_url from blob store
-    recording_repository = RecordingRepository(session)
-    recording = recording_repository.create(word_id, s3_key, user.id)
+    # 2. Store Recording entry with recording_url from blob store
+    service = RecordingService(uow)
+    recording = service.create_recording(word_id, s3_key, user.id)
     
     # 3. Dispatch recording to ML backend
     inferred_phoneme_strings = dispatch_to_model(wav_file)
-
-    phoneme_repository = PhonemeRepository(session)
-    inferred_phonemes = list(map(lambda x: phoneme_repository.get_phoneme_by_ipa(x), inferred_phoneme_strings))
+    inferred_phonemes = list(map(lambda x: uow.phonemes.get_phoneme_by_ipa(x), inferred_phoneme_strings))
     
     # 4. Form feedback based on model response
-    phoneme_query = (
-        select(Phoneme)
-        .join(WordPhonemeLink)
-        .where(WordPhonemeLink.word_id == word_id)
-        .order_by(col(WordPhonemeLink.index))
-        )
-    phonemes = session.exec(phoneme_query).all()
-
-    word_phonemes = []
-    for phoneme in phonemes:
-        assert phoneme.id is not None
-        word_phonemes.append(phoneme.ipa)
-
+    word_phonemes = list(map(lambda x: x.ipa, uow.phonemes.find_phonemes_by_word(word_id)))
     feedback = similarity(word_phonemes, inferred_phoneme_strings)
     
     # 6. Delete temporary file

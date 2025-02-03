@@ -1,13 +1,7 @@
-from typing import TYPE_CHECKING, Optional
 
-from sqlmodel import Field, SQLModel
-
-
-if TYPE_CHECKING:
-    pass
+from app.models.id_model import IdModel
 
 
 # Possible words the user can pronounce
-class Word(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+class Word(IdModel, table=True):
     word: str

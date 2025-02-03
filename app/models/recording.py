@@ -1,17 +1,13 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional
 
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field
 
-
-if TYPE_CHECKING:
-    pass
+from app.models.id_model import IdModel
 
 
 # Possible words the user can pronounce
-class Recording(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+class Recording(IdModel, table=True):
     recording_s3_key: str
     user_id: int = Field(foreign_key="user.id")
     word_id: int = Field(foreign_key="word.id")
-    time_created: datetime
+    created_at: datetime = Field(default_factory=datetime.now)
