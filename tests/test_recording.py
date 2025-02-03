@@ -39,9 +39,8 @@ def test_similarity(s1: str, s2: str, expected: int) -> None:
 
 def test_recording_feedback(
         seeded_session: Session,
-        seeded_client: TestClient,
+        authorised_client: TestClient,
         mocker: MockerFixture,
-        user_token: str
     ) -> None:
     # Check that calls to:
     # create_wav_file, upload_wav_to_s3, dispatch_to_model, similarity are made correctly
@@ -65,9 +64,8 @@ def test_recording_feedback(
     with open(wav_file_path, "rb") as f:
         files = {"audio_file": f}
 
-        recording_response = seeded_client.post(
+        recording_response = authorised_client.post(
             f"/api/v1/words/{word.id}/recording",
-            headers={"Authorization": f"Bearer {user_token}"},
             files=files
         )
     assert recording_response.status_code == 200
