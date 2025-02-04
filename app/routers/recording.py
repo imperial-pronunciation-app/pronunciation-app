@@ -55,7 +55,7 @@ async def post_recording(
     
     # 2. Store Recording entry with recording_url from blob store
     service = RecordingService(uow)
-    recording = service.create_recording(word_id, s3_key, user.id)
+    recording = service.create_recording(0, s3_key)
     
     # 3. Dispatch recording to ML backend
     inferred_phoneme_strings = dispatch_to_model(wav_file)
