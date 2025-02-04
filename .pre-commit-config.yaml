@@ -11,6 +11,7 @@ repos:
       additional_dependencies:
         - sqlmodel
         - types-requests
+        - types-redis
         # - types-python-dotenv
         # - types-pytest
         # - types-psycopg2

@@ -1,4 +1,4 @@
-from typing import Generic, Optional, Sequence, Type, TypeVar
+from typing import Generic, List, Optional, Sequence, Type, TypeVar
 
 from sqlmodel import Session, select
 
@@ -15,6 +15,9 @@ class GenericRepository(Generic[T]):
 
     def get_by_id(self, id: int) -> T:
         return self._session.get_one(self._model_cls, id)
+    
+    def get_by_ids(self, ids: List[int]) -> List[T]:
+        return [self.get_by_id(id) for id in ids]
     
     def find_by_id(self, id: int) -> Optional[T]:
         return self._session.get(self._model_cls, id)

@@ -13,6 +13,7 @@ services:
       - MODEL_API_URL=${MODEL_API_URL}
     depends_on:
       - db
+      - redis
     restart: unless-stopped
     profiles:
       - dev
@@ -50,6 +51,11 @@ services:
       - MODEL_API_URL=http://test-model-api.com
     profiles:
       - test
+  
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
 
 volumes:
   postgres_data:

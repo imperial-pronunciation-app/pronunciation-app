@@ -17,4 +17,4 @@ class LeaderboardResponse(BaseModel):
     league: League
     days_until_end: int
     leaders: List[LeaderboardEntry]
-    current: List[LeaderboardEntry]
+    user_position: List[LeaderboardEntry]

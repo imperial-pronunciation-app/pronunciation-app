@@ -13,3 +13,4 @@ fastapi-users-db-sqlmodel
 requests
 responses
 APScheduler
+redis

@@ -20,6 +20,13 @@ class LeaderboardUserRepository(GenericRepository[LeaderboardUser]):
         )
         return self._session.exec(stmt).all()
     
+    def find_by_league(self, league: League) -> Sequence[LeaderboardUser]:
+        stmt = (
+            select(LeaderboardUser)
+            .where(LeaderboardUser.league == league)
+        )
+        return self._session.exec(stmt).all()
+    
     def get_by_user(self, user_id: int) -> LeaderboardUser:
         stmt = select(LeaderboardUser).where(LeaderboardUser.user_id == user_id)
         return self._session.exec(stmt).one()

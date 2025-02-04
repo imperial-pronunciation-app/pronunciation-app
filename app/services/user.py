@@ -1,5 +1,6 @@
 from app.crud.unit_of_work import UnitOfWork
 from app.models.leaderboard_user import LeaderboardUser
+from app.redis import increment_redis_entry
 
 
 class UserService:
@@ -13,4 +14,5 @@ class UserService:
         entry.xp += xp_gain
         entry = self._uow.leaderboard_users.upsert(entry)
         self._uow.commit()
+        increment_redis_entry(entry.league, entry.id, xp_gain)
         return entry
