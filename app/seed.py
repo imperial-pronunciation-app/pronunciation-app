@@ -1,48 +1,100 @@
+import json
+from typing import List, TypedDict
+
+from fastapi_users.password import PasswordHelper
 from sqlmodel import Session, SQLModel
 
-from app.models import LeaderboardUser, Phoneme, Recording, Word, WordPhonemeLink  # noqa: F401
-from app.seed_data import SeedData, ipa_to_respelling
+from app.database import engine
+from app.models.exercise import Exercise
+from app.models.lesson import Lesson
+from app.models.phoneme import Phoneme
+from app.models.unit import Unit
+from app.models.user import User
+from app.models.word import Word
+from app.models.word_phoneme_link import WordPhonemeLink
 
 
-def seed(session: Session, seed_words: SeedData) -> None:
-    """Seed a database with sample data
+password_helper = PasswordHelper()
 
-    Args:
-        session (Session): Session for database
-        seed_data (SeedData): Words and their phonemes to seed
-    """
+with open("app/resources/phoneme_respellings.json") as f:
+    ipa_to_respelling = json.load(f)
 
-    # Seed phonemes (no stressed phonemes)
-    seed_phonemes = [Phoneme(ipa=ipa, respelling=respelling) for ipa, respelling in ipa_to_respelling.items()]
-    session.add_all(seed_phonemes)
-    
-    # Seed specified words, retain phonemes to make seeding the links easier
-    word_phonemes = [(Word(word=word_data.word), word_data.phonemes) for word_data in seed_words.words]
-    session.add_all([word for word, _ in word_phonemes])
-    
-    session.commit() # Get IDs
+class WordEntry(TypedDict):
+    word: str
+    phonemes: List[str]
 
-    # Map IPA characters to Phoneme objects
-    ipa_to_phoneme = {phoneme.ipa: phoneme for phoneme in seed_phonemes}
+word_data: List[WordEntry] = [
+    {"word": "software", "phonemes": ["s", "oʊ", "f", "t", "w", "ɛ", "r"]},
+    {"word": "hardware", "phonemes": ["h", "ɑː", "r", "d", "w", "ɛ", "r"]},
+    {"word": "computer", "phonemes": ["k", "ə", "m", "p", "j", "uː", "t", "ə"]},
+    {"word": "compilers", "phonemes": ["k", "ə", "m", "p", "aɪ", "l", "ə", "r"]},
+    {"word": "keyboard", "phonemes": ["k", "iː", "b", "ɔː", "d"]},
+    {"word": "mouse", "phonemes": ["m", "aʊ", "s"]},
+    {"word": "parrot", "phonemes": ["p", "æ", "r", "ə", "t"]},
+    {"word": "chocolate", "phonemes": ["tʃ", "ɒ", "k", "l", "ə", "t"]},
+]
 
-    # Seed word phoneme links
-    word_phoneme_links = []
-    for word, phonemes in word_phonemes:
-        word_id = word.id
-        for i, ipa in enumerate(phonemes):
-            phoneme_id = ipa_to_phoneme[ipa].id
-            word_phoneme_links.append(WordPhonemeLink(word_id=word_id, phoneme_id=phoneme_id, index=i))
-
-    session.add_all(word_phoneme_links)
-
+def seed(session: Session) -> None:
+    print("👤 Inserting Users...")
+    users = [
+        User(email="user1@example.com", hashed_password=password_helper.hash("password")),
+        User(email="user2@example.com", hashed_password=password_helper.hash("password"))
+    ]
+    session.add_all(users)
     session.commit()
+
+    print("📝 Inserting Words...")
+    words = {w["word"]: Word(word=w["word"]) for w in word_data}
+    session.add_all(words.values())
+    session.commit()
+
+    print("🔤 Inserting Phonemes...")
+    phonemes = {ipa: Phoneme(ipa=ipa, respelling=respelling) for ipa, respelling in ipa_to_respelling.items()}
+    session.add_all(phonemes.values())
+    session.commit()
+
+    print("🔗 Linking Words and Phonemes...")
+    word_phoneme_links = []
+    for word_entry in word_data:
+        word_obj = words[word_entry["word"]]
+        for index, ipa in enumerate(word_entry["phonemes"]):
+            word_phoneme_links.append(WordPhonemeLink(
+                word_id=word_obj.id,
+                phoneme_id=phonemes[ipa].id,
+                index=index
+            ))
+    session.add_all(word_phoneme_links)
+    session.commit()
+
+    print("📚 Inserting Units with Lessons...")
+    units = [
+        Unit(
+            name="Basic Phonemes",
+            description="Introduction to phonemes",
+            order=1,
+            lessons=[
+                Lesson(title="Short Vowels", order=1, exercises=[Exercise(order=1, word_id=words["software"].id)]),
+                Lesson(title="Long Vowels", order=2, exercises=[Exercise(order=1, word_id=words["hardware"].id)])
+            ]
+        ),
+        Unit(
+            name="Common Words",
+            description="Practicing everyday words",
+            order=2,
+            lessons=[
+                Lesson(title="Common Nouns", order=1, exercises=[Exercise(order=1, word_id=words["computer"].id)])
+            ]
+        )
+    ]
+    session.add_all(units)
+    session.commit()
+
+    print("🎉✅ Database seeding completed successfully!")
 
 # To seed inside a container
 # docker exec -it <container_id> python -m app.seed
 if __name__ == "__main__":
-    from app.database import engine, get_session
-    from app.seed_data import default_data
+    print("🔄 Resetting database schema...")
     SQLModel.metadata.drop_all(engine)
     SQLModel.metadata.create_all(engine)
-    session = next(get_session())
-    seed(session, default_data)
+    seed(Session(engine))
