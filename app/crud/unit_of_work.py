@@ -4,6 +4,7 @@ from typing import Iterator, Self
 from fastapi import Depends
 from sqlmodel import Session
 
+from app.crud.attempts_repository import AttemptRepository
 from app.crud.exercise_repository import ExerciseRepository
 from app.crud.leaderboard_user_repository import LeaderboardUserRepository
 from app.crud.phoneme_repository import PhonemeRepository
@@ -24,6 +25,7 @@ class UnitOfWork:
         self.users = UserRepository(self._session)
         self.exercises = ExerciseRepository(self._session)
         self.units = UnitRepository(self._session)
+        self.attempts = AttemptRepository(self._session)
     
     def __enter__(self) -> Self:
         return self
