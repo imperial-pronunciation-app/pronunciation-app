@@ -44,7 +44,7 @@ def seed(session: Session) -> None:
     session.commit()
 
     print("📝 Inserting Words...")
-    words = {w["word"]: Word(word=w["word"]) for w in word_data}
+    words = {w["word"]: Word(text=w["word"]) for w in word_data}
     session.add_all(words.values())
     session.commit()
 
@@ -73,8 +73,8 @@ def seed(session: Session) -> None:
             description="Introduction to phonemes",
             order=1,
             lessons=[
-                Lesson(title="Short Vowels", order=1, exercises=[Exercise(order=1, word_id=words["software"].id)]),
-                Lesson(title="Long Vowels", order=2, exercises=[Exercise(order=1, word_id=words["hardware"].id)])
+                Lesson(title="Short Vowels", order=1, exercises=[Exercise(index=0, word_id=words["software"].id)]),
+                Lesson(title="Long Vowels", order=2, exercises=[Exercise(index=0, word_id=words["hardware"].id)])
             ]
         ),
         Unit(
@@ -82,7 +82,7 @@ def seed(session: Session) -> None:
             description="Practicing everyday words",
             order=2,
             lessons=[
-                Lesson(title="Common Nouns", order=1, exercises=[Exercise(order=1, word_id=words["computer"].id)])
+                Lesson(title="Common Nouns", order=1, exercises=[Exercise(index=0, word_id=words["computer"].id)])
             ]
         )
     ]
