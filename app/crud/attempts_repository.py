@@ -1,7 +1,7 @@
 from sqlmodel import Session
 
 from app.crud.generic_repository import GenericRepository
-from app.models.exercise import Attempt
+from app.models.attempt import Attempt
 
 
 class AttemptRepository(GenericRepository[Attempt]):
