@@ -41,7 +41,7 @@ def dispatch_to_model(wav_file: str) -> list[str]:
     return model_data.phonemes
 
 @router.post("/api/v1/exercises/{exercise_id}/attempts", response_model=AttemptResponse)
-async def post_recording(
+async def post_attempt(
     exercise_id: int,
     audio_file: UploadFile,
     uow: UnitOfWork = Depends(get_unit_of_work),
