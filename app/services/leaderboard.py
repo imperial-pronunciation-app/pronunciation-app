@@ -40,6 +40,9 @@ class LeaderboardService:
         )
     
     def _leaderboard_entries_from_leaderboard_user_ids(self, leaderboard_user_ids: List[int], starting_rank: int = 0) -> List[LeaderboardEntry]:
+        if starting_rank < 0:
+            # For example, if a league only has 1 player, the rank should start from 1 not -1
+            starting_rank = 0
         return [self._leaderboard_entry_from_leaderboard_user_id_and_rank(user_id, starting_rank + i + 1) for i, user_id in enumerate(leaderboard_user_ids)]
     
     def _leaderboard_entry_from_leaderboard_user_id_and_rank(self, leaderboard_user_id: int, rank: int) -> LeaderboardEntry:

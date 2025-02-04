@@ -1,3 +1,4 @@
+import math
 from typing import List
 
 from apscheduler.job import Job
@@ -49,10 +50,11 @@ def test_update_xp_existing_record(uow: UnitOfWork) -> None:
 
 def test_reset_leaderboard(authorised_client: TestClient, uow: UnitOfWork) -> None:
     # Pre
+    initial_xp = 10
     user = uow.users.get_by_email(TEST_EMAIL)
     user_service = UserService(uow)
-    user_service.update_xp(user.id, 10)
-    assert uow.leaderboard_users.get_by_user(user.id).xp == 10
+    user_service.update_xp(user.id, initial_xp)
+    assert uow.leaderboard_users.get_by_user(user.id).xp == initial_xp
 
     # When
     leaderboard_service = LeaderboardService(uow)
@@ -60,14 +62,15 @@ def test_reset_leaderboard(authorised_client: TestClient, uow: UnitOfWork) -> No
     response = authorised_client.get("/api/v1/leaderboard/global")
 
     # Then
-    assert uow.leaderboard_users.get_by_user(user.id).xp == 0
+    expected_xp = int(math.log2(initial_xp + 1))
+    assert uow.leaderboard_users.get_by_user(user.id).xp == expected_xp
     assert response.status_code == 200
     json = response.json()
-    assert json["league"] == League.BRONZE
+    assert json["league"] == League.SILVER # Promotion
     assert json["leaders"] == [
-        {"rank": 1, "username": TEST_EMAIL, "xp": 0},
+        {"rank": 1, "username": TEST_EMAIL, "xp": expected_xp},
     ]
-    assert json["user_position"] == [{"rank": 1, "username": TEST_EMAIL, "xp": 0}]
+    assert json["user_position"] == [{"rank": 1, "username": TEST_EMAIL, "xp": expected_xp}]
 
 
 def test_get_leaderboard_empty_user_record(authorised_client: TestClient, uow: UnitOfWork) -> None:
