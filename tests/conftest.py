@@ -8,11 +8,14 @@ from sqlmodel.pool import StaticPool
 from app.crud.unit_of_work import UnitOfWork
 from app.database import get_session
 from app.main import app
-from app.models import Phoneme, Recording, Word, WordPhonemeLink  # noqa: F401
 from app.models.user import User
 
 from .utils import login_user, register_user
 
+
+pytest_plugins = [
+   "tests.fixtures.sample_data",
+]
 
 @pytest.fixture
 def session() -> Iterator[Session]:
