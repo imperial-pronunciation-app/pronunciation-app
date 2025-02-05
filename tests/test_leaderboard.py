@@ -8,6 +8,7 @@ from fastapi.testclient import TestClient
 from app.cron import scheduler, service
 from app.crud.unit_of_work import UnitOfWork
 from app.models.leaderboard_user import LeaderboardUser, League
+from app.redis import LRedis
 from app.services.leaderboard import LeaderboardService
 from app.services.user import UserService
 from tests.utils import TEST_DOMAIN, TEST_EMAIL, TEST_USERNAME, register_users
@@ -106,3 +107,41 @@ def test_reset_leaderboard_cron_job_scheduled() -> None:
     job = jobs[0]
     assert job.func == service.reset_leaderboard
     assert job.trigger.__class__ == CronTrigger
+
+
+def test_promotion_demotion(authorised_client: TestClient, uow: UnitOfWork) -> None:
+    # Pre: test with silver league for both promotions and demotions
+    register_users(authorised_client, count=4)
+    user_service = UserService(uow)
+    leaderboard_service = LeaderboardService(uow)
+    leaderboard_service.set_users_new_league(uow.leaderboard_users.all(), League.SILVER)
+    LRedis.move_all_entries(League.BRONZE, League.SILVER)
+    users = uow.users.all()
+    for user in users:
+        user_service.update_xp(user.id, user.id ** 2 * 200)
+
+    # When
+    original_order = uow.leaderboard_users.find_by_league_order_by_xp_desc_with_limit(League.SILVER, 5)
+    leaderboard_service.reset_leaderboard()
+
+    # Then
+    leaderboard_users = uow.leaderboard_users.all()
+    gold = [user for user in leaderboard_users if user.league == League.GOLD]
+    silver = sorted([user for user in leaderboard_users if user.league == League.SILVER], key=lambda x: x.xp, reverse=True)
+    bronze = [user for user in leaderboard_users if user.league == League.BRONZE]
+
+    print(original_order)
+    print(gold)
+    print(silver)
+    print(bronze)
+
+    assert len(gold) == 1
+    assert len(silver) == 3
+    assert len(bronze) == 1
+    assert gold[0].xp >= silver[0].xp
+    assert bronze[0].xp <= silver[2].xp
+    assert original_order[0].id == gold[0].id
+    assert original_order[1].id == silver[0].id
+    assert original_order[2].id == silver[1].id
+    assert original_order[3].id == silver[2].id
+    assert original_order[4].id == bronze[0].id

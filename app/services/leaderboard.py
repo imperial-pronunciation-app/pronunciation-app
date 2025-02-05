@@ -57,10 +57,10 @@ class LeaderboardService:
         silver_demotions = self._get_demotions_for_league(League.SILVER)
         silver_promotions = self._get_promotions_for_league(League.SILVER)
         gold_demotions = self._get_demotions_for_league(League.GOLD)
-        self._set_users_new_league(bronze_promotions, League.SILVER)
-        self._set_users_new_league(silver_demotions, League.BRONZE)
-        self._set_users_new_league(silver_promotions, League.GOLD)
-        self._set_users_new_league(gold_demotions, League.SILVER)
+        self.set_users_new_league(bronze_promotions, League.SILVER)
+        self.set_users_new_league(silver_demotions, League.BRONZE)
+        self.set_users_new_league(silver_promotions, League.GOLD)
+        self.set_users_new_league(gold_demotions, League.SILVER)
 
     def _get_promotions_for_league(self, league: League) -> Sequence[LeaderboardUser]:
         # Get total players in the current league
@@ -88,8 +88,8 @@ class LeaderboardService:
         demoted_leaderboard_user_ids = LRedis.sorted(league, 0, bottom_20_cutoff, desc=False)
         return self._uow.leaderboard_users.get_by_ids([leaderboard_user_id for leaderboard_user_id in demoted_leaderboard_user_ids])
 
-
-    def _set_users_new_league(self, users: Sequence[LeaderboardUser], new_league: League) -> None:
+    def set_users_new_league(self, users: Sequence[LeaderboardUser], new_league: League) -> None:
+        """Should only be used internally and in tests"""
         for user in users:
             user.league = new_league
         self._uow.leaderboard_users.upsert_all(users)
