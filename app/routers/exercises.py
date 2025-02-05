@@ -15,8 +15,8 @@ async def get_exercise(exercise_id: int, uow: UnitOfWork = Depends(get_unit_of_w
     if not exercise:
         raise HTTPException(status_code=404, detail="Exercise not found")
     
-    previous_exercise = exercise.get_previous_exercise()
-    next_exercise = exercise.get_next_exercise()
+    previous_exercise = exercise.previous_exercise()
+    next_exercise = exercise.next_exercise()
 
     return ExerciseResponse(
         word=exercise.word.to_public_with_phonemes(),

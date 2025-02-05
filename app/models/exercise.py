@@ -19,12 +19,12 @@ class Exercise(IdModel, table=True):
     word: "Word" = Relationship(back_populates="exercises")
     attempts: List["Attempt"] = Relationship(back_populates="exercise", cascade_delete=True)
 
-    def get_previous_exercise(self) -> Optional["Exercise"]:
+    def previous_exercise(self) -> Optional["Exercise"]:
         """Returns the previous exercise within the lesson, or None if it's the first exercise."""
         sorted_exercises = sorted(self.lesson.exercises, key=lambda e: e.index)
         return sorted_exercises[self.index - 1] if self.index > 0 else None
 
-    def get_next_exercise(self) -> Optional["Exercise"]:
+    def next_exercise(self) -> Optional["Exercise"]:
         """Returns the next exercise within the lesson, or None if it's the last exercise."""
         sorted_exercises = sorted(self.lesson.exercises, key=lambda e: e.index)
         return sorted_exercises[self.index + 1] if self.index < len(sorted_exercises) - 1 else None
