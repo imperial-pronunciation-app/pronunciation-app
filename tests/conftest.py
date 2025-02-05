@@ -9,7 +9,7 @@ from app.crud.unit_of_work import UnitOfWork
 from app.database import get_session
 from app.main import app
 from app.models import Phoneme, Recording, Word, WordPhonemeLink  # noqa: F401
-from app.redis import redis_client
+from app.redis import LRedis
 from app.seed import SeedData, seed
 from app.seed_data import default_data
 from tests.utils import login_user, register_user
@@ -94,5 +94,8 @@ def unit_of_work(session: Session) -> Iterator[UnitOfWork]:
 
 
 @pytest.fixture(autouse=True)
-def reset_redis() -> None:
-    redis_client.flushall()
+def reset_redis() -> Iterator[None]:
+    """Reset redis after each test
+    """
+    yield
+    LRedis.clear()
