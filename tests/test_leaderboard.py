@@ -55,7 +55,7 @@ def test_reset_leaderboard(authorised_client: TestClient, uow: UnitOfWork) -> No
     user = uow.users.get_by_email(TEST_EMAIL)
     user_service = UserService(uow)
     user_service.update_xp(user.id, initial_xp)
-    assert uow.leaderboard_users.get_by_user(user.id).xp == initial_xp
+    assert user.leaderboard_users[0].xp == initial_xp
 
     # When
     leaderboard_service = LeaderboardService(uow)
@@ -64,7 +64,7 @@ def test_reset_leaderboard(authorised_client: TestClient, uow: UnitOfWork) -> No
 
     # Then
     expected_xp = int(math.log2(initial_xp + 1))
-    assert uow.leaderboard_users.get_by_user(user.id).xp == expected_xp
+    assert user.leaderboard_users[0].xp == expected_xp
     assert response.status_code == 200
     json = response.json()
     assert json["league"] == League.SILVER # Promotion

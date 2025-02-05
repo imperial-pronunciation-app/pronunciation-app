@@ -15,11 +15,10 @@ class LeaderboardService:
         self._uow = uow
 
     def get_global_leaderboard_for_user(self, user: User, top_k: int = 3, user_position_k: int = 2) -> LeaderboardResponse:
-        leaderboard_user = self._uow.leaderboard_users.get_by_user(user.id)
         days_until_end = days_until_next_sunday()
-        league = leaderboard_user.league
+        league = user.leaderboard_users[0].league
 
-        user_rank = LRedis.rank(league, leaderboard_user.id)
+        user_rank = LRedis.rank(league, user.leaderboard_users[0].id)
 
         top_leaderboard_user_ids = LRedis.sorted(league, 0, top_k - 1)
         user_position_leaderboard_user_ids = LRedis.sorted(league, user_rank - user_position_k, user_rank + user_position_k)
@@ -42,8 +41,7 @@ class LeaderboardService:
     
     def _leaderboard_entry_from_leaderboard_user_id_and_rank(self, leaderboard_user_id: int, rank: int) -> LeaderboardEntry:
         leaderboard_user = self._uow.leaderboard_users.get_by_id(leaderboard_user_id)
-        email = self._uow.users.get_by_id(leaderboard_user.user_id).email
-        return LeaderboardEntry(rank, email, leaderboard_user.xp)
+        return LeaderboardEntry(rank, leaderboard_user.user.email, leaderboard_user.xp)
     
     def reset_leaderboard(self) -> None:
         self._handle_promotions_and_demotions()
