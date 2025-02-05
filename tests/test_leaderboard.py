@@ -1,5 +1,10 @@
+from typing import List
+
+from apscheduler.job import Job
+from apscheduler.triggers.cron import CronTrigger
 from fastapi.testclient import TestClient
 
+from app.cron import scheduler, service
 from app.crud.unit_of_work import UnitOfWork
 from app.models.leaderboard_user import League
 from app.models.user import User
@@ -45,3 +50,10 @@ def test_reset_leaderboard(test_user: User, auth_client: TestClient, uow: UnitOf
     ]
     assert json["current"] == [{"rank": 0, "username": test_user.email, "xp": 0}]
 
+
+def test_reset_leaderboard_cron_job_scheduled() -> None:
+    jobs: List[Job] = scheduler.get_jobs()
+    assert len(jobs) == 1
+    job = jobs[0]
+    assert job.func == service.reset_leaderboard
+    assert job.trigger.__class__ == CronTrigger

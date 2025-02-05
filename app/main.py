@@ -2,10 +2,11 @@ from typing import Dict
 
 from fastapi import FastAPI
 
+from app.cron import lifespan
 from app.routers import routers
 
 
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
 
 
 @app.get("/")
