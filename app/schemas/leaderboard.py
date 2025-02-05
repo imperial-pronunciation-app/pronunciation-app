@@ -3,7 +3,7 @@ from typing import List
 
 from pydantic import BaseModel
 
-from app.models.leaderboard_user import League
+from app.models.leaderboard_user_link import League
 
 
 @dataclass

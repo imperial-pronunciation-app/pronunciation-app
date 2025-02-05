@@ -2,7 +2,7 @@ from typing import Dict, List, Sequence
 
 from redis import Redis
 
-from app.models.leaderboard_user import LeaderboardUser, League
+from app.models.leaderboard_user_link import LeaderboardUserLink, League
 
 
 class LRedis:
@@ -43,7 +43,7 @@ class LRedis:
         LRedis._redis.zadd(LRedis._league_key(league), {str(leaderboard_user_id): xp}, nx=True)
 
     @staticmethod
-    def create_entry_from_user(leaderboard_user: LeaderboardUser) -> None:
+    def create_entry_from_user(leaderboard_user: LeaderboardUserLink) -> None:
         LRedis.create_entry(leaderboard_user.league, leaderboard_user.id, leaderboard_user.xp)
 
     @staticmethod
@@ -55,7 +55,7 @@ class LRedis:
         LRedis._redis.zadd(LRedis._league_key(league), id_str_to_xp, nx=True) # type: ignore
 
     @staticmethod
-    def create_entries_from_users(league: League, leaderboard_users: Sequence[LeaderboardUser]) -> None:
+    def create_entries_from_users(league: League, leaderboard_users: Sequence[LeaderboardUserLink]) -> None:
         LRedis.create_entries(league, {user.id: user.xp for user in leaderboard_users})
 
     @staticmethod

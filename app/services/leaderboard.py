@@ -2,7 +2,7 @@ import math
 from typing import List, Sequence
 
 from app.crud.unit_of_work import UnitOfWork
-from app.models.leaderboard_user import LeaderboardUser, League
+from app.models.leaderboard_user_link import LeaderboardUserLink, League
 from app.models.user import User
 from app.redis import LRedis
 from app.schemas.leaderboard import LeaderboardEntry, LeaderboardResponse
@@ -60,7 +60,7 @@ class LeaderboardService:
         self.set_users_new_league(silver_promotions, League.GOLD)
         self.set_users_new_league(gold_demotions, League.SILVER)
 
-    def _get_promotions_for_league(self, league: League) -> Sequence[LeaderboardUser]:
+    def _get_promotions_for_league(self, league: League) -> Sequence[LeaderboardUserLink]:
         # Get total players in the current league
         league_size = LRedis.size_of(league)
         if league_size == 0:
@@ -73,7 +73,7 @@ class LeaderboardService:
         promoted_leaderboard_user_ids = LRedis.sorted(league, 0, top_20_cutoff)
         return self._uow.leaderboard_users.get_by_ids(promoted_leaderboard_user_ids)
 
-    def _get_demotions_for_league(self, league: League) -> Sequence[LeaderboardUser]:
+    def _get_demotions_for_league(self, league: League) -> Sequence[LeaderboardUserLink]:
         # Get total players in the current league
         league_size = LRedis.size_of(league)
         if league_size == 0:
@@ -86,7 +86,7 @@ class LeaderboardService:
         demoted_leaderboard_user_ids = LRedis.sorted(league, 0, bottom_20_cutoff, desc=False)
         return self._uow.leaderboard_users.get_by_ids([leaderboard_user_id for leaderboard_user_id in demoted_leaderboard_user_ids])
 
-    def set_users_new_league(self, users: Sequence[LeaderboardUser], new_league: League) -> None:
+    def set_users_new_league(self, users: Sequence[LeaderboardUserLink], new_league: League) -> None:
         """Should only be used internally and in tests"""
         for user in users:
             user.league = new_league

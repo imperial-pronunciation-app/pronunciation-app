@@ -19,7 +19,7 @@ class League(str, Enum):
     BRONZE = "Bronze"
 
 
-class LeaderboardUser(IdModel, table=True):
+class LeaderboardUserLink(IdModel, table=True):
     user_id: int = Field(foreign_key="user.id", index=True)
     user: "User" = Relationship(back_populates="leaderboard_users")
     league: League = Field(default=League.BRONZE, sa_column=Column(SQLEnum(League), index=True))

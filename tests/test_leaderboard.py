@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 
 from app.cron import scheduler, service
 from app.crud.unit_of_work import UnitOfWork
-from app.models.leaderboard_user import LeaderboardUser, League
+from app.models.leaderboard_user_link import LeaderboardUserLink, League
 from app.redis import LRedis
 from app.services.leaderboard import LeaderboardService
 from app.services.user import UserService
@@ -21,7 +21,7 @@ def test_update_xp_existing_record(uow: UnitOfWork) -> None:
     xp_gain = 100
 
     # When
-    result = uow.leaderboard_users.upsert(LeaderboardUser(user_id=user_id, league=league, xp=xp_gain))
+    result = uow.leaderboard_users.upsert(LeaderboardUserLink(user_id=user_id, league=league, xp=xp_gain))
 
     # Then
     assert result.user_id == user_id
@@ -129,11 +129,6 @@ def test_promotion_demotion(authorised_client: TestClient, uow: UnitOfWork) -> N
     gold = [user for user in leaderboard_users if user.league == League.GOLD]
     silver = sorted([user for user in leaderboard_users if user.league == League.SILVER], key=lambda x: x.xp, reverse=True)
     bronze = [user for user in leaderboard_users if user.league == League.BRONZE]
-
-    print(original_order)
-    print(gold)
-    print(silver)
-    print(bronze)
 
     assert len(gold) == 1
     assert len(silver) == 3
