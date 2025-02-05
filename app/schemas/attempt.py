@@ -9,4 +9,3 @@ class AttemptResponse(BaseModel):
     recording_id: int
     score: int
     recording_phonemes: List[Phoneme]
-
