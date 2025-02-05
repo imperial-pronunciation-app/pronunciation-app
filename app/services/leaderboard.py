@@ -16,9 +16,9 @@ class LeaderboardService:
 
     def get_global_leaderboard_for_user(self, user: User, top_k: int = 3, user_position_k: int = 2) -> LeaderboardResponse:
         days_until_end = days_until_next_sunday()
-        league = user.leaderboard_users[0].league
+        league = user.leaderboard_entries[0].league
 
-        user_rank = LRedis.rank(league, user.leaderboard_users[0].id)
+        user_rank = LRedis.rank(league, user.leaderboard_entries[0].id)
 
         top_leaderboard_user_ids = LRedis.sorted(league, 0, top_k - 1)
         user_position_leaderboard_user_ids = LRedis.sorted(league, user_rank - user_position_k, user_rank + user_position_k)

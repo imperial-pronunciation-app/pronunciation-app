@@ -8,4 +8,4 @@ from app.models.leaderboard_user_link import LeaderboardUserLink
 
 
 class User(IdModel, SQLModelBaseUserDB, table=True):
-    leaderboard_users: List[LeaderboardUserLink] = Relationship(back_populates="user")
+    leaderboard_entries: List[LeaderboardUserLink] = Relationship(back_populates="user")
