@@ -94,13 +94,3 @@ def sample_exercises(session: Session, sample_lesson: Lesson, sample_words: List
 def sample_exercise(sample_exercises: List[Exercise]) -> Exercise:
     """Fixture to return a single exercise."""
     return sample_exercises[1]
-
-@pytest.fixture
-def sample_first_exercise(sample_exercises: List[Exercise]) -> Exercise:
-    """Fixture to return a single exercise."""
-    return sample_exercises[0]
-
-@pytest.fixture
-def sample_last_exercise(sample_exercises: List[Exercise]) -> Exercise:
-    """Fixture to return a single exercise."""
-    return sample_exercises[2]
