@@ -7,7 +7,7 @@ from sqlmodel import Session, SQLModel, text
 from app.database import engine
 from app.models.attempt import Attempt  # noqa: F401
 from app.models.exercise import Exercise
-from app.models.leaderboard_user_link import LeaderboardUserLink  # noqa: F401
+from app.models.leaderboard_user_link import LeaderboardUserLink, League  # noqa: F401
 from app.models.lesson import Lesson
 from app.models.phoneme import Phoneme
 from app.models.recording import Recording  # noqa: F401
@@ -15,6 +15,7 @@ from app.models.unit import Unit
 from app.models.user import User
 from app.models.word import Word
 from app.models.word_phoneme_link import WordPhonemeLink
+from app.redis import LRedis
 
 
 password_helper = PasswordHelper()
@@ -91,6 +92,7 @@ def seed(session: Session) -> None:
     ]
     session.add_all(units)
     session.commit()
+    LRedis.clear()
 
     print("🎉✅ Database seeding completed successfully!")
 
