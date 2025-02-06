@@ -1,24 +1,33 @@
+from typing import Optional
+
+import pytest
 from fastapi.testclient import TestClient
 
-from tests.utils import login_user, register_user
+from app.models.user import User
+from tests.utils import login_user
 
 
-def test_login_user(client: TestClient) -> None:
+TEST_EMAIL = "newuser@example.com"
+TEST_PASSWORD = "SecurePass123"
+
+def test_login_user(client: TestClient, test_user: User) -> None:
     """Should successfully log in a registered user and return an access token."""
-    register_user(client)
-    response = login_user(client)
+    response = login_user(client, test_user.email, "password")
 
-    assert response.status_code == 200
-    assert "access_token" in response.json()
+    assert response.status_code == 200, f"Unexpected status: {response.status_code}, response: {response.json()}"
+    assert "access_token" in response.json(), f"Response missing token: {response.json()}"
 
-def test_login_user_bad_credentials(client: TestClient) -> None:
-    """Should return 400 when logging in with incorrect credentials."""
-    register_user(client)
-    response = login_user(client, password="wrongPassword")
-    assert response.status_code == 400
+@pytest.mark.parametrize(
+    "email, password, expected_status",
+    [
+        (TEST_EMAIL, "wrongPassword", 400),  # Wrong password
+        (TEST_EMAIL, None, 422),             # Missing password
+        (None, TEST_PASSWORD, 422),          # Missing username
+        (None, None, 422),                   # Missing both
+    ]
+)
+def test_login_user_invalid_cases(client: TestClient, email: Optional[str], password: Optional[str], expected_status: int) -> None:
+    """Should return correct status codes for invalid login attempts."""
+    response = login_user(client, email=email, password=password)
 
-def test_login_user_missing_details(client: TestClient) -> None:
-    """Should return 422 when missing required login details."""
-    register_user(client)
-    response = login_user(client, password=None)
-    assert response.status_code == 422
+    assert response.status_code == expected_status, f"Unexpected status: {response.status_code}, response: {response.json()}"
