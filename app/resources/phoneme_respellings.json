@@ -50,5 +50,6 @@
   "ər": "er",
   "ju:": "ew",
   "ɹ": "r",
-  "ɹ̩": "err"
+  "ɹ̩": "err",
+  "<unknown>": "<unknown>"
 }
