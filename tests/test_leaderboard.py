@@ -30,9 +30,8 @@ def test_update_xp_existing_record(test_user: User, uow: UnitOfWork) -> None:
 
 def test_reset_leaderboard(test_user: User, auth_client: TestClient, uow: UnitOfWork) -> None:
     # Pre
-    user = test_user
     user_service = UserService(uow)
-    user_service.update_xp(user, 10)
+    user_service.update_xp(test_user, 10)
     assert test_user.leaderboard_user.xp == 10
 
     # When
@@ -41,7 +40,7 @@ def test_reset_leaderboard(test_user: User, auth_client: TestClient, uow: UnitOf
     response = auth_client.get("/api/v1/leaderboard/global")
 
     # Then
-    assert uow.leaderboard_users.get_by_user(user.id).xp == 0
+    assert uow.leaderboard_users.get_by_user(test_user.id).xp == 0
     assert response.status_code == 200
     json = response.json()
     assert json["league"] == League.BRONZE
