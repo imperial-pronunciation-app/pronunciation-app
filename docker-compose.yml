@@ -22,6 +22,7 @@ services:
       - prod
     networks:
       - parrot-network
+      - default
   
   db:
     image: postgres:15
@@ -36,8 +37,6 @@ services:
     profiles:
       - dev
       - prod
-    networks:
-      - parrot-network
 
   test:
     build:
@@ -60,8 +59,9 @@ services:
     image: redis:latest
     ports:
       - "6379:6379"
-    networks:
-      - parrot-network
+    profiles:
+      - dev
+      - prod
 
 volumes:
   postgres_data:
