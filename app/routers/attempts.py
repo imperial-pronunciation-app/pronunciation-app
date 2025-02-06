@@ -11,6 +11,7 @@ from app.models.recording import Recording
 from app.models.user import User
 from app.schemas.attempt import AttemptResponse
 from app.schemas.model_api import InferPhonemesResponse
+from app.services.user import UserService
 from app.users import current_active_user
 from app.utils.s3 import upload_wav_to_s3
 from app.utils.similarity import similarity
@@ -82,9 +83,12 @@ async def post_attempt(
     word_phonemes = list(map(lambda x: x.ipa, uow.phonemes.find_phonemes_by_word(exercise.word.id)))
     feedback = similarity(word_phonemes, inferred_phoneme_strings)
     
+    # 5. Update user xp based on feedback
+    user_service = UserService(uow)
+    xp_gain = user_service.update_xp_with_boost(user, feedback)
+
     # 6. Delete temporary file
     os.remove(wav_file)
     
     # 7. Serve response to user
-    return AttemptResponse(recording_id=recording.id, score=feedback, recording_phonemes=inferred_phonemes)
-
+    return AttemptResponse(recording_id=recording.id, score=feedback, recording_phonemes=inferred_phonemes, xp_gain=xp_gain)

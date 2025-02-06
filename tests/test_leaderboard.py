@@ -5,7 +5,7 @@ from apscheduler.job import Job
 from apscheduler.triggers.cron import CronTrigger
 from fastapi.testclient import TestClient
 
-from app.cron import scheduler, service
+from app.cron import leaderboard_service, reset_leaderboard_job, scheduler
 from app.crud.unit_of_work import UnitOfWork
 from app.models.leaderboard_user_link import LeaderboardUserLink, League
 from app.models.user import User
@@ -72,10 +72,8 @@ def test_get_leaderboard(test_user: User, auth_client: TestClient, sample_leader
 
 
 def test_reset_leaderboard_cron_job_scheduled() -> None:
-    jobs: List[Job] = scheduler.get_jobs()
-    assert len(jobs) == 1
-    job = jobs[0]
-    assert job.func == service.reset_leaderboard
+    job: Job = scheduler.get_job(reset_leaderboard_job.id)
+    assert job.func == leaderboard_service.reset_leaderboard
     assert job.trigger.__class__ == CronTrigger
 
 
