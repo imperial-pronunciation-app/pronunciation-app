@@ -24,6 +24,7 @@ async def get_exercise(exercise_id: int, uow: UnitOfWork = Depends(get_unit_of_w
     next_exercise = exercise_service.next_exercise(exercise)
 
     return ExerciseResponse(
+        id=exercise.id,
         word=word_service.to_public_with_phonemes(exercise.word),
         previous_exercise_id=previous_exercise.id if previous_exercise else None,
         next_exercise_id=next_exercise.id if next_exercise else None
