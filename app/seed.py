@@ -5,9 +5,12 @@ from fastapi_users.password import PasswordHelper
 from sqlmodel import Session, SQLModel, text
 
 from app.database import engine
+from app.models.attempt import Attempt  # noqa: F401
 from app.models.exercise import Exercise
+from app.models.leaderboard_user import LeaderboardUser  # noqa: F401
 from app.models.lesson import Lesson
 from app.models.phoneme import Phoneme
+from app.models.recording import Recording  # noqa: F401
 from app.models.unit import Unit
 from app.models.user import User
 from app.models.word import Word
