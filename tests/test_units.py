@@ -29,7 +29,7 @@ def test_get_units_success(test_user: User, auth_client: TestClient, sample_unit
     lesson = unit.lessons[0]
     assert lesson_data["title"] == lesson.title
     assert lesson_data["first_exercise_id"] == lesson.exercises[0].id
-    assert lesson_data["is_completed"] == lesson.is_completed(test_user)
+    assert not lesson_data["is_completed"] # No exercises have been attempted yet
 
 def test_get_units_no_units(auth_client: TestClient) -> None:
     """Test retrieving units when there are none."""

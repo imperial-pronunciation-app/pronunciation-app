@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING, List, Optional
 from sqlmodel import Field, Relationship
 
 from app.models.id_model import IdModel
-from app.models.user import User
 
 
 if TYPE_CHECKING:
@@ -26,7 +25,3 @@ class Exercise(IdModel, table=True):
     def next_exercise(self) -> Optional["Exercise"]:
         """Returns the next exercise within the lesson, or None if it's the last exercise."""
         return self.lesson.exercises[self.index + 1] if self.index < len(self.lesson.exercises) - 1 else None
-    
-    def is_completed(self, user: User) -> bool:
-        """Returns True if the user has completed this exercise. i.e. if exercise was attempted"""
-        return any(attempt.user_id == user.id for attempt in self.attempts)
