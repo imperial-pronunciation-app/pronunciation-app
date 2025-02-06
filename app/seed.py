@@ -2,7 +2,7 @@ import json
 from typing import List, TypedDict
 
 from fastapi_users.password import PasswordHelper
-from sqlmodel import Session, SQLModel
+from sqlmodel import Session, SQLModel, text
 
 from app.database import engine
 from app.models.exercise import Exercise
@@ -95,6 +95,7 @@ def seed(session: Session) -> None:
 # docker exec -it <container_id> python -m app.seed
 if __name__ == "__main__":
     print("🔄 Resetting database schema...")
-    SQLModel.metadata.drop_all(engine)
+    with engine.begin() as conn:
+        conn.execute(text("DROP SCHEMA public CASCADE; CREATE SCHEMA public;"))
     SQLModel.metadata.create_all(engine)
     seed(Session(engine))
