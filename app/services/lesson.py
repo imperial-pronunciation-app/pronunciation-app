@@ -11,6 +11,7 @@ class LessonService:
     
     def to_response(self, lesson: Lesson, user: User) -> LessonResponse:
         return LessonResponse(
+            id=lesson.id,
             title=lesson.title,
             is_completed=self._is_completed_by(lesson, user),
             first_exercise_id=lesson.exercises[0].id
