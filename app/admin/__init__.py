@@ -1,4 +1,4 @@
-from .leaderboard_user_admin import LeaderboardUserAdmin
+from .leaderboard_user_link_admin import LeaderboardUserLinkAdmin
 from .phoneme_admin import PhonemeAdmin
 from .recording_admin import RecordingAdmin
 from .user_admin import UserAdmin
@@ -7,7 +7,7 @@ from .word_phoneme_link_admin import WordPhonemeLinkAdmin
 
 
 views = sorted([
-    LeaderboardUserAdmin,
+    LeaderboardUserLinkAdmin,
     PhonemeAdmin,
     RecordingAdmin,
     UserAdmin,

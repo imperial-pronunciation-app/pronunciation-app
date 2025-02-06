@@ -4,9 +4,7 @@ from fastapi.testclient import TestClient
 from httpx import Response
 
 
-TEST_USERNAME = "newuser"
-TEST_DOMAIN = "example.com"
-TEST_EMAIL = f"{TEST_USERNAME}@{TEST_DOMAIN}"
+TEST_EMAIL = "newuser@example.com"
 TEST_PASSWORD = "SecurePass123"
 REGISTER_ENDPOINT = "/users/register"
 LOGIN_ENDPOINT = "/auth/jwt/login"
