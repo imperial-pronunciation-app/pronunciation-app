@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING, List
 
 from sqlmodel import Relationship
 
-from app.models.base.phoneme import PhonemeBase
+from app.models.base.phoneme_base import PhonemeBase
 
 from .word_phoneme_link import WordPhonemeLink
 
