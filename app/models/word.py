@@ -11,5 +11,5 @@ if TYPE_CHECKING:
     from app.models.phoneme import Phoneme
 
 class Word(WordBase, table=True):
-    phonemes: List["Phoneme"] = Relationship(back_populates="words", link_model=WordPhonemeLink)
+    phonemes: List["Phoneme"] = Relationship(back_populates="words", link_model=WordPhonemeLink, sa_relationship_kwargs={"order_by": "WordPhonemeLink.index"})
     exercises: List["Exercise"] = Relationship(back_populates="word")
