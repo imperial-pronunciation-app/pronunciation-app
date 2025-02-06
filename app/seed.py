@@ -15,6 +15,7 @@ from app.models.unit import Unit
 from app.models.user import User
 from app.models.word import Word
 from app.models.word_phoneme_link import WordPhonemeLink
+from app.redis import LRedis
 
 
 password_helper = PasswordHelper()
@@ -91,6 +92,7 @@ def seed(session: Session) -> None:
     ]
     session.add_all(units)
     session.commit()
+    LRedis.clear()
 
     print("🎉✅ Database seeding completed successfully!")
 
