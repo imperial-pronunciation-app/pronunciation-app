@@ -1,3 +1,6 @@
+from datetime import date
+from typing import Sequence
+
 from sqlmodel import Session, select
 
 from app.crud.generic_repository import GenericRepository
@@ -12,3 +15,7 @@ class UserRepository(GenericRepository[User]):
     def get_by_email(self, email: str) -> User:
         stmt = select(User).where(User.email == email)
         return self._session.exec(stmt).one()
+
+    def find_by_new_users_created_before(self, created_before: date) -> Sequence[User]:
+        stmt = select(User).where(User.new_user).where(User.created_at.date() < created_before)
+        return self._session.exec(stmt).all()
