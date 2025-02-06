@@ -11,6 +11,7 @@ from app.models.recording import Recording
 from app.models.user import User
 from app.schemas.attempt import AttemptResponse
 from app.schemas.model_api import InferPhonemesResponse
+from app.services.phoneme import PhonemeService
 from app.services.user import UserService
 from app.users import current_active_user
 from app.utils.s3 import upload_wav_to_s3
@@ -77,7 +78,8 @@ async def post_attempt(
     
     # 3. Dispatch recording to ML backend
     inferred_phoneme_strings = dispatch_to_model(wav_file)
-    inferred_phonemes = list(map(lambda x: uow.phonemes.get_phoneme_by_ipa(x), inferred_phoneme_strings))
+    phoneme_service = PhonemeService(uow)
+    inferred_phonemes = phoneme_service.get_public_phonemes(inferred_phoneme_strings)
     
     # 4. Form feedback based on model response
     word_phonemes = list(map(lambda x: x.ipa, uow.phonemes.find_phonemes_by_word(exercise.word.id)))
