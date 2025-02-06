@@ -13,3 +13,5 @@ fastapi-users-db-sqlmodel
 requests
 responses
 APScheduler
+sqladmin
+itsdangerous

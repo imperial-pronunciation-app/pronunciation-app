@@ -16,6 +16,8 @@ set -e  # Exit on any error
 : "${BUCKET_NAME:?Must set BUCKET_NAME}"
 : "${USER_MANAGER_SECRET:?Must set USER_MANAGER_SECRET}"
 : "${MODEL_API_URL:?Must set MODEL_API_URL}"
+: "${ADMIN_USERNAME:?Must set ADMIN_USERNAME}"
+: "${ADMIN_PASSWORD_HASH:?Must set ADMIN_PASSWORD_HASH}"
 
 # Optional configuration with defaults
 # CONTAINER_NAME=${CONTAINER_NAME:-"flask-api"}
