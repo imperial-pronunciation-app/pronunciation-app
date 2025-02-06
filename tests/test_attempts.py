@@ -86,6 +86,7 @@ def test_post_attempt(
     assert recording_response.status_code == 200
     data = recording_response.json()
     assert data["score"] == 100
+    assert data["xp_gain"] == 1.5 * 100
     recording_id = data["recording_id"]
     
     recording = session.get(Recording, recording_id)
