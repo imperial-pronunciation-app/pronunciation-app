@@ -4,6 +4,6 @@ from app.models import Word
 
 
 class WordAdmin(ModelView, model=Word): # type: ignore[call-arg]
-    column_list = [Word.id, Word.word]
-    column_searchable_list = [Word.word]
-    column_sortable_list = [Word.id, Word.word]
+    column_list = [Word.id, Word.text]
+    column_searchable_list = [Word.text]
+    column_sortable_list = [Word.id, Word.text]
