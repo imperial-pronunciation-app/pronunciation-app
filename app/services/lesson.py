@@ -13,7 +13,7 @@ class LessonService:
         return LessonResponse(
             title=lesson.title,
             is_completed=self._is_completed_by(lesson, user),
-            first_exercise_id=lesson.first_exercise().id
+            first_exercise_id=lesson.exercises[0].id
         )
     
     def _is_completed_by(self, lesson: Lesson, user: User) -> bool:

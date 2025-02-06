@@ -15,6 +15,3 @@ class Lesson(IdModel, table=True):
     title: str
     order: int
     exercises: List["Exercise"] = Relationship(back_populates="lesson", cascade_delete=True, sa_relationship_kwargs={"order_by": "Exercise.index"})
-    
-    def first_exercise(self) -> "Exercise":
-        return self.exercises[0]

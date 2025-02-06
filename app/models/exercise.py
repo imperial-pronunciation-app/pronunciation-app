@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, List
 
 from sqlmodel import Field, Relationship
 
@@ -17,11 +17,3 @@ class Exercise(IdModel, table=True):
     word_id: int = Field(foreign_key="word.id")
     word: "Word" = Relationship(back_populates="exercises")
     attempts: List["Attempt"] = Relationship(back_populates="exercise", cascade_delete=True)
-
-    def previous_exercise(self) -> Optional["Exercise"]:
-        """Returns the previous exercise within the lesson, or None if it's the first exercise."""
-        return self.lesson.exercises[self.index - 1] if self.index > 0 else None
-
-    def next_exercise(self) -> Optional["Exercise"]:
-        """Returns the next exercise within the lesson, or None if it's the last exercise."""
-        return self.lesson.exercises[self.index + 1] if self.index < len(self.lesson.exercises) - 1 else None
