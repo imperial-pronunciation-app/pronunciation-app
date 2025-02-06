@@ -3,7 +3,7 @@ import os
 import dotenv
 import responses
 
-from app.routers.recording import dispatch_to_model
+from app.routers.attempts import dispatch_to_model
 
 
 dotenv.load_dotenv()

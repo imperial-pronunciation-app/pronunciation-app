@@ -72,11 +72,5 @@ class LRedis:
         LRedis._redis.flushall()
 
     @staticmethod
-    def move_all_entries(from_league: League, to_league: League) -> None:
-        """Should be used for testing only"""
-        LRedis._redis.zunionstore(LRedis._league_key(to_league), [LRedis._league_key(from_league), LRedis._league_key(to_league)])
-        LRedis.clear_league(from_league)
-
-    @staticmethod
     def _league_key(league: League) -> str:
         return f"leaderboard:{league}"

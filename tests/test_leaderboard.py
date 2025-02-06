@@ -1,5 +1,5 @@
 import math
-from typing import List
+from typing import List, Sequence
 
 from apscheduler.job import Job
 from apscheduler.triggers.cron import CronTrigger
@@ -8,96 +8,66 @@ from fastapi.testclient import TestClient
 from app.cron import scheduler, service
 from app.crud.unit_of_work import UnitOfWork
 from app.models.leaderboard_user_link import LeaderboardUserLink, League
-from app.redis import LRedis
+from app.models.user import User
 from app.services.leaderboard import LeaderboardService
 from app.services.user import UserService
-from tests.utils import TEST_DOMAIN, TEST_EMAIL, TEST_USERNAME, register_users
+from tests.fixtures.leaderboard_data import TEST_EMAILS, TEST_XPS
 
 
-def test_update_xp_existing_record(uow: UnitOfWork) -> None:
-    # Pre
-    user_id = 1
-    league = League.GOLD
-    xp_gain = 100
-
-    # When
-    result = uow.leaderboard_users.upsert(LeaderboardUserLink(user_id=user_id, league=league, xp=xp_gain))
-
-    # Then
-    assert result.user_id == user_id
-    assert result.league == league
-    assert result.xp == xp_gain
-
+def test_update_xp_existing_record(test_user: User, uow: UnitOfWork) -> None:
     # Pre
     user_service = UserService(uow)
     xp_gain = 50
+    prev_league = test_user.leaderboard_entry.league
+    prev_xp = test_user.leaderboard_entry.xp
 
     # When
-    result2 = user_service.update_xp(user_id, xp_gain)
+    leaderboard_user = user_service.update_xp(test_user, xp_gain)
 
     # Then
-    assert result2.user_id == user_id
-    assert result2.league == league
-    assert result2.xp == 150
-
-    # When
-    result3 = uow.leaderboard_users.get_by_user(user_id)
-
-    # Then
-    assert result3.user_id == user_id
-    assert result3.league == league
-    assert result3.xp == 150
+    assert leaderboard_user.user_id == test_user.id
+    assert leaderboard_user.league == prev_league
+    assert leaderboard_user.xp == prev_xp + xp_gain
 
 
-def test_reset_leaderboard(authorised_client: TestClient, uow: UnitOfWork) -> None:
+def test_reset_leaderboard(test_user: User, auth_client: TestClient, uow: UnitOfWork) -> None:
     # Pre
     initial_xp = 10
-    user = uow.users.get_by_email(TEST_EMAIL)
     user_service = UserService(uow)
-    user_service.update_xp(user.id, initial_xp)
-    assert user.leaderboard_entries[0].xp == initial_xp
+    user_service.update_xp(test_user, initial_xp)
+    assert test_user.leaderboard_entry.xp == initial_xp
 
     # When
     leaderboard_service = LeaderboardService(uow)
     leaderboard_service.reset_leaderboard()
-    response = authorised_client.get("/api/v1/leaderboard/global")
+    response = auth_client.get("/api/v1/leaderboard/global")
 
     # Then
     expected_xp = int(math.log2(initial_xp + 1))
-    assert user.leaderboard_entries[0].xp == expected_xp
+    assert uow.leaderboard_users.get_by_user(test_user.id).xp == expected_xp
     assert response.status_code == 200
     json = response.json()
     assert json["league"] == League.SILVER # Promotion
-    assert json["leaders"] == [
-        {"rank": 1, "username": TEST_EMAIL, "xp": expected_xp},
-    ]
-    assert json["user_position"] == [{"rank": 1, "username": TEST_EMAIL, "xp": expected_xp}]
+    assert json["leaders"] == json["user_position"] == [{"rank": 1, "username": test_user.email, "xp": expected_xp}]
 
 
-def test_get_leaderboard_empty_user_record(authorised_client: TestClient, uow: UnitOfWork) -> None:
-    # Pre
-    user_service = UserService(uow)
-    register_users(authorised_client)
-    leaders = uow.users.all()
-    for leader in leaders:
-        user_service.update_xp(leader.id, leader.id * 2)
-
+def test_get_leaderboard(test_user: User, auth_client: TestClient, sample_leaderboard_users_bronze: List[LeaderboardUserLink]) -> None:
     # When
-    response = authorised_client.get("/api/v1/leaderboard/global")
+    response = auth_client.get("/api/v1/leaderboard/global")
 
     # Then
     assert response.status_code == 200
     json = response.json()
     assert json["league"] == League.BRONZE
     assert json["leaders"] == [
-        {"rank": 1, "username": f"{TEST_USERNAME}9@{TEST_DOMAIN}", "xp": 22},
-        {"rank": 2, "username": f"{TEST_USERNAME}8@{TEST_DOMAIN}", "xp": 20},
-        {"rank": 3, "username": f"{TEST_USERNAME}7@{TEST_DOMAIN}", "xp": 18},
+        {"rank": 1, "username": TEST_EMAILS[0], "xp": TEST_XPS[0]},
+        {"rank": 2, "username": TEST_EMAILS[1], "xp": TEST_XPS[1]},
+        {"rank": 3, "username": TEST_EMAILS[2], "xp": TEST_XPS[2]},
     ]
     assert json["user_position"] == [
-        {"rank": 9, "username": f"{TEST_USERNAME}1@{TEST_DOMAIN}", "xp": 6},
-        {"rank": 10, "username": f"{TEST_USERNAME}0@{TEST_DOMAIN}", "xp": 4},
-        {"rank": 11, "username": TEST_EMAIL, "xp": 2},
+        {"rank": 4, "username": TEST_EMAILS[3], "xp": TEST_XPS[3]},
+        {"rank": 5, "username": TEST_EMAILS[4], "xp": TEST_XPS[4]},
+        {"rank": 6, "username": test_user.email, "xp": 0},
     ]
 
 
@@ -109,19 +79,12 @@ def test_reset_leaderboard_cron_job_scheduled() -> None:
     assert job.trigger.__class__ == CronTrigger
 
 
-def test_promotion_demotion(authorised_client: TestClient, uow: UnitOfWork) -> None:
-    # Pre: test with silver league for both promotions and demotions
-    register_users(authorised_client, count=4)
-    user_service = UserService(uow)
-    leaderboard_service = LeaderboardService(uow)
-    leaderboard_service.set_users_new_league(uow.leaderboard_users.all(), League.SILVER)
-    LRedis.move_all_entries(League.BRONZE, League.SILVER)
-    users = uow.users.all()
-    for user in users:
-        user_service.update_xp(user.id, user.id ** 2 * 200)
-
+def test_promotion_demotion(uow: UnitOfWork, sample_leaderboard_users_silver: Sequence[LeaderboardUserLink]) -> None:    
+    # Pre: ensure the sample leaderboard users are in the correct order
+    assert all(sample_leaderboard_users_silver[i].xp >= sample_leaderboard_users_silver[i + 1].xp for i in range(len(sample_leaderboard_users_silver) - 1))
+    
     # When
-    original_order = uow.leaderboard_users.find_by_league_order_by_xp_desc_with_limit(League.SILVER, 5)
+    leaderboard_service = LeaderboardService(uow)
     leaderboard_service.reset_leaderboard()
 
     # Then
@@ -135,8 +98,8 @@ def test_promotion_demotion(authorised_client: TestClient, uow: UnitOfWork) -> N
     assert len(bronze) == 1
     assert gold[0].xp >= silver[0].xp
     assert bronze[0].xp <= silver[2].xp
-    assert original_order[0].id == gold[0].id
-    assert original_order[1].id == silver[0].id
-    assert original_order[2].id == silver[1].id
-    assert original_order[3].id == silver[2].id
-    assert original_order[4].id == bronze[0].id
+    assert sample_leaderboard_users_silver[0].id == gold[0].id
+    assert sample_leaderboard_users_silver[1].id == silver[0].id
+    assert sample_leaderboard_users_silver[2].id == silver[1].id
+    assert sample_leaderboard_users_silver[3].id == silver[2].id
+    assert sample_leaderboard_users_silver[4].id == bronze[0].id

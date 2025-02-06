@@ -16,9 +16,9 @@ class LeaderboardService:
 
     def get_global_leaderboard_for_user(self, user: User, top_k: int = 3, user_position_k: int = 2) -> LeaderboardResponse:
         days_until_end = days_until_next_sunday()
-        league = user.leaderboard_entries[0].league
+        league = user.leaderboard_entry.league
 
-        user_rank = LRedis.rank(league, user.leaderboard_entries[0].id)
+        user_rank = LRedis.rank(league, user.leaderboard_entry.id)
 
         top_leaderboard_user_ids = LRedis.sorted(league, 0, top_k - 1)
         user_position_leaderboard_user_ids = LRedis.sorted(league, user_rank - user_position_k, user_rank + user_position_k)
@@ -43,11 +43,16 @@ class LeaderboardService:
         leaderboard_user = self._uow.leaderboard_users.get_by_id(leaderboard_user_id)
         return LeaderboardEntry(rank, leaderboard_user.user.email, leaderboard_user.xp)
     
+    def set_users_new_league(self, leaderboard_users: Sequence[LeaderboardUserLink], new_league: League) -> Sequence[LeaderboardUserLink]:
+        """Should only be used for testing"""
+        result = self._set_users_new_league_postgres(leaderboard_users, new_league)
+        self._reset_redis()
+        return result
+    
     def reset_leaderboard(self) -> None:
         self._handle_promotions_and_demotions()
         self._log_carry_forward()
-        for league in League:
-            self._reset_redis(league)
+        self._reset_redis()
         self._uow.commit()
     
     def _handle_promotions_and_demotions(self) -> None:
@@ -55,10 +60,10 @@ class LeaderboardService:
         silver_demotions = self._get_demotions_for_league(League.SILVER)
         silver_promotions = self._get_promotions_for_league(League.SILVER)
         gold_demotions = self._get_demotions_for_league(League.GOLD)
-        self.set_users_new_league(bronze_promotions, League.SILVER)
-        self.set_users_new_league(silver_demotions, League.BRONZE)
-        self.set_users_new_league(silver_promotions, League.GOLD)
-        self.set_users_new_league(gold_demotions, League.SILVER)
+        self._set_users_new_league_postgres(bronze_promotions, League.SILVER)
+        self._set_users_new_league_postgres(silver_demotions, League.BRONZE)
+        self._set_users_new_league_postgres(silver_promotions, League.GOLD)
+        self._set_users_new_league_postgres(gold_demotions, League.SILVER)
 
     def _get_promotions_for_league(self, league: League) -> Sequence[LeaderboardUserLink]:
         # Get total players in the current league
@@ -86,11 +91,10 @@ class LeaderboardService:
         demoted_leaderboard_user_ids = LRedis.sorted(league, 0, bottom_20_cutoff, desc=False)
         return self._uow.leaderboard_users.get_by_ids([leaderboard_user_id for leaderboard_user_id in demoted_leaderboard_user_ids])
 
-    def set_users_new_league(self, users: Sequence[LeaderboardUserLink], new_league: League) -> None:
-        """Should only be used internally and in tests"""
+    def _set_users_new_league_postgres(self, users: Sequence[LeaderboardUserLink], new_league: League) -> Sequence[LeaderboardUserLink]:
         for user in users:
             user.league = new_league
-        self._uow.leaderboard_users.upsert_all(users)
+        return self._uow.leaderboard_users.upsert_all(users)
 
     def _log_carry_forward(self) -> None:
         records = self._uow.leaderboard_users.all()
@@ -98,7 +102,11 @@ class LeaderboardService:
             record.xp = int(math.log2(record.xp + 1))
         self._uow.leaderboard_users.upsert_all(records)
     
-    def _reset_redis(self, league: League) -> None:
+    def _reset_redis(self) -> None:
+        for league in League:
+            self._reset_redis_by_league(league)
+
+    def _reset_redis_by_league(self, league: League) -> None:
         LRedis.clear_league(league)
         records = self._uow.leaderboard_users.find_by_league(league)
         LRedis.create_entries_from_users(league, records)

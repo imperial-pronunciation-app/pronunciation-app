@@ -21,7 +21,7 @@ class League(str, Enum):
 
 class LeaderboardUserLink(IdModel, table=True):
     user_id: int = Field(foreign_key="user.id", index=True)
-    user: "User" = Relationship(back_populates="leaderboard_entries")
+    user: "User" = Relationship(back_populates="leaderboard_entry")
     league: League = Field(default=League.BRONZE, sa_column=Column(SQLEnum(League), index=True))
     xp: int = Field(default=0)
     created_at: datetime = Field(default_factory=datetime.now)

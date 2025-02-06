@@ -106,6 +106,8 @@ jobs:
                         BUCKET_NAME='${{ secrets.BUCKET_NAME }}' \
                         USER_MANAGER_SECRET='${{ secrets.USER_MANAGER_SECRET }}' \
                         MODEL_API_URL='${{ secrets.MODEL_API_URL }}' \
+                        ADMIN_USERNAME='${{ secrets.ADMIN_USERNAME }}' \
+                        ADMIN_PASSWORD_HASH='${{ secrets.ADMIN_PASSWORD_HASH }}' \
                         bash ~/deploy.sh"
 
       - name: Wait for container to be up

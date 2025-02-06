@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     AWS_REGION: str
     BUCKET_NAME: str
     MODEL_API_URL: str
+    ADMIN_USERNAME: str
+    ADMIN_PASSWORD_HASH: str
 
     model_config = SettingsConfigDict(env_file=".env")
 
