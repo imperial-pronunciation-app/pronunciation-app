@@ -8,7 +8,7 @@ from app.models.leaderboard_user_link import LeaderboardUserLink, League
 class LRedis:
     """Leaderboard redis client"""
 
-    _redis = Redis(host="redis")
+    _redis = Redis(host="redis", port=6379)
 
     def __init__(self) -> None:
         raise ValueError("Do not instantiate")

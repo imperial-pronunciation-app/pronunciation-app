@@ -21,6 +21,7 @@ services:
       - dev
       - prod
     networks:
+      - default
       - parrot-network
   
   db:
@@ -36,8 +37,6 @@ services:
     profiles:
       - dev
       - prod
-    networks:
-      - parrot-network
 
   test:
     build:
@@ -55,14 +54,25 @@ services:
       - ADMIN_PASSWORD_HASH=foobarbaz
     profiles:
       - test
+    networks:
+      - default
+    depends_on:
+      - redis
   
   redis:
     image: redis:latest
+    volumes:
+      - redis_data:/data
     ports:
       - "6379:6379"
+    profiles:
+      - dev
+      - prod
+      - test
 
 volumes:
   postgres_data:
+  redis_data:
 
 networks:
   parrot-network:
