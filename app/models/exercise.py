@@ -21,13 +21,11 @@ class Exercise(IdModel, table=True):
 
     def previous_exercise(self) -> Optional["Exercise"]:
         """Returns the previous exercise within the lesson, or None if it's the first exercise."""
-        sorted_exercises = sorted(self.lesson.exercises, key=lambda e: e.index)
-        return sorted_exercises[self.index - 1] if self.index > 0 else None
+        return self.lesson.exercises[self.index - 1] if self.index > 0 else None
 
     def next_exercise(self) -> Optional["Exercise"]:
         """Returns the next exercise within the lesson, or None if it's the last exercise."""
-        sorted_exercises = sorted(self.lesson.exercises, key=lambda e: e.index)
-        return sorted_exercises[self.index + 1] if self.index < len(sorted_exercises) - 1 else None
+        return self.lesson.exercises[self.index + 1] if self.index < len(self.lesson.exercises) - 1 else None
     
     def is_completed(self, user: User) -> bool:
         """Returns True if the user has completed this exercise. i.e. if exercise was attempted"""

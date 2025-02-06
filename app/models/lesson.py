@@ -16,7 +16,7 @@ class Lesson(IdModel, table=True):
     unit: Unit = Relationship(back_populates="lessons")
     title: str
     order: int
-    exercises: List["Exercise"] = Relationship(back_populates="lesson", cascade_delete=True)
+    exercises: List["Exercise"] = Relationship(back_populates="lesson", cascade_delete=True, sa_relationship_kwargs={"order_by": "Exercise.index"})
 
     def to_response(self, user: User) -> LessonResponse:
         return LessonResponse(
@@ -29,4 +29,4 @@ class Lesson(IdModel, table=True):
         return all(exercise.is_completed(user) for exercise in self.exercises)
     
     def first_exercise(self) -> "Exercise":
-        return min(self.exercises, key=lambda e: e.index)
+        return self.exercises[0]
