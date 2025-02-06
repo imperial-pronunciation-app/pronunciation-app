@@ -1,6 +1,17 @@
 from sqlmodel import SQLModel, create_engine
 
-from app.models import Attempt, Exercise, Lesson, Phoneme, Recording, Unit, Word, WordPhonemeLink  # noqa: F401
+from app.models import (  # noqa: F401
+    Attempt,
+    Exercise,
+    LeaderboardUserLink,
+    Lesson,
+    Phoneme,
+    Recording,
+    Unit,
+    User,
+    Word,
+    WordPhonemeLink,
+)
 
 
 def test_create_database() -> None:
