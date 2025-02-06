@@ -1,12 +1,19 @@
 from typing import Dict
 
 from fastapi import FastAPI
+from sqladmin import Admin
 
+from app.admin import views
+from app.admin.auth import AdminAuth
 from app.cron import lifespan
+from app.database import engine
 from app.routers import routers
 
 
 app = FastAPI(lifespan=lifespan)
+admin = Admin(app, engine, authentication_backend=AdminAuth())
+for view in views:
+    admin.add_view(view)
 
 
 @app.get("/")
