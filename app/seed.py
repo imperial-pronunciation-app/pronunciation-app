@@ -117,7 +117,7 @@ def seed(session: Session) -> None:
     print("📚 Inserting Units with Lessons...")
     units = [
         Unit(
-            name="Shot Vowel Sound",
+            name="Short Vowel Sound",
             description="Focus on /æ/",
             order=1,
             lessons=[
