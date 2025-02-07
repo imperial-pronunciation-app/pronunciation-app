@@ -1,6 +1,6 @@
 from typing import AsyncGenerator, Optional
 
-from fastapi import Depends, Request
+from fastapi import Depends, Request, Response
 from fastapi_users import BaseUserManager, FastAPIUsers, IntegerIDMixin
 from fastapi_users.authentication import (
     AuthenticationBackend,
@@ -15,6 +15,7 @@ from app.database import get_user_db
 from app.models.leaderboard_user_link import LeaderboardUserLink
 from app.models.user import User
 from app.redis import LRedis
+from app.services.user import UserService
 
 
 secret = get_settings().USER_MANAGER_SECRET
@@ -31,6 +32,10 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         leaderboard_user = self.uow.leaderboard_users.upsert(LeaderboardUserLink(user_id=user.id)) # Defaults to bronze league and 0 xp
         self.uow.commit()
         LRedis.create_entry_from_user(leaderboard_user)
+    
+    async def on_after_login(self, user: User, request: Optional[Request] = None, response: Optional[Response] = None) -> None:
+        user_service = UserService(self.uow)
+        user_service.update_login_streak(user)
 
 
 async def get_user_manager(user_db: SQLModelUserDatabase = Depends(get_user_db), uow: UnitOfWork = Depends(get_unit_of_work)) -> AsyncGenerator[UserManager, None]:
