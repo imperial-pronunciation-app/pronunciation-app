@@ -36,6 +36,50 @@ word_data: List[WordEntry] = [
     {"word": "mouse", "phonemes": ["m", "aʊ", "s"]},
     {"word": "parrot", "phonemes": ["p", "æ", "r", "ə", "t"]},
     {"word": "chocolate", "phonemes": ["tʃ", "ɒ", "k", "l", "ə", "t"]},
+    {"word": "cat", "phonemes": ["k", "æ", "t"]},
+    {"word": "cut", "phonemes": ["k", "ʌ", "t"]},
+    {"word": "hat", "phonemes": ["h", "æ", "t"]},
+    {"word": "hut", "phonemes": ["h", "ʌ", "t"]},
+    {"word": "bat", "phonemes": ["b", "æ", "t"]},
+    {"word": "bet", "phonemes": ["b", "ɛ", "t"]},
+    {"word": "pan", "phonemes": ["p", "æ", "n"]},
+    {"word": "pen", "phonemes": ["p", "ɛ", "n"]},
+    {"word": "man", "phonemes": ["m", "æ", "n"]},
+    {"word": "bag", "phonemes": ["b", "æ", "ɡ"]},
+    {"word": "cap", "phonemes": ["k", "æ", "p"]},
+    {"word": "sat", "phonemes": ["s", "æ", "t"]},
+    {"word": "dad", "phonemes": ["d", "æ", "d"]},
+    {"word": "jam", "phonemes": ["dʒ", "æ", "m"]},
+    {"word": "map", "phonemes": ["m", "æ", "p"]},
+    {"word": "nap", "phonemes": ["n", "æ", "p"]},
+    {"word": "pat", "phonemes": ["p", "æ", "t"]},
+    {"word": "pot", "phonemes": ["p", "ɒ", "t"]},
+    {"word": "pig", "phonemes": ["p", "ɪ", "ɡ"]},
+    {"word": "pop", "phonemes": ["p", "ɒ", "p"]},
+    {"word": "pet", "phonemes": ["p", "ɛ", "t"]},
+    {"word": "pit", "phonemes": ["p", "ɪ", "t"]},
+    {"word": "pin", "phonemes": ["p", "ɪ", "n"]},
+    {"word": "pack", "phonemes": ["p", "æ", "k"]},
+    {"word": "puff", "phonemes": ["p", "ʌ", "f"]},
+    {"word": "pair", "phonemes": ["p", "ɛ", "ə", "ɹ"]},
+    {"word": "page", "phonemes": ["p", "eɪ", "dʒ"]},
+    {"word": "pine", "phonemes": ["p", "aɪ", "n"]},
+    {"word": "see", "phonemes": ["s", "iː"]},
+    {"word": "sit", "phonemes": ["s", "ɪ", "t"]},
+    {"word": "feel", "phonemes": ["f", "iː", "l"]},
+    {"word": "fill", "phonemes": ["f", "ɪ", "l"]},
+    {"word": "sheep", "phonemes": ["ʃ", "iː", "p"]},
+    {"word": "ship", "phonemes": ["ʃ", "ɪ", "p"]},
+    {"word": "heel", "phonemes": ["h", "iː", "l"]},
+    {"word": "hill", "phonemes": ["h", "ɪ", "l"]},
+    {"word": "tree", "phonemes": ["t", "r", "iː"]},
+    {"word": "keep", "phonemes": ["k", "iː", "p"]},
+    {"word": "tea", "phonemes": ["t", "iː"]},
+    {"word": "free", "phonemes": ["f", "r", "iː"]},
+    {"word": "pea", "phonemes": ["p", "iː"]},
+    {"word": "neat", "phonemes": ["n", "iː", "t"]},
+    {"word": "green", "phonemes": ["ɡ", "r", "iː", "n"]},
+    {"word": "heat", "phonemes": ["h", "iː", "t"]}
 ]
 
 def seed(session: Session) -> None:
@@ -73,20 +117,102 @@ def seed(session: Session) -> None:
     print("📚 Inserting Units with Lessons...")
     units = [
         Unit(
-            name="Basic Phonemes",
-            description="Introduction to phonemes",
+            name="Shot Vowel Sound",
+            description="Focus on /æ/",
             order=1,
             lessons=[
-                Lesson(title="Short Vowels", order=1, exercises=[Exercise(index=0, word_id=words["software"].id)]),
-                Lesson(title="Long Vowels", order=2, exercises=[Exercise(index=0, word_id=words["hardware"].id)])
+                Lesson(title="Listening Discrimination Pairs", order=1, exercises=[
+                    Exercise(index=0, word_id=words["cat"].id),
+                    Exercise(index=1, word_id=words["cut"].id),
+                    Exercise(index=2, word_id=words["hat"].id),
+                    Exercise(index=3, word_id=words["hut"].id),
+                    Exercise(index=4, word_id=words["bat"].id),
+                    Exercise(index=5, word_id=words["bet"].id),
+                    Exercise(index=6, word_id=words["pan"].id),
+                    Exercise(index=7, word_id=words["pen"].id),
+                ]),
+                Lesson(title="Repetition Practice Words", order=2, exercises=[
+                    Exercise(index=0, word_id=words["man"].id),
+                    Exercise(index=1, word_id=words["bag"].id),
+                    Exercise(index=2, word_id=words["cap"].id),
+                    Exercise(index=3, word_id=words["sat"].id),
+                    Exercise(index=4, word_id=words["dad"].id),
+                    Exercise(index=5, word_id=words["jam"].id),
+                    Exercise(index=6, word_id=words["map"].id),
+                    Exercise(index=7, word_id=words["nap"].id),
+                ])
+            ]
+            
+        ),
+        Unit(
+            name="Consonant Sound",
+            description="Focus on /p/",
+            order=2,
+            lessons=[
+                Lesson(title="Sound Isolation Words", order=1, exercises=[
+                    Exercise(index=0, word_id=words["pat"].id),
+                    Exercise(index=1, word_id=words["pot"].id),
+                    Exercise(index=2, word_id=words["pig"].id),
+                    Exercise(index=3, word_id=words["pan"].id),
+                    Exercise(index=4, word_id=words["pen"].id),
+                    Exercise(index=5, word_id=words["pop"].id),
+                    Exercise(index=6, word_id=words["pet"].id),
+                    Exercise(index=7, word_id=words["pit"].id),
+                ]),
+                Lesson(title="Repetition Practice Words", order=2, exercises=[
+                    Exercise(index=0, word_id=words["pen"].id),
+                    Exercise(index=1, word_id=words["pin"].id),
+                    Exercise(index=2, word_id=words["pack"].id),
+                    Exercise(index=3, word_id=words["puff"].id),
+                    Exercise(index=4, word_id=words["pit"].id),
+                    Exercise(index=5, word_id=words["pair"].id),
+                    Exercise(index=6, word_id=words["page"].id),
+                    Exercise(index=7, word_id=words["pine"].id),
+                ])
             ]
         ),
         Unit(
-            name="Common Words",
-            description="Practicing everyday words",
-            order=2,
+            name="Long Vowel Sound",
+            description="Focus on /iː/",
+            order=3,
             lessons=[
-                Lesson(title="Common Nouns", order=1, exercises=[Exercise(index=0, word_id=words["computer"].id)])
+                Lesson(title="Listening Discrimination Pairs", order=1, exercises=[
+                    Exercise(index=0, word_id=words["see"].id),
+                    Exercise(index=1, word_id=words["sit"].id),
+                    Exercise(index=2, word_id=words["feel"].id),
+                    Exercise(index=3, word_id=words["fill"].id),
+                    Exercise(index=4, word_id=words["sheep"].id),
+                    Exercise(index=5, word_id=words["ship"].id),
+                    Exercise(index=6, word_id=words["heel"].id),
+                    Exercise(index=7, word_id=words["hill"].id),
+                ]),
+                Lesson(title="Repetition Practice Words", order=2, exercises=[
+                    Exercise(index=0, word_id=words["tree"].id),
+                    Exercise(index=1, word_id=words["keep"].id),
+                    Exercise(index=2, word_id=words["tea"].id),
+                    Exercise(index=3, word_id=words["free"].id),
+                    Exercise(index=4, word_id=words["pea"].id),
+                    Exercise(index=5, word_id=words["neat"].id),
+                    Exercise(index=6, word_id=words["green"].id),
+                    Exercise(index=7, word_id=words["heat"].id),
+                ])
+            ]
+        ),
+        Unit(
+            name="Advanced Topics",
+            description="More complex topics",
+            order=4,
+            lessons=[
+                Lesson(title="Programming Terms", order=1, exercises=[
+                    Exercise(index=0, word_id=words["compilers"].id),
+                    Exercise(index=1, word_id=words["hardware"].id),
+                    Exercise(index=2, word_id=words["software"].id)
+                    ]),
+                Lesson(title="Computer Accessories", order=2, exercises=[
+                    Exercise(index=0, word_id=words["keyboard"].id),
+                    Exercise(index=1, word_id=words["mouse"].id),
+                    Exercise(index=2, word_id=words["computer"].id)
+                    ]),
             ]
         )
     ]
