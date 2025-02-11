@@ -1,3 +1,4 @@
+from datetime import date as pydate
 from datetime import datetime
 from typing import TYPE_CHECKING
 
@@ -13,4 +14,5 @@ if TYPE_CHECKING:
 class WordOfDay(IdModel, table=True):
     word_id: int = Field(foreign_key="word.id")
     created_at: datetime = Field(default_factory=datetime.now)
+    date: pydate = Field(index=True, default_factory=pydate.today)
     word: "Word" = Relationship(back_populates="word_of_day")

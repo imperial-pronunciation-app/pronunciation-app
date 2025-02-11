@@ -14,8 +14,8 @@ router = APIRouter()
 async def get_word_of_day(
     uow: UnitOfWork = Depends(get_unit_of_work), user: User = Depends(current_active_user)
 ) -> WordOfDayResponse:
-    uow.word_of_day.get_word_of_day()
+    today_word = uow.word_of_day.get_word_of_day()
     return WordOfDayResponse(
-        word=WordService(uow).to_public_with_phonemes(uow.word_of_day.get_word_of_day().word),
-        id=uow.word_of_day.get_word_of_day().word_id,
+        word=WordService(uow).to_public_with_phonemes(today_word.word),
+        id=today_word.word_id,
     )
