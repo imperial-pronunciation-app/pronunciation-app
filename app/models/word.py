@@ -1,6 +1,7 @@
+from datetime import date, datetime
 from typing import TYPE_CHECKING, List
 
-from sqlmodel import Relationship
+from sqlmodel import Field, Relationship
 
 from app.models.base.word_base import WordBase
 from app.models.word_phoneme_link import WordPhonemeLink
@@ -18,3 +19,4 @@ class Word(WordBase, table=True):
     )
     exercises: List["Exercise"] = Relationship(back_populates="word")
     word_of_day: List["WordOfDay"] = Relationship(back_populates="word")
+    word_of_day_last_used: date = Field(default=datetime.min.date())
