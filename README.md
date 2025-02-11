@@ -36,6 +36,17 @@ lsof -i :5432
 kill -9 <PID>
 ```
 
+### Docker commands to get docker image
+```bash
+docker ps
+```
+
+### Seeding the database
+```bash
+docker exec -it <insert-docker-image-name> python3 -m app.seed
+```
+
+
 
 
 
