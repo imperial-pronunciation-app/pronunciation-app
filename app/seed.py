@@ -114,6 +114,11 @@ def seed(session: Session) -> None:
     session.add_all(word_phoneme_links)
     session.commit()
 
+    print("📅 Inserting Word of the Day...")
+    word_of_day = WordOfDay(word_id=words["software"].id)
+    session.add(word_of_day)
+    session.commit()
+
     print("📚 Inserting Units with Lessons...")
     units = [
         Unit(
