@@ -4,5 +4,4 @@ from app.schemas.word import WordPublicWithPhonemes
 
 
 class WordOfDayResponse(BaseModel):
-    id: int
     word: WordPublicWithPhonemes

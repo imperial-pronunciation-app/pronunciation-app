@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+from random import choice
 
 from sqlmodel import Session, select
 
@@ -11,9 +12,9 @@ class WordRepository(GenericRepository[Word]):
         super().__init__(session, Word)
 
     def get_word_not_used_for(self, days: int) -> Word:
-        # TODO: Should this be done atomically?
         stmt = select(Word).where(Word.word_of_day_last_used < date.today() - timedelta(days=days))
-        res = self._session.exec(stmt).one()
+        res_list = self._session.exec(stmt)
+        res = choice(list(res_list))
         res.word_of_day_last_used = date.today()
         self.upsert(res)
         return res

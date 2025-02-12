@@ -17,5 +17,4 @@ async def get_word_of_day(
     today_word = uow.word_of_day.get_word_of_day()
     return WordOfDayResponse(
         word=WordService(uow).to_public_with_phonemes(today_word.word),
-        id=today_word.word_id,
     )
