@@ -1,4 +1,3 @@
-
 import pytest
 from sqlmodel import Session
 
@@ -48,3 +47,33 @@ def sample_word_of_day(session: Session) -> WordOfDay:
     session.refresh(word_of_day)
 
     return word_of_day
+
+
+@pytest.fixture
+def sample_word(session: Session) -> Word:
+    """Fixture to add word to database"""
+    pat = Word(text="pat")
+
+    phonemes = [Phoneme(ipa="p", respelling="p"), Phoneme(ipa="a", respelling="a"), Phoneme(ipa="t", respelling="t")]
+
+    session.add(pat)
+    session.add_all(phonemes)
+    session.commit()
+
+    session.refresh(pat)
+
+    for phoneme in phonemes:
+        session.refresh(phoneme)
+
+    word_phoneme_links = [
+        WordPhonemeLink(word_id=pat.id, phoneme_id=phonemes[0].id, index=0),
+        WordPhonemeLink(word_id=pat.id, phoneme_id=phonemes[1].id, index=1),
+        WordPhonemeLink(word_id=pat.id, phoneme_id=phonemes[2].id, index=2),
+    ]
+
+    session.add_all(word_phoneme_links)
+    session.commit()
+
+    session.refresh(pat)
+
+    return pat
