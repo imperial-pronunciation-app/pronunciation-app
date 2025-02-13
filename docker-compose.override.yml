@@ -6,6 +6,6 @@ services:
       dockerfile: Dockerfile
       target: dev
 
-networks:
-  parrot-network:
-    external: false
+# networks:
+#   parrot-network:
+#     external: false
