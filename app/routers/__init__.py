@@ -15,5 +15,5 @@ routers = [
     users_router,
     exercises_router,
     units_router,
-    word_of_day_router,
+    word_of_day_router
 ]

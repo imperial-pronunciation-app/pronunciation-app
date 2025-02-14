@@ -1,3 +1,5 @@
+import random
+
 from app.crud.unit_of_work import UnitOfWork
 from app.models.word import Word
 from app.schemas.phoneme import PhonemePublic
@@ -14,3 +16,9 @@ class WordService:
             text=word.text,
             phonemes=[PhonemePublic(id=p.id, ipa=p.ipa, respelling=p.respelling) for p in word.phonemes]
         )
+
+    def get_random(self) -> Word:
+        words = self._uow.words.all()
+        if len(words) == 0:
+            raise IndexError("No words to choose from")
+        return random.choice(words)
