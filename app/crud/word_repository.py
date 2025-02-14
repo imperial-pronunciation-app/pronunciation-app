@@ -18,3 +18,7 @@ class WordRepository(GenericRepository[Word]):
         res.word_of_day_last_used = date.today()
         self.upsert(res)
         return res
+
+    def update_date_of_word_last_used(self, word: Word, _date: date = date.today()) -> None:
+        word.word_of_day_last_used = _date
+        self.upsert(word)
