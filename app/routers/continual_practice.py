@@ -9,8 +9,8 @@ from app.users import current_active_user
 
 router = APIRouter()
 
-@router.get("/api/v1/continuous_practice", response_model=WordPublicWithPhonemes)
-async def get_continuous_practice_word(uow: UnitOfWork = Depends(get_unit_of_work), user: User = Depends(current_active_user)) -> WordPublicWithPhonemes:
+@router.get("/api/v1/continual_practice", response_model=WordPublicWithPhonemes)
+async def get_continual_practice_word(uow: UnitOfWork = Depends(get_unit_of_work), user: User = Depends(current_active_user)) -> WordPublicWithPhonemes:
   word_service = WordService(uow)
 
   try:
