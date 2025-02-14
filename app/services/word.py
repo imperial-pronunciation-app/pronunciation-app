@@ -21,4 +21,4 @@ class WordService:
         words = self._uow.words.all()
         if len(words) == 0:
             raise IndexError("No words to choose from")
-        return random.choice(self._uow.words.all())
+        return random.choice(words)
