@@ -22,7 +22,7 @@ def test_successful_request() -> None:
     
     rsp = responses.Response(
         method="POST",
-        url=f"{os.environ.get('MODEL_API_URL', '')}/api/v1/infer_phonemes",
+        url=f"{os.environ.get('MODEL_API_URL', '')}/api/v1/eng/infer_phonemes",
         json={"phonemes": test_word_phonemes},
     )
     responses.add(rsp)
