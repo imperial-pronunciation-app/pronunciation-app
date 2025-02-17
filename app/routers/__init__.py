@@ -1,7 +1,6 @@
 # Contains routes and endpoints
 from .attempts import router as attempts_router
 from .auth import router as auth_router
-from .continual_practice import router as continual_practice_router
 from .exercises import router as exercises_router
 from .leaderboard import router as leaderboard_router
 from .units import router as units_router
@@ -14,6 +13,5 @@ routers = [
     attempts_router,
     users_router,
     exercises_router,
-    units_router,
-    continual_practice_router
+    units_router
 ]
