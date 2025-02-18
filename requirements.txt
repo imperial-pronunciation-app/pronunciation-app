@@ -16,3 +16,4 @@ APScheduler
 redis
 sqladmin
 itsdangerous
+numpy
