@@ -13,11 +13,8 @@ class WordRepository(GenericRepository[Word]):
 
     def get_word_not_used_for(self, days: int) -> Word:
         stmt = select(Word).where(Word.word_of_day_last_used < date.today() - timedelta(days=days))
-        res_list = self._session.exec(stmt)
-        res = choice(list(res_list))
-        res.word_of_day_last_used = date.today()
-        self.upsert(res)
-        return res
+        res_list = self._session.exec(stmt).all()
+        return choice(res_list)
 
     def update_date_of_word_last_used(self, word: Word, _date: date = date.today()) -> None:
         word.word_of_day_last_used = _date
