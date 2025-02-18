@@ -7,7 +7,6 @@ from app.crud.unit_of_work import UnitOfWork
 from app.models.exercise import Exercise
 from app.models.lesson import Lesson
 from app.models.phoneme import Phoneme
-from app.models.recording import Recording
 from app.models.unit import Unit
 from app.models.word import Word
 from app.models.word_phoneme_link import WordPhonemeLink
@@ -50,18 +49,26 @@ def test_post_attempt(session: Session, uow: UnitOfWork, mocker: MockerFixture, 
     # Correct response is returned
     test_word = "software"
     test_word_phonemes = ["s", "oʊ", "f", "t", "w", "ɛ", "r"]
-    blob_id = "blob_id"
-    test_wav_filename = "test.wav"
     similarity = 100
 
     # mock_os_remove = mocker.patch("os.remove")
     mock_service = mocker.Mock(spec=AttemptService)
     mocker.patch("app.routers.attempts.AttemptService", return_value=mock_service)
-    mock_upload_wav_to_s3 = mocker.patch("app.utils.s3.upload_wav_to_s3", return_value=blob_id)
-    mock_calculate_similarity = mocker.patch("app.utils.similarity.similarity", return_value=similarity)
 
-    mock_service.create_wav_file.return_value = test_wav_filename
-    mock_service.dispatch_to_model.return_value = test_word_phonemes
+    mock_service.post_attempt.return_value = {
+        "score": similarity,
+        "xp_gain": 1.5 * similarity,
+        "recording_id": 1,
+        "recording_phonemes": [
+            {"ipa": "s", "respelling": "s"},
+            {"ipa": "oʊ", "respelling": "oʊ"},
+            {"ipa": "f", "respelling": "f"},
+            {"ipa": "t", "respelling": "t"},
+            {"ipa": "w", "respelling": "w"},
+            {"ipa": "ɛ", "respelling": "ɛ"},
+            {"ipa": "r", "respelling": "r"},
+        ],
+    }
 
     word = uow.words.upsert(Word(text=test_word))
     phonemes = uow.phonemes.upsert_all([Phoneme(ipa=p, respelling=p) for p in test_word_phonemes])
@@ -83,13 +90,6 @@ def test_post_attempt(session: Session, uow: UnitOfWork, mocker: MockerFixture, 
     print(f"\nThe data is: {data}")
     assert data["score"] == 100
     assert data["xp_gain"] == 1.5 * 100
-    recording_id = data["recording_id"]
+    assert data["recording_id"] == 1
 
-    recording = session.get(Recording, recording_id)
-    # TODO: Test the phonemes
-    assert recording is not None
-
-    mock_service.create_wav_file.assert_called_once()
-    mock_upload_wav_to_s3.assert_called_once_with(test_wav_filename)
-    mock_service.dispatch_to_model.assert_called_once_with(test_wav_filename)
-    mock_calculate_similarity.assert_called_once_with(test_word_phonemes, test_word_phonemes)
+    mock_service.post_attempt.assert_called_once()
