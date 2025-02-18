@@ -17,6 +17,7 @@ from .utils import login_user, register_user
 pytest_plugins = [
    "tests.fixtures.curriculum_data",
    "tests.fixtures.leaderboard_data",
+   "tests.fixtures.pronunciation_data",
 ]
 
 @pytest.fixture
