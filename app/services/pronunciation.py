@@ -17,17 +17,17 @@ class PronunciationService:
         self.insertion_penalty = insertion_penalty
 
     def evaluate_pronunciation(
-        self, word: Word, actual: List[str]
+        self, word: Word, pronounced_phonemes: List[str]
     ) -> Tuple[List[Tuple[Optional[PhonemePublic], Optional[PhonemePublic]]], int]:
         """
         Aligns phonemes and scores pronunciation based on phoneme similarity.
 
-        :param expected: List of correct phonemes.
-        :param actual: List of user-pronounced phonemes.
+        :param word: Attempted word.
+        :param pronounced_phonemes: List of user-pronounced phonemes.
         :return: Tuple of aligned phonemes and a pronunciation score (0-100).
         """
         expected = list(map(lambda x: x.ipa, self._uow.phonemes.find_phonemes_by_word(word.id)))
-        alignment, score = compute_alignment(expected, actual, phoneme_similarity, self.deletion_penalty, self.insertion_penalty)
+        alignment, score = compute_alignment(expected, pronounced_phonemes, phoneme_similarity, self.deletion_penalty, self.insertion_penalty)
 
         return self.convert_alignment_to_phoneme_public(alignment), score
     
