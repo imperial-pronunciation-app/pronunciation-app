@@ -1,4 +1,3 @@
-import pytest
 from fastapi.testclient import TestClient
 from pytest_mock import MockerFixture
 from sqlmodel import Session
@@ -12,7 +11,7 @@ from app.models.unit import Unit
 from app.models.word import Word
 from app.models.word_phoneme_link import WordPhonemeLink
 from app.routers.attempts import create_wav_file
-from app.utils.similarity import similarity
+from app.services.pronunciation import PronunciationService
 
 
 def test_create_wav_file(mocker: MockerFixture) -> None:
@@ -27,21 +26,6 @@ def test_create_wav_file(mocker: MockerFixture) -> None:
     mock_file().write.assert_called_once_with(audio_bytes)
 
 
-@pytest.mark.parametrize(
-    "s1, s2, expected",
-    [
-        (["a", "b", "c"], ["a", "b", "c"], 100),
-        (["a", "b", "c"], ["d", "e", "f"], 0),
-        (["a", "b", "c"], ["a", "b", "d"], 67),
-        (["a", "b", "c"], ["a", "b", "c", "d"], 75),
-        (["a", "b", "c"], ["a", "c", "b", "d"], 50),
-        (["a", "b", "c"], ["c", "a", "b"], 33),
-    ],
-)
-def test_similarity(s1: list[str], s2: list[str], expected: int) -> None:
-    assert similarity(s1, s2) == expected
-
-
 def test_post_attempt(
         session: Session,
         uow: UnitOfWork,
@@ -49,7 +33,7 @@ def test_post_attempt(
         auth_client: TestClient
     ) -> None:
     # Check that calls to:
-    # create_wav_file, upload_wav_to_s3, dispatch_to_model, similarity are made correctly
+    # create_wav_file, upload_wav_to_s3, dispatch_to_model, evaluate_pronunciation are made correctly
     # Recording entry is added to the table
     # File is deleted correctly
     # Correct response is returned
@@ -57,18 +41,22 @@ def test_post_attempt(
     test_word_phonemes = ['s', 'oʊ', 'f', 't', 'w', 'ɛ', 'r']
     blob_id = "blob_id"
     test_wav_filename = "test.wav"
-    similarity = 100
-
+    score = 100
+    
     mock_create_wav_file = mocker.patch("app.routers.attempts.create_wav_file", return_value=test_wav_filename)
     mock_upload_wav_to_s3 = mocker.patch("app.routers.attempts.upload_wav_to_s3", return_value=blob_id)
     mock_dispatch_to_model = mocker.patch("app.routers.attempts.dispatch_to_model", return_value=test_word_phonemes)
     mock_os_remove = mocker.patch("os.remove")
-    mock_similarity = mocker.patch("app.routers.attempts.similarity", return_value=similarity)
+    
 
     word = uow.words.upsert(Word(text=test_word))
     phonemes = uow.phonemes.upsert_all([Phoneme(ipa=p, respelling=p) for p in test_word_phonemes])
     session.add_all([WordPhonemeLink(word_id=word.id, phoneme_id=p.id, index=i) for i, p in enumerate(phonemes)])
     session.commit()
+
+    alignment = [(p, p) for p in phonemes]
+    mock_evaluate_pronunciation = mocker.patch.object(PronunciationService, "evaluate_pronunciation", return_value=(alignment, score))
+
     unit = uow.units.upsert(Unit(name="test", description="test", order=1))
     lesson = uow.lessons.upsert(Lesson(title="test", unit_id=unit.id, order=1))
     exercise = uow.exercises.upsert(Exercise(lesson_id=lesson.id, word_id=word.id, index=0))
@@ -98,4 +86,4 @@ def test_post_attempt(
     
     mock_dispatch_to_model.assert_called_once_with(test_wav_filename)
     mock_os_remove.assert_called_once_with(test_wav_filename)
-    mock_similarity.assert_called_once_with(test_word_phonemes, test_word_phonemes)
+    mock_evaluate_pronunciation.assert_called_once_with(word, test_word_phonemes)
