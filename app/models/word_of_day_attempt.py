@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 
 class WordOfDayAttempt(IdModel, table=True):
-    word_of_day_id: int = Field(foreign_key="word_of_day.id")  # Changed from "word_of_day.id"
+    word_of_day_id: int = Field(foreign_key="wordofday.id")
     word_of_day: "WordOfDay" = Relationship(back_populates="word_of_day_attempts")
     user_id: int = Field(foreign_key="user.id")
     created_at: datetime = Field(default_factory=datetime.now)

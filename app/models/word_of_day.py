@@ -18,6 +18,4 @@ class WordOfDay(IdModel, table=True):
     created_at: datetime = Field(default_factory=datetime.now)
     date: pydate = Field(index=True, default_factory=pydate.today)
     word: "Word" = Relationship(back_populates="word_of_day")
-    word_of_day_attempts: List["WordOfDayAttempt"] = Relationship(
-        back_populates="word_of_day", sa_relationship_kwargs={"cascade": "all, delete-orphan"}
-    )
+    word_of_day_attempts: List["WordOfDayAttempt"] = Relationship(back_populates="word_of_day", cascade_delete=True)
