@@ -1,7 +1,7 @@
+from enum import Enum
 
-# TODO: Make into actual enum
-# struct AttemptType {
-#     "continual",
-#     "lesson",
-#     "wotd"
-# }
+
+class AttemptType(str, Enum):
+    CONTINUAL = "continual"
+    EXERCISE = "exercise"
+    WOTD = "wotd"

@@ -7,7 +7,7 @@ from fastapi import Depends, HTTPException, UploadFile
 from app.config import get_settings
 from app.crud.unit_of_work import UnitOfWork, get_unit_of_work
 from app.models.attempt import Attempt
-from app.models.attempt_type import AttemptEnum  # type: ignore
+from app.models.attempt_type import AttemptType
 from app.models.recording import Recording
 from app.models.user import User
 from app.models.word_of_day_attempt import WordOfDayAttempt
@@ -47,17 +47,17 @@ class AttemptService:
     async def post_attempt(
         self,
         audio_file: UploadFile,
-        attempt_type: AttemptEnum,
+        attempt_type: AttemptType,
         _id: int,
         uow: UnitOfWork = Depends(get_unit_of_work),
         user: User = Depends(current_active_user),
     ) -> AttemptResponse:
-        if attempt_type == "exercise":
+        if attempt_type == AttemptType.EXERCISE:
             exercise = uow.exercises.find_by_id(id=_id)
             if not exercise:
                 raise HTTPException(status_code=404, detail="Exercise not found")
             word_id = exercise.word.id
-        elif attempt_type == "WOD":
+        elif attempt_type == AttemptType.WOTD:
             word_id = _id
 
         else:
@@ -70,10 +70,10 @@ class AttemptService:
         s3_key = upload_wav_to_s3(wav_file)
 
         # 2a. Create attempt entries and recoding entries
-        if attempt_type == "exercise":
+        if attempt_type == AttemptType.EXERCISE:
             attempt = uow.attempts.upsert(Attempt(user_id=user.id, exercise_id=_id))
             recording = uow.recordings.upsert(Recording(attempt_id=attempt.id, s3_key=s3_key))
-        elif attempt_type == "WOD":
+        elif attempt_type == AttemptType.WOTD:
             wod_attempt = uow.word_of_day_attempts.upsert(WordOfDayAttempt(user_id=user.id, id=_id, word_of_day_id=_id))
             recording = uow.recordings.upsert(Recording(attempt_id=wod_attempt.id, s3_key=s3_key))
         else:
