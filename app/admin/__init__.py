@@ -1,3 +1,5 @@
+from app.admin.attempt_admin import AttemptAdmin
+
 from .leaderboard_user_link_admin import LeaderboardUserLinkAdmin
 from .phoneme_admin import PhonemeAdmin
 from .recording_admin import RecordingAdmin
@@ -9,6 +11,7 @@ from .word_phoneme_link_admin import WordPhonemeLinkAdmin
 views = sorted([
     LeaderboardUserLinkAdmin,
     PhonemeAdmin,
+    AttemptAdmin,
     RecordingAdmin,
     UserAdmin,
     WordAdmin,
