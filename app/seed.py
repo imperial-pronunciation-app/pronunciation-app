@@ -10,6 +10,7 @@ from app.models.exercise import Exercise
 from app.models.leaderboard_user_link import LeaderboardUserLink  # noqa: F401
 from app.models.lesson import Lesson
 from app.models.phoneme import Phoneme
+from app.models.public_lesson import PublicLesson
 from app.models.recording import Recording  # noqa: F401
 from app.models.unit import Unit
 from app.models.user import User
@@ -115,39 +116,95 @@ def seed(session: Session) -> None:
     session.commit()
 
     print("📅 Inserting Word of the Day...")
-    word_of_day = WordOfDay(word_id=words["software"].id)
-    word = Word(id=word_of_day.word_id, text=words["software"].text, word_of_day_last_used=word_of_day.date)
+    word = words["software"]
+    word_of_day = WordOfDay(word_id=word.id)
+    word.word_of_day_last_used = word_of_day.date
     session.add(word_of_day)
     session.add(word)
     session.commit()
 
     print("📚 Inserting Units with Lessons...")
+    lessons = [
+        Lesson(title="Listening Discrimination Pairs", order=1, exercises=[
+            Exercise(index=0, word_id=words["cat"].id),
+            Exercise(index=1, word_id=words["cut"].id),
+            Exercise(index=2, word_id=words["hat"].id),
+            Exercise(index=3, word_id=words["hut"].id),
+            Exercise(index=4, word_id=words["bat"].id),
+            Exercise(index=5, word_id=words["bet"].id),
+            Exercise(index=6, word_id=words["pan"].id),
+            Exercise(index=7, word_id=words["pen"].id),
+        ]),
+        Lesson(title="Repetition Practice Words", order=2, exercises=[
+            Exercise(index=0, word_id=words["man"].id),
+            Exercise(index=1, word_id=words["bag"].id),
+            Exercise(index=2, word_id=words["cap"].id),
+            Exercise(index=3, word_id=words["sat"].id),
+            Exercise(index=4, word_id=words["dad"].id),
+            Exercise(index=5, word_id=words["jam"].id),
+            Exercise(index=6, word_id=words["map"].id),
+            Exercise(index=7, word_id=words["nap"].id),
+        ]),
+        Lesson(title="Sound Isolation Words", order=1, exercises=[
+            Exercise(index=0, word_id=words["pat"].id),
+            Exercise(index=1, word_id=words["pot"].id),
+            Exercise(index=2, word_id=words["pig"].id),
+            Exercise(index=3, word_id=words["pan"].id),
+            Exercise(index=4, word_id=words["pen"].id),
+            Exercise(index=5, word_id=words["pop"].id),
+            Exercise(index=6, word_id=words["pet"].id),
+            Exercise(index=7, word_id=words["pit"].id),
+        ]),
+        Lesson(title="Repetition Practice Words", order=2, exercises=[
+            Exercise(index=0, word_id=words["pen"].id),
+            Exercise(index=1, word_id=words["pin"].id),
+            Exercise(index=2, word_id=words["pack"].id),
+            Exercise(index=3, word_id=words["puff"].id),
+            Exercise(index=4, word_id=words["pit"].id),
+            Exercise(index=5, word_id=words["pair"].id),
+            Exercise(index=6, word_id=words["page"].id),
+            Exercise(index=7, word_id=words["pine"].id),
+        ]),
+        Lesson(title="Listening Discrimination Pairs", order=1, exercises=[
+            Exercise(index=0, word_id=words["see"].id),
+            Exercise(index=1, word_id=words["sit"].id),
+            Exercise(index=2, word_id=words["feel"].id),
+            Exercise(index=3, word_id=words["fill"].id),
+            Exercise(index=4, word_id=words["sheep"].id),
+            Exercise(index=5, word_id=words["ship"].id),
+            Exercise(index=6, word_id=words["heel"].id),
+            Exercise(index=7, word_id=words["hill"].id),
+        ]),
+        Lesson(title="Repetition Practice Words", order=2, exercises=[
+            Exercise(index=0, word_id=words["tree"].id),
+            Exercise(index=1, word_id=words["keep"].id),
+            Exercise(index=2, word_id=words["tea"].id),
+            Exercise(index=3, word_id=words["free"].id),
+            Exercise(index=4, word_id=words["pea"].id),
+            Exercise(index=5, word_id=words["neat"].id),
+            Exercise(index=6, word_id=words["green"].id),
+            Exercise(index=7, word_id=words["heat"].id),
+        ]),
+        Lesson(title="Programming Terms", order=1, exercises=[
+            Exercise(index=0, word_id=words["compilers"].id),
+            Exercise(index=1, word_id=words["hardware"].id),
+            Exercise(index=2, word_id=words["software"].id)
+        ]),
+        Lesson(title="Computer Accessories", order=2, exercises=[
+            Exercise(index=0, word_id=words["keyboard"].id),
+            Exercise(index=1, word_id=words["mouse"].id),
+            Exercise(index=2, word_id=words["computer"].id)
+        ])
+    ]
+
     units = [
         Unit(
             name="Short Vowel Sound",
             description="Focus on /æ/",
             order=1,
             lessons=[
-                Lesson(title="Listening Discrimination Pairs", order=1, exercises=[
-                    Exercise(index=0, word_id=words["cat"].id),
-                    Exercise(index=1, word_id=words["cut"].id),
-                    Exercise(index=2, word_id=words["hat"].id),
-                    Exercise(index=3, word_id=words["hut"].id),
-                    Exercise(index=4, word_id=words["bat"].id),
-                    Exercise(index=5, word_id=words["bet"].id),
-                    Exercise(index=6, word_id=words["pan"].id),
-                    Exercise(index=7, word_id=words["pen"].id),
-                ]),
-                Lesson(title="Repetition Practice Words", order=2, exercises=[
-                    Exercise(index=0, word_id=words["man"].id),
-                    Exercise(index=1, word_id=words["bag"].id),
-                    Exercise(index=2, word_id=words["cap"].id),
-                    Exercise(index=3, word_id=words["sat"].id),
-                    Exercise(index=4, word_id=words["dad"].id),
-                    Exercise(index=5, word_id=words["jam"].id),
-                    Exercise(index=6, word_id=words["map"].id),
-                    Exercise(index=7, word_id=words["nap"].id),
-                ])
+                PublicLesson(id=lessons[0].id),
+                PublicLesson(id=lessons[1].id)
             ]
         ),
         Unit(
@@ -155,26 +212,8 @@ def seed(session: Session) -> None:
             description="Focus on /p/",
             order=2,
             lessons=[
-                Lesson(title="Sound Isolation Words", order=1, exercises=[
-                    Exercise(index=0, word_id=words["pat"].id),
-                    Exercise(index=1, word_id=words["pot"].id),
-                    Exercise(index=2, word_id=words["pig"].id),
-                    Exercise(index=3, word_id=words["pan"].id),
-                    Exercise(index=4, word_id=words["pen"].id),
-                    Exercise(index=5, word_id=words["pop"].id),
-                    Exercise(index=6, word_id=words["pet"].id),
-                    Exercise(index=7, word_id=words["pit"].id),
-                ]),
-                Lesson(title="Repetition Practice Words", order=2, exercises=[
-                    Exercise(index=0, word_id=words["pen"].id),
-                    Exercise(index=1, word_id=words["pin"].id),
-                    Exercise(index=2, word_id=words["pack"].id),
-                    Exercise(index=3, word_id=words["puff"].id),
-                    Exercise(index=4, word_id=words["pit"].id),
-                    Exercise(index=5, word_id=words["pair"].id),
-                    Exercise(index=6, word_id=words["page"].id),
-                    Exercise(index=7, word_id=words["pine"].id),
-                ])
+                PublicLesson(id=lessons[2].id),
+                PublicLesson(id=lessons[3].id)
             ]
         ),
         Unit(
@@ -182,26 +221,8 @@ def seed(session: Session) -> None:
             description="Focus on /iː/",
             order=3,
             lessons=[
-                Lesson(title="Listening Discrimination Pairs", order=1, exercises=[
-                    Exercise(index=0, word_id=words["see"].id),
-                    Exercise(index=1, word_id=words["sit"].id),
-                    Exercise(index=2, word_id=words["feel"].id),
-                    Exercise(index=3, word_id=words["fill"].id),
-                    Exercise(index=4, word_id=words["sheep"].id),
-                    Exercise(index=5, word_id=words["ship"].id),
-                    Exercise(index=6, word_id=words["heel"].id),
-                    Exercise(index=7, word_id=words["hill"].id),
-                ]),
-                Lesson(title="Repetition Practice Words", order=2, exercises=[
-                    Exercise(index=0, word_id=words["tree"].id),
-                    Exercise(index=1, word_id=words["keep"].id),
-                    Exercise(index=2, word_id=words["tea"].id),
-                    Exercise(index=3, word_id=words["free"].id),
-                    Exercise(index=4, word_id=words["pea"].id),
-                    Exercise(index=5, word_id=words["neat"].id),
-                    Exercise(index=6, word_id=words["green"].id),
-                    Exercise(index=7, word_id=words["heat"].id),
-                ])
+                PublicLesson(id=lessons[4].id),
+                PublicLesson(id=lessons[5].id)
             ]
         ),
         Unit(
@@ -209,19 +230,12 @@ def seed(session: Session) -> None:
             description="More complex topics",
             order=4,
             lessons=[
-                Lesson(title="Programming Terms", order=1, exercises=[
-                    Exercise(index=0, word_id=words["compilers"].id),
-                    Exercise(index=1, word_id=words["hardware"].id),
-                    Exercise(index=2, word_id=words["software"].id)
-                    ]),
-                Lesson(title="Computer Accessories", order=2, exercises=[
-                    Exercise(index=0, word_id=words["keyboard"].id),
-                    Exercise(index=1, word_id=words["mouse"].id),
-                    Exercise(index=2, word_id=words["computer"].id)
-                    ]),
+                PublicLesson(id=lessons[6].id),
+                PublicLesson(id=lessons[7].id)
             ]
         )
     ]
+    session.add_all(lessons)
     session.add_all(units)
     session.commit()
     LRedis.clear()

@@ -15,5 +15,5 @@ class UnitService:
             id=unit.id,
             name=unit.name,
             description=unit.description,
-            lessons=[lesson_service.to_response(lesson, user) for lesson in unit.lessons]
+            lessons=[lesson_service.to_response(lesson.lesson, user) for lesson in unit.lessons]
         )
