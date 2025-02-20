@@ -11,7 +11,7 @@ class UserService:
     def __init__(self, uow: UnitOfWork) -> None:
         self._uow = uow
     
-    def update_xp_with_boost(
+    async def update_xp_with_boost(
         self,
         user: User,
         lesson_xp: int,
@@ -30,26 +30,26 @@ class UserService:
 
         entry = user.leaderboard_entry
         entry.xp += xp_gain
-        self._uow.leaderboard_users.upsert(entry)
+        await self._uow.leaderboard_users.upsert(entry)
         user.xp_total += xp_gain
-        self._uow.users.upsert(user)
-        self._uow.commit()
+        await self._uow.users.upsert(user)
+        await self._uow.commit()
         LRedis.update_xp(entry.league, entry.id, xp_gain)
         return xp_gain
     
-    def update_xp(self, user: User, xp_gain: int) -> LeaderboardUserLink:
+    async def update_xp(self, user: User, xp_gain: int) -> LeaderboardUserLink:
         """Should be used for testing only, as it does not account for boosts, e.g. streaks"""
         assert xp_gain >= 0
         entry = user.leaderboard_entry
         entry.xp += xp_gain
-        entry = self._uow.leaderboard_users.upsert(entry)
+        entry = await self._uow.leaderboard_users.upsert(entry)
         user.xp_total += xp_gain
-        self._uow.users.upsert(user)
-        self._uow.commit()
+        await self._uow.users.upsert(user)
+        await self._uow.commit()
         LRedis.update_xp(entry.league, entry.id, xp_gain)
         return entry
 
-    def update_login_streak(self, user: User) -> User:
+    async def update_login_streak(self, user: User) -> User:
         today = date.today()
         datediff = today - user.last_login_date
         match datediff.days:
@@ -60,13 +60,13 @@ class UserService:
             case _:
                 user.login_streak = 1
         user.last_login_date = today
-        user = self._uow.users.upsert(user)
-        self._uow.commit()
+        user = await self._uow.users.upsert(user)
+        await self._uow.commit()
         return user
     
-    def disable_new_user_boost(self, boost_duration_days: int = 3) -> None:
-        users = self._uow.users.find_by_new_users_created_before(date.today() - timedelta(days=boost_duration_days))
+    async def disable_new_user_boost(self, boost_duration_days: int = 3) -> None:
+        users = await self._uow.users.find_by_new_users_created_before(date.today() - timedelta(days=boost_duration_days))
         for user in users:
             user.new_user = False
-        self._uow.users.upsert_all(users)
-        self._uow.commit()
+        await self._uow.users.upsert_all(users)
+        await self._uow.commit()

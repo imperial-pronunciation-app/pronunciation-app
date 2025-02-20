@@ -1,9 +1,12 @@
-from typing import Optional
+from sqlalchemy import ForeignKey, Integer
+from sqlalchemy.orm import Mapped, mapped_column
 
-from sqlmodel import Field, SQLModel
+from app.models.base_model import Base
 
 
-class WordPhonemeLink(SQLModel, table=True):
-    word_id: Optional[int] = Field(foreign_key="word.id", primary_key=True)
-    phoneme_id: Optional[int] = Field(foreign_key="phoneme.id", primary_key=True)
-    index: int = Field(primary_key=True) # needs to be a primary key in case a word contains multiples of the same phoneme
+class WordPhonemeLink(Base):
+    __tablename__ = "word_phoneme_link"
+
+    word_id: Mapped[int] = mapped_column(ForeignKey("word.id"), primary_key=True)
+    phoneme_id: Mapped[int] = mapped_column(ForeignKey("phoneme.id"), primary_key=True)
+    index: Mapped[int] = mapped_column(Integer, primary_key=True)

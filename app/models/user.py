@@ -1,20 +1,26 @@
 from datetime import date
 from typing import TYPE_CHECKING
 
-from fastapi_users_db_sqlmodel import SQLModelBaseUserDB
-from sqlmodel import Field, Relationship
+from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
+from sqlalchemy import Boolean, Date, Integer
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.id_model import IdModel
-from app.models.leaderboard_user_link import LeaderboardUserLink
 
 
 if TYPE_CHECKING:
     from app.models.leaderboard_user_link import LeaderboardUserLink
 
-class User(IdModel, SQLModelBaseUserDB, table=True):
-    login_streak: int = Field(default=1)
-    last_login_date: date = Field(default_factory=date.today)
-    xp_total: int = Field(default=0)
-    level: int = Field(default=1)
-    new_user: bool = Field(default=True)
-    leaderboard_entry: "LeaderboardUserLink" = Relationship(back_populates="user")
+class User(IdModel, SQLAlchemyBaseUserTable[Mapped[int]]):
+    __tablename__ = "user"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+
+    login_streak: Mapped[int] = mapped_column(Integer, default=1)
+    last_login_date: Mapped[date] = mapped_column(Date, default=date.today)
+    xp_total: Mapped[int] = mapped_column(Integer, default=0)
+    level: Mapped[int] = mapped_column(Integer, default=1)
+    new_user: Mapped[bool] = mapped_column(Boolean, default=True)
+    leaderboard_entry: Mapped["LeaderboardUserLink"] = relationship(back_populates="user")
+
+    created_at: Mapped[date] = mapped_column(Date, default=date.today)

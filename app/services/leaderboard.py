@@ -14,17 +14,17 @@ class LeaderboardService:
     def __init__(self, uow: UnitOfWork) -> None:
         self._uow = uow
 
-    def get_global_leaderboard_for_user(self, user: User, top_k: int = 3, user_position_k: int = 2) -> LeaderboardResponse:
+    async def get_global_leaderboard_for_user(self, user: User, top_k: int = 3, user_position_k: int = 2) -> LeaderboardResponse:
         days_until_end = days_until_next_sunday()
         league = user.leaderboard_entry.league
 
-        user_rank = LRedis.rank(league, user.leaderboard_entry.id)
+        user_rank = await LRedis.rank(league, user.leaderboard_entry.id)
 
-        top_leaderboard_user_ids = LRedis.sorted(league, 0, top_k - 1)
-        user_position_leaderboard_user_ids = LRedis.sorted(league, user_rank - user_position_k, user_rank + user_position_k)
+        top_leaderboard_user_ids = await LRedis.sorted(league, 0, top_k - 1)
+        user_position_leaderboard_user_ids = await LRedis.sorted(league, user_rank - user_position_k, user_rank + user_position_k)
 
-        leaders = self._leaderboard_entries_from_leaderboard_user_ids(top_leaderboard_user_ids)
-        user_position = self._leaderboard_entries_from_leaderboard_user_ids(user_position_leaderboard_user_ids, user_rank - user_position_k)
+        leaders = await self._leaderboard_entries_from_leaderboard_user_ids(top_leaderboard_user_ids)
+        user_position = await self._leaderboard_entries_from_leaderboard_user_ids(user_position_leaderboard_user_ids, user_rank - user_position_k)
 
         return LeaderboardResponse(
             league=league,
@@ -33,39 +33,39 @@ class LeaderboardService:
             user_position=user_position
         )
     
-    def _leaderboard_entries_from_leaderboard_user_ids(self, leaderboard_user_ids: List[int], starting_rank: int = 0) -> List[LeaderboardEntry]:
+    async def _leaderboard_entries_from_leaderboard_user_ids(self, leaderboard_user_ids: List[int], starting_rank: int = 0) -> List[LeaderboardEntry]:
         if starting_rank < 0:
             # For example, if a league only has 1 player, the rank should start from 1 not -1
             starting_rank = 0
-        return [self._leaderboard_entry_from_leaderboard_user_id_and_rank(user_id, starting_rank + i + 1) for i, user_id in enumerate(leaderboard_user_ids)]
+        return [await self._leaderboard_entry_from_leaderboard_user_id_and_rank(user_id, starting_rank + i + 1) for i, user_id in enumerate(leaderboard_user_ids)]
     
-    def _leaderboard_entry_from_leaderboard_user_id_and_rank(self, leaderboard_user_id: int, rank: int) -> LeaderboardEntry:
-        leaderboard_user = self._uow.leaderboard_users.get_by_id(leaderboard_user_id)
+    async def _leaderboard_entry_from_leaderboard_user_id_and_rank(self, leaderboard_user_id: int, rank: int) -> LeaderboardEntry:
+        leaderboard_user = await self._uow.leaderboard_users.get_by_id(leaderboard_user_id)
         return LeaderboardEntry(rank, leaderboard_user.user.email, leaderboard_user.xp)
     
-    def set_users_new_league(self, leaderboard_users: Sequence[LeaderboardUserLink], new_league: League) -> Sequence[LeaderboardUserLink]:
+    async def set_users_new_league(self, leaderboard_users: Sequence[LeaderboardUserLink], new_league: League) -> Sequence[LeaderboardUserLink]:
         """Should only be used for testing"""
-        result = self._set_users_new_league_postgres(leaderboard_users, new_league)
-        self._reset_redis()
+        result = await self._set_users_new_league_postgres(leaderboard_users, new_league)
+        await self._reset_redis()
         return result
     
-    def reset_leaderboard(self) -> None:
-        self._handle_promotions_and_demotions()
-        self._log_carry_forward()
-        self._reset_redis()
-        self._uow.commit()
+    async def reset_leaderboard(self) -> None:
+        await self._handle_promotions_and_demotions()
+        await self._log_carry_forward()
+        await self._reset_redis()
+        await self._uow.commit()
     
-    def _handle_promotions_and_demotions(self) -> None:
-        bronze_promotions = self._get_promotions_for_league(League.BRONZE)
-        silver_demotions = self._get_demotions_for_league(League.SILVER)
-        silver_promotions = self._get_promotions_for_league(League.SILVER)
-        gold_demotions = self._get_demotions_for_league(League.GOLD)
-        self._set_users_new_league_postgres(bronze_promotions, League.SILVER)
-        self._set_users_new_league_postgres(silver_demotions, League.BRONZE)
-        self._set_users_new_league_postgres(silver_promotions, League.GOLD)
-        self._set_users_new_league_postgres(gold_demotions, League.SILVER)
+    async def _handle_promotions_and_demotions(self) -> None:
+        bronze_promotions = await self._get_promotions_for_league(League.BRONZE)
+        silver_demotions = await self._get_demotions_for_league(League.SILVER)
+        silver_promotions = await self._get_promotions_for_league(League.SILVER)
+        gold_demotions = await self._get_demotions_for_league(League.GOLD)
+        await self._set_users_new_league_postgres(bronze_promotions, League.SILVER)
+        await self._set_users_new_league_postgres(silver_demotions, League.BRONZE)
+        await self._set_users_new_league_postgres(silver_promotions, League.GOLD)
+        await self._set_users_new_league_postgres(gold_demotions, League.SILVER)
 
-    def _get_promotions_for_league(self, league: League) -> Sequence[LeaderboardUserLink]:
+    async def _get_promotions_for_league(self, league: League) -> Sequence[LeaderboardUserLink]:
         # Get total players in the current league
         league_size = LRedis.size_of(league)
         if league_size == 0:
@@ -75,10 +75,10 @@ class LeaderboardService:
         top_20_cutoff = int(league_size * 0.2) - 1  # Top 20% (highest scores)
 
         # Get top 20% players for promotion (highest scores)
-        promoted_leaderboard_user_ids = LRedis.sorted(league, 0, top_20_cutoff)
-        return self._uow.leaderboard_users.get_by_ids(promoted_leaderboard_user_ids)
+        promoted_leaderboard_user_ids = await LRedis.sorted(league, 0, top_20_cutoff)
+        return await self._uow.leaderboard_users.get_by_ids(promoted_leaderboard_user_ids)
 
-    def _get_demotions_for_league(self, league: League) -> Sequence[LeaderboardUserLink]:
+    async def _get_demotions_for_league(self, league: League) -> Sequence[LeaderboardUserLink]:
         # Get total players in the current league
         league_size = LRedis.size_of(league)
         if league_size == 0:
@@ -88,25 +88,25 @@ class LeaderboardService:
         bottom_20_cutoff = int(league_size * 0.2) - 1  # Bottom 20% (lowest scores)
 
         # Get top 20% players for promotion (highest scores)
-        demoted_leaderboard_user_ids = LRedis.sorted(league, 0, bottom_20_cutoff, desc=False)
-        return self._uow.leaderboard_users.get_by_ids([leaderboard_user_id for leaderboard_user_id in demoted_leaderboard_user_ids])
+        demoted_leaderboard_user_ids = await LRedis.sorted(league, 0, bottom_20_cutoff, desc=False)
+        return await self._uow.leaderboard_users.get_by_ids([leaderboard_user_id for leaderboard_user_id in demoted_leaderboard_user_ids])
 
-    def _set_users_new_league_postgres(self, users: Sequence[LeaderboardUserLink], new_league: League) -> Sequence[LeaderboardUserLink]:
+    async def _set_users_new_league_postgres(self, users: Sequence[LeaderboardUserLink], new_league: League) -> Sequence[LeaderboardUserLink]:
         for user in users:
             user.league = new_league
-        return self._uow.leaderboard_users.upsert_all(users)
+        return await self._uow.leaderboard_users.upsert_all(users)
 
-    def _log_carry_forward(self) -> None:
-        records = self._uow.leaderboard_users.all()
+    async def _log_carry_forward(self) -> None:
+        records = await self._uow.leaderboard_users.all()
         for record in records:
             record.xp = int(math.log2(record.xp + 1))
-        self._uow.leaderboard_users.upsert_all(records)
+        await self._uow.leaderboard_users.upsert_all(records)
     
-    def _reset_redis(self) -> None:
+    async def _reset_redis(self) -> None:
         for league in League:
-            self._reset_redis_by_league(league)
+            await self._reset_redis_by_league(league)
 
-    def _reset_redis_by_league(self, league: League) -> None:
+    async def _reset_redis_by_league(self, league: League) -> None:
         LRedis.clear_league(league)
-        records = self._uow.leaderboard_users.find_by_league(league)
+        records = await self._uow.leaderboard_users.find_by_league(league)
         LRedis.create_entries_from_users(league, records)

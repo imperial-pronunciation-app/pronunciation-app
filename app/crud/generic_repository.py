@@ -1,6 +1,7 @@
 from typing import Generic, List, Optional, Sequence, Type, TypeVar
 
-from sqlmodel import Session, col, select
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.id_model import IdModel
 
@@ -9,39 +10,39 @@ T = TypeVar("T", bound=IdModel)
 
 class GenericRepository(Generic[T]):
 
-    def __init__(self, session: Session, model_cls: Type[T]) -> None:
+    def __init__(self, session: AsyncSession, model_cls: Type[T]) -> None:
         self._session = session
         self._model_cls = model_cls
 
-    def get_by_id(self, id: int) -> T:
-        return self._session.get_one(self._model_cls, id)
+    async def get_by_id(self, id: int) -> T:
+        return await self._session.get_one(self._model_cls, id)
     
-    def get_by_ids(self, ids: List[int]) -> Sequence[T]:
-        stmt = select(self._model_cls).where(col(self._model_cls.id).in_(ids))
-        return self._session.exec(stmt).all()
+    async def get_by_ids(self, ids: List[int]) -> Sequence[T]:
+        stmt = select(self._model_cls).where(self._model_cls.id.in_(ids))
+        return (await self._session.execute(stmt)).scalars().all()
     
-    def find_by_id(self, id: int) -> Optional[T]:
-        return self._session.get(self._model_cls, id)
+    async def find_by_id(self, id: int) -> Optional[T]:
+        return await self._session.get(self._model_cls, id)
     
-    def all(self) -> Sequence[T]:
+    async def all(self) -> Sequence[T]:
         stmt = select(self._model_cls)
-        return self._session.exec(stmt).all()
+        return (await self._session.execute(stmt)).scalars().all()
 
-    def upsert(self, record: T) -> T:
+    async def upsert(self, record: T) -> T:
         self._session.add(record)
-        self._session.flush()
-        self._session.refresh(record)
+        await self._session.flush()
+        await self._session.refresh(record)
         return record
 
-    def upsert_all(self, records: Sequence[T]) -> Sequence[T]:
+    async def upsert_all(self, records: Sequence[T]) -> Sequence[T]:
         self._session.add_all(records)
-        self._session.flush()
+        await self._session.flush()
         for record in records:
-            self._session.refresh(record)
+            await self._session.refresh(record)
         return records
 
-    def delete(self, id: int) -> None:
-        record = self.find_by_id(id)
+    async def delete(self, id: int) -> None:
+        record = await self.find_by_id(id)
         if record:
-            self._session.delete(record)
-            self._session.flush()
+            await self._session.delete(record)
+            await self._session.flush()

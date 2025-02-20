@@ -1,7 +1,8 @@
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlmodel import Field, Relationship
+from sqlalchemy import DateTime, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.id_model import IdModel
 
@@ -9,9 +10,11 @@ from app.models.id_model import IdModel
 if TYPE_CHECKING:
     from app.models.exercise import Exercise
 
-    
-class Attempt(IdModel, table=True):
-    exercise_id: int = Field(foreign_key="exercise.id")
-    exercise: "Exercise" = Relationship(back_populates="attempts")
-    user_id: int = Field(foreign_key="user.id")
-    created_at: datetime = Field(default_factory=datetime.now)
+
+class Attempt(IdModel):
+    __tablename__ = "attempt"
+
+    exercise_id: Mapped[int] = mapped_column(ForeignKey("exercise.id"))
+    exercise: Mapped["Exercise"] = relationship(back_populates="attempts")
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)

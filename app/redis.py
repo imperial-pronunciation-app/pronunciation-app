@@ -14,7 +14,7 @@ class LRedis:
         raise ValueError("Do not instantiate")
 
     @staticmethod
-    def sorted(league: League, start: int, end: int, desc: bool = True) -> List[int]:
+    async def sorted(league: League, start: int, end: int, desc: bool = True) -> List[int]:
         """Indices are inclusive as expected in redis"""
 
         league_key = LRedis._league_key(league)
@@ -23,12 +23,12 @@ class LRedis:
         end_index = min(end, total_count - 1)
 
         if desc:
-            return list(map(int, LRedis._redis.zrevrange(league_key, start_index, end_index)))
+            return [int(user_id) for user_id in LRedis._redis.zrevrange(league_key, start_index, end_index)]
         else:
-            return list(map(int, LRedis._redis.zrange(league_key, start_index, end_index)))
+            return [int(user_id) for user_id in LRedis._redis.zrange(league_key, start_index, end_index)]
 
     @staticmethod
-    def rank(league: League, leaderboard_user_id: int) -> int:
+    async def rank(league: League, leaderboard_user_id: int) -> int:
         r = LRedis._redis.zrevrank(LRedis._league_key(league), leaderboard_user_id)
         if r is None:
             raise ValueError(f"Leaderboard user with id {leaderboard_user_id} not found in league {league}")

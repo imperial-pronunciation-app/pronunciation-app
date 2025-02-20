@@ -1,11 +1,13 @@
+import asyncio
 import json
 from typing import List, TypedDict
 
 from fastapi_users.password import PasswordHelper
-from sqlmodel import Session, SQLModel, text
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import engine
 from app.models.attempt import Attempt  # noqa: F401
+from app.models.base_model import Base
 from app.models.exercise import Exercise
 from app.models.leaderboard_user_link import LeaderboardUserLink  # noqa: F401
 from app.models.lesson import Lesson
@@ -82,24 +84,24 @@ word_data: List[WordEntry] = [
     {"word": "heat", "phonemes": ["h", "iː", "t"]}
 ]
 
-def seed(session: Session) -> None:
+async def seed(session: AsyncSession) -> None:
     print("👤 Inserting Users...")
     users = [
         User(email="user1@example.com", hashed_password=password_helper.hash("password")),
         User(email="user2@example.com", hashed_password=password_helper.hash("password"))
     ]
     session.add_all(users)
-    session.commit()
+    await session.commit()
 
     print("📝 Inserting Words...")
     words = {w["word"]: Word(text=w["word"]) for w in word_data}
     session.add_all(words.values())
-    session.commit()
+    await session.commit()
 
     print("🔤 Inserting Phonemes...")
     phonemes = {ipa: Phoneme(ipa=ipa, respelling=respelling) for ipa, respelling in ipa_to_respelling.items()}
     session.add_all(phonemes.values())
-    session.commit()
+    await session.commit()
 
     print("🔗 Linking Words and Phonemes...")
     word_phoneme_links = []
@@ -112,7 +114,7 @@ def seed(session: Session) -> None:
                 index=index
             ))
     session.add_all(word_phoneme_links)
-    session.commit()
+    await session.commit()
 
     print("📚 Inserting Units with Lessons...")
     units = [
@@ -217,16 +219,21 @@ def seed(session: Session) -> None:
         )
     ]
     session.add_all(units)
-    session.commit()
+    await session.commit()
     LRedis.clear()
 
     print("🎉✅ Database seeding completed successfully!")
 
+
+async def main() -> None:
+    print("🔄 Resetting database schema...")
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
+    # Create all tables
+    await seed(AsyncSession(engine))
+
 # To seed inside a container
 # docker exec -it <container_id> python -m app.seed
 if __name__ == "__main__":
-    print("🔄 Resetting database schema...")
-    with engine.begin() as conn:
-        conn.execute(text("DROP SCHEMA public CASCADE; CREATE SCHEMA public;"))
-    SQLModel.metadata.create_all(engine)
-    seed(Session(engine))
+    asyncio.run(main())

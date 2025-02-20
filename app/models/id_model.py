@@ -1,8 +1,12 @@
-from sqlmodel import Field, SQLModel
+from sqlalchemy import Integer
+from sqlalchemy.orm import Mapped, mapped_column
+
+from app.models.base_model import Base
 
 
-class IdModel(SQLModel):
-    """SQL model class with an id field.
+class IdModel(Base):
+    """SQL Alchemy ORM class with an id field.
     """
+    __abstract__ = True
 
-    id: int = Field(default=None, primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, default=None)

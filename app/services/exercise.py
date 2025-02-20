@@ -18,6 +18,6 @@ class ExerciseService:
         return exercise.lesson.exercises[exercise.index + 1] if exercise.index < len(exercise.lesson.exercises) - 1 else None
 
 
-    def is_completed_by(self, exercise: Exercise, user: User) -> bool:
+    async def is_completed_by(self, exercise: Exercise, user: User) -> bool:
         """Returns True if the user has completed this exercise. i.e. if exercise was attempted"""
-        return self._uow.attempts.find_by_user_id_and_exercise_id(user.id, exercise.id) != []
+        return (await self._uow.attempts.find_by_user_id_and_exercise_id(user.id, exercise.id)) != []

@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, List
 
-from sqlmodel import Relationship
+from sqlalchemy import Integer
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base.unit_base import UnitBase
 
@@ -8,7 +9,8 @@ from app.models.base.unit_base import UnitBase
 if TYPE_CHECKING:
     from app.models.lesson import Lesson
 
+class Unit(UnitBase):
+    __tablename__ = "unit"
 
-class Unit(UnitBase, table=True):
-    order: int
-    lessons: List["Lesson"] = Relationship(back_populates="unit", cascade_delete=True)
+    order: Mapped[int] = mapped_column(Integer)
+    lessons: Mapped[List["Lesson"]] = relationship(back_populates="unit", cascade="all, delete-orphan")

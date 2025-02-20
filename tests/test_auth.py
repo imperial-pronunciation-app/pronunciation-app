@@ -10,7 +10,8 @@ from tests.utils import login_user
 TEST_EMAIL = "newuser@example.com"
 TEST_PASSWORD = "SecurePass123"
 
-def test_login_user(client: TestClient, test_user: User) -> None:
+@pytest.mark.asyncio
+async def test_login_user(client: TestClient, test_user: User) -> None:
     """Should successfully log in a registered user and return an access token."""
     response = login_user(client, test_user.email, "password")
 

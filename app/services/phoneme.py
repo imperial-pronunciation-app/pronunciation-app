@@ -9,13 +9,8 @@ class PhonemeService:
     def __init__(self, uow: UnitOfWork):
         self._uow = uow
 
-    def get_public_phonemes(self, phoneme_strings: List[str]) -> List[PhonemePublic]:
-        return list(map(
-            lambda x: self._to_phoneme_public(
-                self._uow.phonemes.get_phoneme_by_ipa(x)
-            ),
-            phoneme_strings
-        ))
+    async def get_public_phonemes(self, phoneme_strings: List[str]) -> List[PhonemePublic]:
+        return [self._to_phoneme_public(await self._uow.phonemes.get_phoneme_by_ipa(ipa)) for ipa in phoneme_strings]
 
     def _to_phoneme_public(self, phoneme: Phoneme) -> PhonemePublic:
         return PhonemePublic(

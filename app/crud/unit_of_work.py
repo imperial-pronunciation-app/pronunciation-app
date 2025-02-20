@@ -1,8 +1,8 @@
 from types import TracebackType
-from typing import Iterator, Self
+from typing import AsyncContextManager, AsyncIterator
 
 from fastapi import Depends
-from sqlmodel import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud.attempts_repository import AttemptRepository
 from app.crud.exercise_repository import ExerciseRepository
@@ -13,11 +13,11 @@ from app.crud.recording_repository import RecordingRepository
 from app.crud.unit_repository import UnitRepository
 from app.crud.user_repository import UserRepository
 from app.crud.word_repository import WordRepository
-from app.database import get_session
+from app.database import get_async_session
 
 
-class UnitOfWork:
-    def __init__(self, session: Session = Depends(get_session)) -> None:
+class UnitOfWork(AsyncContextManager["UnitOfWork"]):
+    def __init__(self, session: AsyncSession = Depends(get_async_session)) -> None:
         self._session = session
         self.recordings = RecordingRepository(self._session)
         self.leaderboard_users = LeaderboardUserRepository(self._session)
@@ -29,24 +29,24 @@ class UnitOfWork:
         self.lessons = LessonRepository(self._session)
         self.attempts = AttemptRepository(self._session)
     
-    def __enter__(self) -> Self:
+    async def __aenter__(self) -> "UnitOfWork":
         return self
 
-    def __exit__(
+    async def __aexit__(
         self,
         type_: type[BaseException] | None,
         value: BaseException | None,
         traceback: TracebackType | None,
     ) -> None:
-        self.rollback()
+        await self.rollback()
 
-    def commit(self) -> None:
-        self._session.commit()
+    async def commit(self) -> None:
+        await self._session.commit()
 
-    def rollback(self) -> None:
-        self._session.rollback()
+    async def rollback(self) -> None:
+        await self._session.rollback()
 
 
-def get_unit_of_work(session: Session = Depends(get_session)) -> Iterator[UnitOfWork]:
-    with UnitOfWork(session) as uow:
+async def get_unit_of_work(session: AsyncSession = Depends(get_async_session)) -> AsyncIterator[UnitOfWork]:
+    async with UnitOfWork(session) as uow:
         yield uow

@@ -7,7 +7,7 @@ from fastapi_users.authentication import (
     BearerTransport,
     JWTStrategy,
 )
-from fastapi_users_db_sqlmodel import SQLModelUserDatabase
+from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
 
 from app.config import get_settings
 from app.crud.unit_of_work import UnitOfWork, get_unit_of_work
@@ -23,17 +23,17 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
     reset_password_token_secret = secret
     verification_token_secret = secret
 
-    def __init__(self, user_db: SQLModelUserDatabase, uow: UnitOfWork) -> None:
+    def __init__(self, user_db: SQLAlchemyUserDatabase, uow: UnitOfWork) -> None:
         self.uow = uow
         super().__init__(user_db)
 
     async def on_after_register(self, user: User, request: Optional[Request] = None) -> None:
-        leaderboard_user = self.uow.leaderboard_users.upsert(LeaderboardUserLink(user_id=user.id)) # Defaults to bronze league and 0 xp
-        self.uow.commit()
+        leaderboard_user = await self.uow.leaderboard_users.upsert(LeaderboardUserLink(user_id=user.id)) # Defaults to bronze league and 0 xp
+        await self.uow.commit()
         LRedis.create_entry_from_user(leaderboard_user)
 
 
-async def get_user_manager(user_db: SQLModelUserDatabase = Depends(get_user_db), uow: UnitOfWork = Depends(get_unit_of_work)) -> AsyncGenerator[UserManager, None]:
+async def get_user_manager(user_db: SQLAlchemyUserDatabase = Depends(get_user_db), uow: UnitOfWork = Depends(get_unit_of_work)) -> AsyncGenerator[UserManager, None]:
     yield UserManager(user_db, uow)
 
 

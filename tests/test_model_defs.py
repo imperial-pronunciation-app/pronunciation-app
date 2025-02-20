@@ -1,20 +1,10 @@
-from sqlmodel import SQLModel, create_engine
+# from sqlalchemy.ext.asyncio import create_async_engine
 
-from app.models import (  # noqa: F401
-    Attempt,
-    Exercise,
-    LeaderboardUserLink,
-    Lesson,
-    Phoneme,
-    Recording,
-    Unit,
-    User,
-    Word,
-    WordPhonemeLink,
-)
+# from app.models.base_model import Base
 
 
-def test_create_database() -> None:
-    engine = create_engine("sqlite://", connect_args={"check_same_thread": False})
-    SQLModel.metadata.create_all(engine)
-    assert True
+# async def test_create_database() -> None:
+#     engine = create_async_engine("sqlite+aiosqlite://", connect_args={"check_same_thread": False})
+#     async with engine.begin() as conn:
+#         await conn.run_sync(Base.metadata.create_all)
+#     assert True

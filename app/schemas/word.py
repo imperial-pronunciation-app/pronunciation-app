@@ -1,8 +1,11 @@
 from typing import List
 
-from app.models.base.word_base import WordBase
+from pydantic import BaseModel
+
 from app.schemas.phoneme import PhonemePublic
 
 
-class WordPublicWithPhonemes(WordBase):
-    phonemes: List[PhonemePublic]
+class WordPublicWithPhonemes(BaseModel):
+  id: int
+  text: str
+  phonemes: List[PhonemePublic]

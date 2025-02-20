@@ -9,11 +9,11 @@ class UnitService:
     def __init__(self, uow: UnitOfWork):
         self._uow = uow
     
-    def to_public_with_lessons(self, unit: Unit, user: User) -> UnitPublicWithLessons:
+    async def to_public_with_lessons(self, unit: Unit, user: User) -> UnitPublicWithLessons:
         lesson_service = LessonService(self._uow)
         return UnitPublicWithLessons(
             id=unit.id,
             name=unit.name,
             description=unit.description,
-            lessons=[lesson_service.to_response(lesson, user) for lesson in unit.lessons]
+            lessons=[(await lesson_service.to_response(lesson, user)) for lesson in unit.lessons]
         )

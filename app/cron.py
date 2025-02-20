@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
-from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers.background import BackgroundScheduler  # type: ignore
 from fastapi import Depends, FastAPI
 
 from app.crud.unit_of_work import UnitOfWork, get_unit_of_work

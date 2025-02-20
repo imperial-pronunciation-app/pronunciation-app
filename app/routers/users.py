@@ -1,7 +1,6 @@
 from fastapi import APIRouter
 
-from app.models.user import User
-from app.schemas.user import UserCreate, UserRead, UserUpdate
+from app.schemas.user import User, UserCreate, UserRead, UserUpdate
 from app.users import fastapi_users
 
 

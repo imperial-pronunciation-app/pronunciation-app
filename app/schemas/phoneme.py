@@ -1,5 +1,7 @@
-from app.models.base.phoneme_base import PhonemeBase
+from pydantic import BaseModel
 
 
-class PhonemePublic(PhonemeBase):
-    pass
+class PhonemePublic(BaseModel):
+    id: int
+    ipa: str
+    respelling: str

@@ -1,15 +1,16 @@
 from typing import TYPE_CHECKING, List
 
-from sqlmodel import Relationship
+from sqlalchemy.orm import Mapped, relationship
 
 from app.models.base.word_base import WordBase
-from app.models.word_phoneme_link import WordPhonemeLink
 
 
 if TYPE_CHECKING:
     from app.models.exercise import Exercise
     from app.models.phoneme import Phoneme
 
-class Word(WordBase, table=True):
-    phonemes: List["Phoneme"] = Relationship(back_populates="words", link_model=WordPhonemeLink, sa_relationship_kwargs={"order_by": "WordPhonemeLink.index"})
-    exercises: List["Exercise"] = Relationship(back_populates="word")
+class Word(WordBase):
+    __tablename__ = "word"
+
+    phonemes: Mapped[List["Phoneme"]] = relationship(back_populates="words", secondary="word_phoneme_link", order_by="WordPhonemeLink.index")
+    exercises: Mapped[List["Exercise"]] = relationship(back_populates="word")
