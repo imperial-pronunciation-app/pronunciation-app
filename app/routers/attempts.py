@@ -11,11 +11,10 @@ from app.models.recording import Recording
 from app.models.user import User
 from app.schemas.attempt import AttemptResponse
 from app.schemas.model_api import InferPhonemesResponse
-from app.services.phoneme import PhonemeService
+from app.services.pronunciation import PronunciationService
 from app.services.user import UserService
 from app.users import current_active_user
 from app.utils.s3 import upload_wav_to_s3
-from app.utils.similarity import similarity
 
 
 router = APIRouter()
@@ -34,7 +33,7 @@ def dispatch_to_model(wav_file: str) -> list[str]:
         }
 
         print(get_settings().MODEL_API_URL)
-        model_response = requests.post(f"{get_settings().MODEL_API_URL}/api/v1/infer_phonemes", files=files)
+        model_response = requests.post(f"{get_settings().MODEL_API_URL}/api/v1/eng/infer_phonemes", files=files)
 
     model_response.raise_for_status()
 
@@ -78,19 +77,21 @@ async def post_attempt(
     
     # 3. Dispatch recording to ML backend
     inferred_phoneme_strings = dispatch_to_model(wav_file)
-    phoneme_service = PhonemeService(uow)
-    inferred_phonemes = phoneme_service.get_public_phonemes(inferred_phoneme_strings)
     
     # 4. Form feedback based on model response
-    word_phonemes = list(map(lambda x: x.ipa, uow.phonemes.find_phonemes_by_word(exercise.word.id)))
-    feedback = similarity(word_phonemes, inferred_phoneme_strings)
+    aligned_phonemes, score = PronunciationService(uow).evaluate_pronunciation(exercise.word, inferred_phoneme_strings)
     
     # 5. Update user xp based on feedback
     user_service = UserService(uow)
-    xp_gain = user_service.update_xp_with_boost(user, feedback)
+    xp_gain = user_service.update_xp_with_boost(user, score)
 
     # 6. Delete temporary file
     os.remove(wav_file)
     
     # 7. Serve response to user
-    return AttemptResponse(recording_id=recording.id, score=feedback, recording_phonemes=inferred_phonemes, xp_gain=xp_gain)
+    return AttemptResponse(
+        recording_id=recording.id,
+        score=score,
+        phonemes=aligned_phonemes,
+        xp_gain=xp_gain
+    )

@@ -32,7 +32,7 @@ class WordEntry(TypedDict):
 
 word_data: List[WordEntry] = [
     {"word": "software", "phonemes": ["s", "oʊ", "f", "t", "w", "ɛ", "r"]},
-    {"word": "hardware", "phonemes": ["h", "ɑː", "r", "d", "w", "ɛ", "r"]},
+    {"word": "hardware", "phonemes": ["h", "ɑː", "ɹ", "d", "w", "ɛ", "ɹ"]},
     {"word": "computer", "phonemes": ["k", "ə", "m", "p", "j", "uː", "t", "ə"]},
     {"word": "compilers", "phonemes": ["k", "ə", "m", "p", "aɪ", "l", "ə", "r"]},
     {"word": "keyboard", "phonemes": ["k", "iː", "b", "ɔː", "d"]},

@@ -5,7 +5,3 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dev
-
-networks:
-  parrot-network:
-    external: false
