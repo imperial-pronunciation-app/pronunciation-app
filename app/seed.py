@@ -115,8 +115,9 @@ def seed(session: Session) -> None:
     session.commit()
 
     print("📅 Inserting Word of the Day...")
-    word_of_day = WordOfDay(word_id=words["software"].id)
-    word = Word(id=word_of_day.word_id, text=words["software"].text, word_of_day_last_used=word_of_day.date)
+    word = words["software"]
+    word_of_day = WordOfDay(word_id=word.id)
+    word.word_of_day_last_used = word_of_day.date
     session.add(word_of_day)
     session.add(word)
     session.commit()
