@@ -16,7 +16,7 @@ class UnitService:
             id=unit.id,
             name=unit.name,
             description=unit.description,
-            lessons=[lesson_service.to_response(lesson, user) for lesson in unit.lessons],
+            lessons=[lesson_service.to_response(lesson, user) for lesson in unit.lessons if lesson.user_id is None],
             recap_lesson=self._uow.lessons.find_recap_by_user_id_and_unit_id(user.id, unit.id)
         )
 
