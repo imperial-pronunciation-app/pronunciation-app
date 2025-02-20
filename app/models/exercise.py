@@ -6,7 +6,7 @@ from app.models.id_model import IdModel
 
 
 if TYPE_CHECKING:
-    from app.models.attempt import Attempt
+    from app.models.exercise_attempt import ExerciseAttempt
     from app.models.lesson import Lesson
     from app.models.word import Word
 
@@ -16,4 +16,4 @@ class Exercise(IdModel, table=True):
     index: int
     word_id: int = Field(foreign_key="word.id")
     word: "Word" = Relationship(back_populates="exercises")
-    attempts: List["Attempt"] = Relationship(back_populates="exercise", cascade_delete=True)
+    attempts: List["ExerciseAttempt"] = Relationship(back_populates="exercise", cascade_delete=True)

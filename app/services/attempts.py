@@ -7,7 +7,7 @@ from fastapi import Depends, HTTPException, UploadFile
 from app.config import get_settings
 from app.crud.unit_of_work import UnitOfWork, get_unit_of_work
 from app.models.attempt import Attempt
-from app.models.attempt_type import AttemptType
+from app.models.exercise_attempt import ExerciseAttempt
 from app.models.recording import Recording
 from app.models.user import User
 from app.models.word_of_day_attempt import WordOfDayAttempt
@@ -43,45 +43,8 @@ class AttemptService:
         model_data = InferPhonemesResponse.model_validate(model_response.json())
 
         return model_data.phonemes
-
-    async def post_attempt(
-        self,
-        audio_file: UploadFile,
-        attempt_type: AttemptType,
-        _id: int,
-        uow: UnitOfWork = Depends(get_unit_of_work),
-        user: User = Depends(current_active_user),
-    ) -> AttemptResponse:
-        if attempt_type == AttemptType.EXERCISE:
-            exercise = uow.exercises.find_by_id(id=_id)
-            if not exercise:
-                raise HTTPException(status_code=404, detail="Exercise not found")
-            word_id = exercise.word.id
-        elif attempt_type == AttemptType.WOTD:
-            word_id = _id
-
-        else:
-            raise HTTPException(status_code=404, detail="Attempt type not found")
-
-        audio_bytes = await audio_file.read()
-
-        # 1. Send .wav file to blob store
-        wav_file = self.create_wav_file(audio_bytes)
-        s3_key = upload_wav_to_s3(wav_file)
-
-        # 2a. Create attempt entries and recoding entries
-        if attempt_type == AttemptType.EXERCISE:
-            attempt = uow.attempts.upsert(Attempt(user_id=user.id, exercise_id=_id))
-            recording = uow.recordings.upsert(Recording(attempt_id=attempt.id, s3_key=s3_key))
-        elif attempt_type == AttemptType.WOTD:
-            wod_attempt = uow.word_of_day_attempts.upsert(WordOfDayAttempt(user_id=user.id, id=_id, word_of_day_id=_id))
-            recording = uow.recordings.upsert(Recording(attempt_id=wod_attempt.id, s3_key=s3_key))
-        else:
-            # TODO: Add more attempt types.
-            pass
-
-        uow.commit()
-
+    
+    def get_attempt_feedback(self, wav_file: str, uow: UnitOfWork, user: User, word_id: int, recording_id: int) -> AttemptResponse:
         # 3. Dispatch recording to ML backend
         inferred_phoneme_strings = self.dispatch_to_model(wav_file)
         phoneme_service = PhonemeService(uow)
@@ -101,5 +64,58 @@ class AttemptService:
 
         # 7. Serve response to user
         return AttemptResponse(
-            recording_id=recording.id, score=feedback, recording_phonemes=inferred_phonemes, xp_gain=xp_gain
+            recording_id=recording_id, score=feedback, recording_phonemes=inferred_phonemes, xp_gain=xp_gain
         )
+
+    async def post_exercise_attempt(
+        self,
+        audio_file: UploadFile,
+        exercise_id: int,
+        uow: UnitOfWork = Depends(get_unit_of_work),
+        user: User = Depends(current_active_user)
+        ) -> AttemptResponse:
+        exercise = uow.exercises.find_by_id(id=exercise_id)
+        if not exercise:
+            raise HTTPException(status_code=404, detail="Exercise not found")
+        word_id = exercise.word.id
+        
+        audio_bytes = await audio_file.read()
+
+        # 1. Send .wav file to blob store
+        wav_file = self.create_wav_file(audio_bytes)
+        s3_key = upload_wav_to_s3(wav_file)
+        
+        # 2. Create exercise attempt entries and recording entries
+        attempt = uow.attempts.upsert(Attempt(user_id=user.id))
+        uow.exercise_attempts.upsert(ExerciseAttempt(id=attempt.id, user_id=user.id, exercise_id=exercise_id))
+        recording = uow.recordings.upsert(Recording(attempt_id=attempt.id, s3_key=s3_key))
+        uow.commit()
+        
+        return self.get_attempt_feedback(wav_file, uow, user, word_id, recording.id)
+
+    async def post_word_of_day_attempt(
+        self,
+        audio_file: UploadFile,
+        word_of_day_id: int,
+        uow: UnitOfWork = Depends(get_unit_of_work),
+        user: User = Depends(current_active_user)
+        ) -> AttemptResponse:
+        word_of_day = uow.word_of_day.find_by_id(id=word_of_day_id)
+        if not word_of_day:
+            raise HTTPException(status_code=404, detail="Word of the day not found")
+        word_id = word_of_day.word.id
+        
+        audio_bytes = await audio_file.read()
+
+        # 1. Send .wav file to blob store
+        wav_file = self.create_wav_file(audio_bytes)
+        s3_key = upload_wav_to_s3(wav_file)
+        
+        # 2. Create word of day attempt entries and recording entries
+        attempt = uow.attempts.upsert(Attempt(user_id=user.id))
+        uow.word_of_day_attempts.upsert(WordOfDayAttempt(id=attempt.id, user_id=user.id, word_of_day_id=word_of_day_id))
+        recording = uow.recordings.upsert(Recording(attempt_id=attempt.id, s3_key=s3_key))
+        uow.commit()
+        
+        return self.get_attempt_feedback(wav_file, uow, user, word_id, recording.id)
+

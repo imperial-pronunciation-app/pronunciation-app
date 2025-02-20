@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, UploadFile
 
 from app.crud.unit_of_work import UnitOfWork, get_unit_of_work
-from app.models.attempt_type import AttemptType
 from app.models.user import User
 from app.schemas.attempt import AttemptResponse
 from app.services.attempts import AttemptService
@@ -19,7 +18,7 @@ async def post_exercise_attempt(
     user: User = Depends(current_active_user),
 ) -> AttemptResponse:
     attempt_service = AttemptService(uow)
-    resp = await attempt_service.post_attempt(audio_file, AttemptType.EXERCISE, exercise_id, uow, user)
+    resp = await attempt_service.post_exercise_attempt(audio_file, exercise_id, uow, user)
     return resp
 
 
@@ -30,6 +29,6 @@ async def post_word_of_day_attempt(
     user: User = Depends(current_active_user),
 ) -> AttemptResponse:
     attempt_service = AttemptService(uow)
-    _id = uow.word_of_day.get_word_of_day().id
-    resp = await attempt_service.post_attempt(audio_file, AttemptType.WOTD, _id, uow, user)
+    word_of_day_id = uow.word_of_day.get_word_of_day().id
+    resp = await attempt_service.post_word_of_day_attempt(audio_file, word_of_day_id, uow, user)
     return resp
