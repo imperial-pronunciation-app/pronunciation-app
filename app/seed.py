@@ -14,6 +14,7 @@ from app.models.recording import Recording  # noqa: F401
 from app.models.unit import Unit
 from app.models.user import User
 from app.models.word import Word
+from app.models.word_of_day import WordOfDay
 from app.models.word_phoneme_link import WordPhonemeLink
 from app.redis import LRedis
 
@@ -23,9 +24,11 @@ password_helper = PasswordHelper()
 with open("app/resources/phoneme_respellings.json") as f:
     ipa_to_respelling = json.load(f)
 
+
 class WordEntry(TypedDict):
     word: str
     phonemes: List[str]
+
 
 word_data: List[WordEntry] = [
     {"word": "software", "phonemes": ["s", "oʊ", "f", "t", "w", "ɛ", "r"]},
@@ -79,14 +82,15 @@ word_data: List[WordEntry] = [
     {"word": "pea", "phonemes": ["p", "iː"]},
     {"word": "neat", "phonemes": ["n", "iː", "t"]},
     {"word": "green", "phonemes": ["ɡ", "r", "iː", "n"]},
-    {"word": "heat", "phonemes": ["h", "iː", "t"]}
+    {"word": "heat", "phonemes": ["h", "iː", "t"]},
 ]
+
 
 def seed(session: Session) -> None:
     print("👤 Inserting Users...")
     users = [
         User(email="user1@example.com", hashed_password=password_helper.hash("password")),
-        User(email="user2@example.com", hashed_password=password_helper.hash("password"))
+        User(email="user2@example.com", hashed_password=password_helper.hash("password")),
     ]
     session.add_all(users)
     session.commit()
@@ -106,12 +110,15 @@ def seed(session: Session) -> None:
     for word_entry in word_data:
         word_obj = words[word_entry["word"]]
         for index, ipa in enumerate(word_entry["phonemes"]):
-            word_phoneme_links.append(WordPhonemeLink(
-                word_id=word_obj.id,
-                phoneme_id=phonemes[ipa].id,
-                index=index
-            ))
+            word_phoneme_links.append(WordPhonemeLink(word_id=word_obj.id, phoneme_id=phonemes[ipa].id, index=index))
     session.add_all(word_phoneme_links)
+    session.commit()
+
+    print("📅 Inserting Word of the Day...")
+    word_of_day = WordOfDay(word_id=words["software"].id)
+    word = Word(id=word_of_day.word_id, text=words["software"].text, word_of_day_last_used=word_of_day.date)
+    session.add(word_of_day)
+    session.add(word)
     session.commit()
 
     print("📚 Inserting Units with Lessons...")
@@ -142,7 +149,6 @@ def seed(session: Session) -> None:
                     Exercise(index=7, word_id=words["nap"].id),
                 ])
             ]
-            
         ),
         Unit(
             name="Consonant Sound",
@@ -221,6 +227,7 @@ def seed(session: Session) -> None:
     LRedis.clear()
 
     print("🎉✅ Database seeding completed successfully!")
+
 
 # To seed inside a container
 # docker exec -it <container_id> python -m app.seed

@@ -12,6 +12,7 @@ from app.crud.phoneme_repository import PhonemeRepository
 from app.crud.recording_repository import RecordingRepository
 from app.crud.unit_repository import UnitRepository
 from app.crud.user_repository import UserRepository
+from app.crud.word_of_day_repository import WordOfDayRepository
 from app.crud.word_repository import WordRepository
 from app.database import get_session
 
@@ -28,6 +29,7 @@ class UnitOfWork:
         self.units = UnitRepository(self._session)
         self.lessons = LessonRepository(self._session)
         self.attempts = AttemptRepository(self._session)
+        self.word_of_day = WordOfDayRepository(self._session)
     
     def __enter__(self) -> Self:
         return self

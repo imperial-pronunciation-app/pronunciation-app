@@ -8,7 +8,20 @@ from .recording import Recording
 from .unit import Unit
 from .user import User
 from .word import Word
+from .word_of_day import WordOfDay
 from .word_phoneme_link import WordPhonemeLink
 
 
-__all__ = ["Word", "Phoneme", "WordPhonemeLink", "Unit", "Lesson", "Exercise", "User", "Attempt", "Recording", "LeaderboardUserLink"]
+__all__ = [
+    "Word",
+    "Phoneme",
+    "WordPhonemeLink",
+    "Unit",
+    "Lesson",
+    "Exercise",
+    "User",
+    "Attempt",
+    "Recording",
+    "LeaderboardUserLink",
+    "WordOfDay",
+]

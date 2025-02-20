@@ -5,6 +5,7 @@ from .exercises import router as exercises_router
 from .leaderboard import router as leaderboard_router
 from .units import router as units_router
 from .users import router as users_router
+from .word_of_day import router as word_of_day_router
 
 
 routers = [
@@ -13,5 +14,6 @@ routers = [
     attempts_router,
     users_router,
     exercises_router,
-    units_router
+    units_router,
+    word_of_day_router,
 ]

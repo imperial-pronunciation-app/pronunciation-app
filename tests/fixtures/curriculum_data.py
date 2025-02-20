@@ -15,6 +15,7 @@ from app.models.word_phoneme_link import WordPhonemeLink
 def sample_units(sample_exercise: Exercise) -> List[Unit]:
     return [sample_exercise.lesson.unit]
 
+
 @pytest.fixture
 def sample_unit(session: Session) -> Unit:
     """Fixture to create a unit for lessons."""
@@ -23,6 +24,7 @@ def sample_unit(session: Session) -> Unit:
     session.commit()
     session.refresh(unit)
     return unit
+
 
 @pytest.fixture
 def sample_lesson(session: Session, sample_unit: Unit) -> Lesson:
@@ -41,11 +43,7 @@ def sample_words(session: Session) -> List[Word]:
     tap = Word(text="tap")
     words = [pat, tap]
 
-    phonemes = [
-        Phoneme(ipa="p", respelling="p"),
-        Phoneme(ipa="a", respelling="a"),
-        Phoneme(ipa="t", respelling="t")
-    ]
+    phonemes = [Phoneme(ipa="p", respelling="p"), Phoneme(ipa="a", respelling="a"), Phoneme(ipa="t", respelling="t")]
 
     session.add_all(words)
     session.add_all(phonemes)
@@ -63,7 +61,7 @@ def sample_words(session: Session) -> List[Word]:
         WordPhonemeLink(word_id=pat.id, phoneme_id=phonemes[2].id, index=2),
         WordPhonemeLink(word_id=tap.id, phoneme_id=phonemes[2].id, index=0),
         WordPhonemeLink(word_id=tap.id, phoneme_id=phonemes[1].id, index=1),
-        WordPhonemeLink(word_id=tap.id, phoneme_id=phonemes[0].id, index=2)
+        WordPhonemeLink(word_id=tap.id, phoneme_id=phonemes[0].id, index=2),
     ]
 
     session.add_all(word_phoneme_links)
@@ -74,13 +72,14 @@ def sample_words(session: Session) -> List[Word]:
 
     return words
 
+
 @pytest.fixture
 def sample_exercises(session: Session, sample_lesson: Lesson, sample_words: List[Word]) -> List[Exercise]:
     """Fixture to create 3 exercises with words containing phonemes."""
     exercises = [
         Exercise(lesson_id=sample_lesson.id, word_id=sample_words[0].id, index=0),
         Exercise(lesson_id=sample_lesson.id, word_id=sample_words[1].id, index=1),
-        Exercise(lesson_id=sample_lesson.id, word_id=sample_words[0].id, index=2)
+        Exercise(lesson_id=sample_lesson.id, word_id=sample_words[0].id, index=2),
     ]
     session.add_all(exercises)
     session.commit()
@@ -90,7 +89,9 @@ def sample_exercises(session: Session, sample_lesson: Lesson, sample_words: List
 
     return exercises
 
+
 @pytest.fixture
 def sample_exercise(sample_exercises: List[Exercise]) -> Exercise:
     """Fixture to return a single exercise."""
     return sample_exercises[1]
+
