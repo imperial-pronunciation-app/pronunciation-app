@@ -10,7 +10,6 @@ from app.models.exercise import Exercise
 from app.models.leaderboard_user_link import LeaderboardUserLink  # noqa: F401
 from app.models.lesson import Lesson
 from app.models.phoneme import Phoneme
-from app.models.public_lesson import PublicLesson
 from app.models.recording import Recording  # noqa: F401
 from app.models.unit import Unit
 from app.models.user import User
@@ -203,8 +202,8 @@ def seed(session: Session) -> None:
             description="Focus on /æ/",
             order=1,
             lessons=[
-                PublicLesson(id=lessons[0].id),
-                PublicLesson(id=lessons[1].id)
+                lessons[0],
+                lessons[1]
             ]
         ),
         Unit(
@@ -212,8 +211,8 @@ def seed(session: Session) -> None:
             description="Focus on /p/",
             order=2,
             lessons=[
-                PublicLesson(id=lessons[2].id),
-                PublicLesson(id=lessons[3].id)
+                lessons[2],
+                lessons[3]
             ]
         ),
         Unit(
@@ -221,8 +220,8 @@ def seed(session: Session) -> None:
             description="Focus on /iː/",
             order=3,
             lessons=[
-                PublicLesson(id=lessons[4].id),
-                PublicLesson(id=lessons[5].id)
+                lessons[4],
+                lessons[5]
             ]
         ),
         Unit(
@@ -230,8 +229,8 @@ def seed(session: Session) -> None:
             description="More complex topics",
             order=4,
             lessons=[
-                PublicLesson(id=lessons[6].id),
-                PublicLesson(id=lessons[7].id)
+                lessons[6],
+                lessons[7]
             ]
         )
     ]
