@@ -17,9 +17,9 @@ def test_get_word_of_day(auth_client: TestClient, sample_word_of_day: WordOfDay)
     # Then
     assert response.status_code == 200
     data = response.json()
-    assert data["word"]["text"] == word_of_day.word.text
-    assert data["word"]["id"] == word_of_day.word_id
-    assert data["word"]["phonemes"] == [
+    assert data["text"] == word_of_day.word.text
+    assert data["id"] == word_of_day.word_id
+    assert data["phonemes"] == [
         {"id": p.id, "ipa": p.ipa, "respelling": p.respelling} for p in word_of_day.word.phonemes
     ]
 

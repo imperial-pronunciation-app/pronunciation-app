@@ -23,7 +23,7 @@ disable_new_user_boost_job = scheduler.add_job(
     user_service.disable_new_user_boost, "cron", hour=0, minute=0, timezone="UTC"
 )
 change_word_of_day_job = scheduler.add_job(
-    word_of_day_service.change_word_of_day, "cron", day_of_week="mon-sun", hour=0, minute=0, timezone="UTC"
+    word_of_day_service.change_word_of_day, "cron", hour=0, timezone="UTC"
 )
 
 

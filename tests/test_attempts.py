@@ -1,18 +1,7 @@
-import pytest
-from fastapi.testclient import TestClient
 from pytest_mock import MockerFixture
 
 from app.crud.unit_of_work import UnitOfWork
 from app.services.attempts import AttemptService
-from app.models.exercise import Exercise
-from app.models.lesson import Lesson
-from app.models.phoneme import Phoneme
-from app.models.recording import Recording
-from app.models.unit import Unit
-from app.models.word import Word
-from app.models.word_phoneme_link import WordPhonemeLink
-from app.routers.attempts import create_wav_file
-from app.services.pronunciation import PronunciationService
 
 
 def test_create_wav_file(mocker: MockerFixture, uow: UnitOfWork) -> None:
