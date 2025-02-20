@@ -26,6 +26,7 @@ class UnitService:
         
 
     def generate_recap_lesson(self, unit: Unit, user: User) -> Lesson:
+        # Precondition: all exercises in the unit have been attempted at least once
         exercise_scores = [(exercise, self._uow.attempts.get_max_score_by_user_id_and_exercise_id(user.id, exercise.id)) for lesson in unit.lessons for exercise in lesson.exercises]
         exercise_scores.sort(key=lambda x: x[1])
         exercises = [exercise for exercise, _ in exercise_scores[:5]]
