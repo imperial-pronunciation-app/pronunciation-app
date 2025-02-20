@@ -11,7 +11,10 @@ from app.models.recording import Recording
 from app.models.user import User
 from app.schemas.attempt import AttemptResponse
 from app.schemas.model_api import InferPhonemesResponse
+from app.services.exercise import ExerciseService
+from app.services.lesson import LessonService
 from app.services.pronunciation import PronunciationService
+from app.services.unit import UnitService
 from app.services.user import UserService
 from app.users import current_active_user
 from app.utils.s3 import upload_wav_to_s3
@@ -88,6 +91,14 @@ async def post_attempt(
 
     # 6. Delete temporary file
     os.remove(wav_file)
+
+    exercise_service = ExerciseService(uow)
+    lesson_service = LessonService(uow)
+    unit_service = UnitService(uow)
+    if exercise_service._is_last_exercise(exercise) and lesson_service._is_last_lesson(exercise.lesson):
+        recap_lesson = unit_service.generate_recap_lesson(exercise.lesson.unit, user)
+        uow.lessons.upsert(recap_lesson)
+        uow.commit()
     
     # 7. Serve response to user
     return AttemptResponse(
