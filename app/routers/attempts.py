@@ -11,8 +11,6 @@ from app.models.recording import Recording
 from app.models.user import User
 from app.schemas.attempt import AttemptResponse
 from app.schemas.model_api import InferPhonemesResponse
-from app.services.exercise import ExerciseService
-from app.services.lesson import LessonService
 from app.services.pronunciation import PronunciationService
 from app.services.unit import UnitService
 from app.services.user import UserService
@@ -93,11 +91,9 @@ async def post_attempt(
     os.remove(wav_file)
 
     # 7. Generate recap lesson if this is the last exercise of the last lesson
-
-    exercise_service = ExerciseService(uow)
-    lesson_service = LessonService(uow)
     unit_service = UnitService(uow)
-    if exercise_service._is_last_exercise(exercise) and lesson_service._is_last_lesson(exercise.lesson):
+    if unit_service._is_completed_by(exercise.lesson.unit, user):
+        print("Generating recap lesson")
         recap_lesson = unit_service.generate_recap_lesson(exercise.lesson.unit, user)
         uow.lessons.upsert(recap_lesson)
         uow.commit()

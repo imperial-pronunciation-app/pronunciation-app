@@ -19,6 +19,10 @@ class UnitService:
             lessons=[lesson_service.to_response(lesson, user) for lesson in unit.lessons],
             recap_lesson=self._uow.lessons.find_recap_by_user_id_and_unit_id(user.id, unit.id)
         )
+
+    def _is_completed_by(self, unit: Unit, user: User) -> bool:
+        lesson_service = LessonService(self._uow)
+        return all(lesson_service._is_completed_by(lesson, user) for lesson in unit.lessons)
         
 
     def generate_recap_lesson(self, unit: Unit, user: User) -> Lesson:
