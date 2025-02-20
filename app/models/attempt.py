@@ -14,4 +14,5 @@ class Attempt(IdModel, table=True):
     exercise_id: int = Field(foreign_key="exercise.id")
     exercise: "Exercise" = Relationship(back_populates="attempts")
     user_id: int = Field(foreign_key="user.id")
+    score: int
     created_at: datetime = Field(default_factory=datetime.now)

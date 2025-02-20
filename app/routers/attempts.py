@@ -58,11 +58,18 @@ async def post_attempt(
     wav_file = create_wav_file(audio_bytes)
     s3_key = upload_wav_to_s3(wav_file)
     
+    # 3. Dispatch recording to ML backend
+    inferred_phoneme_strings = dispatch_to_model(wav_file)
+    
+    # 4. Form feedback based on model response
+    aligned_phonemes, score = PronunciationService(uow).evaluate_pronunciation(exercise.word, inferred_phoneme_strings)
+
     # 2. Create attempt and recording entries
     attempt = uow.attempts.upsert(
         Attempt(
             user_id=user.id,
-            exercise_id=exercise_id
+            exercise_id=exercise_id,
+            score=score
         )
     )
 
@@ -74,12 +81,6 @@ async def post_attempt(
     )
 
     uow.commit()
-    
-    # 3. Dispatch recording to ML backend
-    inferred_phoneme_strings = dispatch_to_model(wav_file)
-    
-    # 4. Form feedback based on model response
-    aligned_phonemes, score = PronunciationService(uow).evaluate_pronunciation(exercise.word, inferred_phoneme_strings)
     
     # 5. Update user xp based on feedback
     user_service = UserService(uow)
