@@ -1,5 +1,4 @@
 # import pytest
-from app.schemas.attempt import AttemptResponse
 from fastapi.testclient import TestClient
 from pytest_mock import MockerFixture
 from sqlmodel import Session
@@ -12,6 +11,7 @@ from app.models.unit import Unit
 from app.models.word import Word
 from app.models.word_of_day import WordOfDay
 from app.models.word_phoneme_link import WordPhonemeLink
+from app.schemas.attempt import AttemptResponse
 from app.services.attempts import AttemptService
 
 
