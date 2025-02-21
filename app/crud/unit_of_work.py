@@ -5,6 +5,7 @@ from fastapi import Depends
 from sqlmodel import Session
 
 from app.crud.attempts_repository import AttemptRepository
+from app.crud.exercise_attempt_repository import ExerciseAttemptRepository
 from app.crud.exercise_repository import ExerciseRepository
 from app.crud.leaderboard_user_repository import LeaderboardUserRepository
 from app.crud.lesson_repository import LessonRepository
@@ -12,6 +13,7 @@ from app.crud.phoneme_repository import PhonemeRepository
 from app.crud.recording_repository import RecordingRepository
 from app.crud.unit_repository import UnitRepository
 from app.crud.user_repository import UserRepository
+from app.crud.word_of_day_attempt_repository import WordOfDayAttemptRepository
 from app.crud.word_of_day_repository import WordOfDayRepository
 from app.crud.word_repository import WordRepository
 from app.database import get_session
@@ -29,8 +31,11 @@ class UnitOfWork:
         self.units = UnitRepository(self._session)
         self.lessons = LessonRepository(self._session)
         self.attempts = AttemptRepository(self._session)
+        self.exercise_attempts = ExerciseAttemptRepository(self._session)
+        self.word_of_day_attempts = WordOfDayAttemptRepository(self._session)
         self.word_of_day = WordOfDayRepository(self._session)
-    
+        self.word_of_day_attempts = WordOfDayAttemptRepository(self._session)
+
     def __enter__(self) -> Self:
         return self
 

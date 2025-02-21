@@ -7,6 +7,7 @@ from sqlmodel import Session, SQLModel, text
 from app.database import engine
 from app.models.attempt import Attempt  # noqa: F401
 from app.models.exercise import Exercise
+from app.models.exercise_attempt import ExerciseAttempt  # noqa: F401
 from app.models.leaderboard_user_link import LeaderboardUserLink  # noqa: F401
 from app.models.lesson import Lesson
 from app.models.phoneme import Phoneme
@@ -15,6 +16,7 @@ from app.models.unit import Unit
 from app.models.user import User
 from app.models.word import Word
 from app.models.word_of_day import WordOfDay
+from app.models.word_of_day_attempt import WordOfDayAttempt  # noqa: F401
 from app.models.word_phoneme_link import WordPhonemeLink
 from app.redis import LRedis
 
@@ -119,7 +121,6 @@ def seed(session: Session) -> None:
     word_of_day = WordOfDay(word_id=word.id)
     word.word_of_day_last_used = word_of_day.date
     session.add(word_of_day)
-    session.add(word)
     session.commit()
 
     print("📚 Inserting Units with Lessons...")

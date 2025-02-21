@@ -19,3 +19,4 @@ def test_create_database() -> None:
     engine = create_engine("sqlite://", connect_args={"check_same_thread": False})
     SQLModel.metadata.create_all(engine)
     assert True
+
