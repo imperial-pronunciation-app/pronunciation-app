@@ -1,4 +1,5 @@
 # import pytest
+from app.schemas.attempt import AttemptResponse
 from fastapi.testclient import TestClient
 from pytest_mock import MockerFixture
 from sqlmodel import Session
@@ -14,7 +15,9 @@ from app.models.word_phoneme_link import WordPhonemeLink
 from app.services.attempts import AttemptService
 
 
-def test_word_of_day_attempts(session: Session, uow: UnitOfWork, mocker: MockerFixture, auth_client: TestClient, sample_word_of_day: WordOfDay) -> None:
+def test_word_of_day_attempts(
+    session: Session, uow: UnitOfWork, mocker: MockerFixture, auth_client: TestClient, sample_word_of_day: WordOfDay
+) -> None:
     """Test post_word_of_day_attempt"""
 
     test_word = "software"
@@ -22,25 +25,24 @@ def test_word_of_day_attempts(session: Session, uow: UnitOfWork, mocker: MockerF
     similarity = 100
     recording_id = 1
     recording_phonemes = [
-        {"ipa": "s", "respelling": "s"},
-        {"ipa": "oʊ", "respelling": "oʊ"},
-        {"ipa": "f", "respelling": "f"},
-        {"ipa": "t", "respelling": "t"},
-        {"ipa": "w", "respelling": "w"},
-        {"ipa": "ɛ", "respelling": "ɛ"},
-        {"ipa": "r", "respelling": "r"},
+        [{"id": 1, "ipa": "s", "respelling": "s"}, {"id": 1, "ipa": "s", "respelling": "s"}],
+        [{"id": 2, "ipa": "oʊ", "respelling": "oʊ"}, {"id": 2, "ipa": "oʊ", "respelling": "oʊ"}],
+        [{"id": 3, "ipa": "f", "respelling": "f"}, {"id": 3, "ipa": "f", "respelling": "f"}],
+        [{"id": 4, "ipa": "t", "respelling": "t"}, {"id": 4, "ipa": "t", "respelling": "t"}],
+        [{"id": 5, "ipa": "w", "respelling": "w"}, {"id": 5, "ipa": "w", "respelling": "w"}],
+        [{"id": 6, "ipa": "ɛ", "respelling": "ɛ"}, {"id": 6, "ipa": "ɛ", "respelling": "ɛ"}],
+        [{"id": 7, "ipa": "r", "respelling": "r"}, {"id": 7, "ipa": "r", "respelling": "r"}],
     ]
-    phoneme_list = [Phoneme(ipa=p["ipa"], respelling=p["respelling"]) for p in recording_phonemes]
 
     # mock_os_remove = mocker.patch("os.remove")
     mock_service = mocker.Mock(spec=AttemptService)
     mocker.patch("app.routers.attempts.AttemptService", return_value=mock_service)
-
+    phonemes = uow.phonemes.upsert_all([Phoneme(ipa=p, respelling=p) for p in test_word_phonemes])
     mock_service.post_word_of_day_attempt.return_value = {
         "score": similarity,
         "xp_gain": 1.5 * similarity,
         "recording_id": recording_id,
-        "phonemes": phoneme_list,
+        "phonemes": recording_phonemes,
     }
 
     word = uow.words.upsert(Word(text=test_word))
@@ -53,7 +55,7 @@ def test_word_of_day_attempts(session: Session, uow: UnitOfWork, mocker: MockerF
     uow.commit()
 
     wav_file_path = f"tests/assets/{test_word}.wav"
-
+    print(AttemptResponse.schema())
     with open(wav_file_path, "rb") as f:
         files = {"audio_file": f}
 
