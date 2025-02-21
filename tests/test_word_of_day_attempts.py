@@ -30,8 +30,7 @@ def test_word_of_day_attempts(session: Session, uow: UnitOfWork, mocker: MockerF
         {"ipa": "ɛ", "respelling": "ɛ"},
         {"ipa": "r", "respelling": "r"},
     ]
-    phonemes = [Phoneme(p, p) for p in recording_phonemes]
-
+    phoneme_list = [Phoneme(ipa=p["ipa"], respelling=p["respelling"]) for p in recording_phonemes]
 
     # mock_os_remove = mocker.patch("os.remove")
     mock_service = mocker.Mock(spec=AttemptService)
@@ -41,7 +40,7 @@ def test_word_of_day_attempts(session: Session, uow: UnitOfWork, mocker: MockerF
         "score": similarity,
         "xp_gain": 1.5 * similarity,
         "recording_id": recording_id,
-        "phonemes": phonemes,
+        "phonemes": phoneme_list,
     }
 
     word = uow.words.upsert(Word(text=test_word))
