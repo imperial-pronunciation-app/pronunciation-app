@@ -20,7 +20,7 @@ class LRedis:
         league_key = LRedis._league_key(league)
         total_count = LRedis._redis.zcard(league_key)
         start_index = max(0, start)
-        end_index = min(end, total_count - 1)
+        end_index = max(0, min(end, total_count - 1))
 
         if desc:
             return list(map(int, LRedis._redis.zrevrange(league_key, start_index, end_index)))
