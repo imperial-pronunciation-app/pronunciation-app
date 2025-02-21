@@ -24,4 +24,4 @@ class LessonService:
 
     def _is_last_lesson(self, lesson: Lesson) -> bool:
         """Returns True if this is the last lesson within the unit."""
-        return lesson.order == len(lesson.unit.lessons) - 1
+        return lesson.order == len(lesson.unit.lessons)
