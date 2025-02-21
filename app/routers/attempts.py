@@ -97,7 +97,7 @@ async def post_attempt(
         recap_lesson = unit_service.generate_recap_lesson(exercise.lesson.unit, user)
         uow.lessons.upsert(recap_lesson)
         uow.commit()
-    
+        
     # 8. Serve response to user
     return AttemptResponse(
         recording_id=recording.id,

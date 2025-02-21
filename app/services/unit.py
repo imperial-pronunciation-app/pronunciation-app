@@ -1,4 +1,5 @@
 from app.crud.unit_of_work import UnitOfWork
+from app.models.exercise import Exercise
 from app.models.lesson import Lesson
 from app.models.unit import Unit
 from app.models.user import User
@@ -12,12 +13,14 @@ class UnitService:
     
     def to_public_with_lessons(self, unit: Unit, user: User) -> UnitPublicWithLessons:
         lesson_service = LessonService(self._uow)
+        recap_lesson = self._uow.lessons.find_recap_by_user_id_and_unit_id(user.id, unit.id)
+
         return UnitPublicWithLessons(
             id=unit.id,
             name=unit.name,
             description=unit.description,
             lessons=[lesson_service.to_response(lesson, user) for lesson in unit.lessons if lesson.user_id is None],
-            recap_lesson=self._uow.lessons.find_recap_by_user_id_and_unit_id(user.id, unit.id)
+            recap_lesson=recap_lesson and lesson_service.to_response(recap_lesson, user) or None
         )
 
     def _is_completed_by(self, unit: Unit, user: User) -> bool:
@@ -33,6 +36,6 @@ class UnitService:
         return Lesson(
             title=f"Recap of {unit.name}",
             unit=unit,
-            exercises=exercises,
+            exercises=[Exercise(index=i, word_id=exercise.word_id) for i, exercise in enumerate(exercises)],
             user_id=user.id
         )
