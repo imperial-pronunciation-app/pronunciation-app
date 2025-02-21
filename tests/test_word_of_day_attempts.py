@@ -30,7 +30,7 @@ def test_word_of_day_attempts(session: Session, uow: UnitOfWork, mocker: MockerF
         {"ipa": "ɛ", "respelling": "ɛ"},
         {"ipa": "r", "respelling": "r"},
     ]
-    phonemes = [(p, p) for p in recording_phonemes]
+    phonemes = [Phoneme(p, p) for p in recording_phonemes]
 
 
     # mock_os_remove = mocker.patch("os.remove")
