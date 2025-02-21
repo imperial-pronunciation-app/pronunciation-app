@@ -63,7 +63,7 @@ class AttemptService:
         # 7. Serve response to user
         return AttemptResponse(recording_id=recording_id, score=score, phonemes=aligned_phonemes, xp_gain=xp_gain)
 
-    async def post_helper(self, audio_file: UploadFile, user: User, uow: UnitOfWork) -> tuple[Word, int, int]:
+    async def post_helper(self, audio_file: UploadFile, user: User, uow: UnitOfWork) -> tuple[str, int, int]:
         audio_bytes = await audio_file.read()
         wav_file = self.create_wav_file(audio_bytes)
         s3_key = upload_wav_to_s3(wav_file)
