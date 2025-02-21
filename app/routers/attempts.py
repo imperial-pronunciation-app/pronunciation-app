@@ -11,7 +11,6 @@ from app.models.recording import Recording
 from app.models.user import User
 from app.schemas.attempt import AttemptResponse
 from app.schemas.model_api import InferPhonemesResponse
-from app.services.lesson import LessonService
 from app.services.pronunciation import PronunciationService
 from app.services.unit import UnitService
 from app.services.user import UserService
