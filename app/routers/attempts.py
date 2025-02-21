@@ -92,12 +92,12 @@ async def post_attempt(
 
     # 7. Generate recap lesson if this is the last exercise of the last lesson
     unit_service = UnitService(uow)
-    if unit_service._is_completed_by(exercise.lesson.unit, user):
+    if unit_service._is_completed_by(exercise.lesson.unit, user) and uow.lessons.find_recap_by_user_id_and_unit_id(user.id, exercise.lesson.unit_id) is None:
         print("Generating recap lesson")
         recap_lesson = unit_service.generate_recap_lesson(exercise.lesson.unit, user)
         uow.lessons.upsert(recap_lesson)
         uow.commit()
-        
+
     # 8. Serve response to user
     return AttemptResponse(
         recording_id=recording.id,
