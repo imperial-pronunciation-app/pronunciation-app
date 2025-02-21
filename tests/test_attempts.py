@@ -14,4 +14,3 @@ def test_create_wav_file(mocker: MockerFixture, uow: UnitOfWork) -> None:
 
     mock_file.assert_called_once_with(filename, "bx")
     mock_file().write.assert_called_once_with(audio_bytes)
-
