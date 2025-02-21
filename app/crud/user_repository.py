@@ -1,7 +1,7 @@
 from datetime import date
 from typing import Sequence
 
-from sqlmodel import Session, select
+from sqlmodel import Date, Session, cast, select
 
 from app.crud.generic_repository import GenericRepository
 from app.models.user import User
@@ -17,5 +17,5 @@ class UserRepository(GenericRepository[User]):
         return self._session.exec(stmt).one()
 
     def find_by_new_users_created_before(self, created_before: date) -> Sequence[User]:
-        stmt = select(User).where(User.new_user).where(User.created_at.date() < created_before)
+        stmt = select(User).where(User.new_user).where(cast(User.created_at, Date) < created_before)
         return self._session.exec(stmt).all()

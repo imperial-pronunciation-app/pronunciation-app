@@ -33,7 +33,15 @@ from app.services.pronunciation import PronunciationService
 
         # Empty user input (0% score)
         ([],  
-         [("t", None), ("ɛ", None), ("s", None), ("t", None)], 0, 0)
+         [("t", None), ("ɛ", None), ("s", None), ("t", None)], 0, 0),
+
+        # Unknown phoneme
+        (["t", "<unknown>", "s", "t"],  # Missing "ɛ"
+         [("t", "t"), ("ɛ", "<unknown>"), ("s", "s"), ("t", "t")], 0, 100),
+
+        # Single phoneme
+        (["t"],
+         [("t", None), ("ɛ", None), ("s", None), ("t", "t")], 0, 100),
     ]
 )
 def test_match_pronunciation(sample_pronunciation_word: Word, pronounced_phonemes: List[str], expected_alignment: List[Tuple[Optional[PhonemePublic], Optional[PhonemePublic]]], min_score: int, max_score: int, uow: UnitOfWork) -> None:

@@ -28,14 +28,15 @@ class UnitService:
         return all(lesson_service._is_completed_by(lesson, user) for lesson in unit.lessons)
         
 
-    def generate_recap_lesson(self, unit: Unit, user: User) -> Lesson:
+    def generate_recap_lesson(self, unit: Unit, user: User) -> None:
         # Precondition: all exercises in the unit have been attempted at least once
-        exercise_scores = [(exercise, self._uow.attempts.get_max_score_by_user_id_and_exercise_id(user.id, exercise.id)) for lesson in unit.lessons for exercise in lesson.exercises]
+        exercise_scores = [(exercise, self._uow.exercise_attempts.get_max_score_by_user_id_and_exercise_id(user.id, exercise.id)) for lesson in unit.lessons for exercise in lesson.exercises]
         exercise_scores.sort(key=lambda x: x[1])
         exercises = [exercise for exercise, _ in exercise_scores[:5]]
-        return Lesson(
+        self._uow.lessons.upsert(Lesson(
             title=f"Recap of {unit.name}",
             unit=unit,
             exercises=[Exercise(index=i, word_id=exercise.word_id) for i, exercise in enumerate(exercises)],
             user_id=user.id
-        )
+        ))
+        self._uow.commit()

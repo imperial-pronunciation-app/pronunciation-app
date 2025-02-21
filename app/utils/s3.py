@@ -21,6 +21,7 @@ def upload_wav_to_s3(wav_file: str) -> str:
     )
     
     s3_key = f"{blob_id}.wav"
+    print(wav_file)
     s3_client.upload_file(wav_file, settings.BUCKET_NAME, s3_key)
   
     return s3_key

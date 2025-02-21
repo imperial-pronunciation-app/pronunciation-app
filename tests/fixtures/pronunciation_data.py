@@ -19,6 +19,7 @@ def sample_pronunciation_phonemes(session: Session) -> List[Phoneme]:
         Phoneme(ipa="k", respelling="k"),
         Phoneme(ipa="x", respelling="x"),
         Phoneme(ipa="e", respelling="e"),
+        Phoneme(ipa="<unknown>", respelling="unknown"),
     ]
 
     session.add_all(phonemes)

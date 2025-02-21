@@ -1,6 +1,5 @@
-from typing import Sequence
 
-from sqlmodel import Session, select
+from sqlmodel import Session
 
 from app.crud.generic_repository import GenericRepository
 from app.models.attempt import Attempt
@@ -10,13 +9,3 @@ class AttemptRepository(GenericRepository[Attempt]):
 
     def __init__(self, session: Session):
         super().__init__(session, Attempt)
-
-    def find_by_user_id_and_exercise_id(self, user_id: int, exercise_id: int) -> Sequence[Attempt]:
-        stmt = (
-            select(Attempt)
-            .where(Attempt.user_id == user_id, Attempt.exercise_id == exercise_id)
-        )
-        return self._session.exec(stmt).all()
-    
-    def get_max_score_by_user_id_and_exercise_id(self, user_id: int, exercise_id: int) -> int:
-        return max([attempt.score for attempt in self.find_by_user_id_and_exercise_id(user_id, exercise_id)])

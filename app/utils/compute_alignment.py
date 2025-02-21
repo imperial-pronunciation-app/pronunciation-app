@@ -37,26 +37,22 @@ def compute_alignment(
     # Initialize DP table
     for i in range(1, n + 1):
         dp[i][0] = dp[i - 1][0] + deletion_penalty  # Deletion penalty
+        backtrace[i][0] = 2  # Indicates deletion
+
     for j in range(1, m + 1):
         dp[0][j] = dp[0][j - 1] + insertion_penalty  # Insertion penalty
+        backtrace[0][j] = 3  # Indicates insertion
 
     # Fill DP table
     for i in range(1, n + 1):
         for j in range(1, m + 1):
             match_score = similarity_func(expected[i - 1], actual[j - 1])
-            dp[i][j] = max(
-                dp[i - 1][j - 1] + match_score,  # Match or substitution
-                dp[i - 1][j] + deletion_penalty,  # Deletion penalty
-                dp[i][j - 1] + insertion_penalty  # Insertion penalty
-            )
-
-            # Backtrace
-            if dp[i][j] == dp[i - 1][j - 1] + match_score:
-                backtrace[i][j] = 1  # Diagonal (match/substitution)
-            elif dp[i][j] == dp[i - 1][j] + deletion_penalty:
-                backtrace[i][j] = 2  # Up (deletion)
-            else:
-                backtrace[i][j] = 3  # Left (insertion)
+            choices = [
+                (dp[i - 1][j - 1] + match_score, 1),  # Match or substitution
+                (dp[i - 1][j] + deletion_penalty, 2),  # Deletion
+                (dp[i][j - 1] + insertion_penalty, 3)  # Insertion
+            ]
+            dp[i][j], backtrace[i][j] = max(choices, key=lambda x: x[0])
 
     # Backtracking to extract alignment
     i, j = n, m
@@ -68,10 +64,13 @@ def compute_alignment(
         elif i > 0 and backtrace[i][j] == 2:  # Deletion
             alignment.append((expected[i - 1], None))
             i -= 1
-        elif i > 0 and j > 0:  # Match or substitution
+        elif i > 0 and j > 0 and backtrace[i][j] == 1:  # Match or substitution
             alignment.append((expected[i - 1], actual[j - 1]))
             i -= 1
             j -= 1
+        else:
+            # Fallback to avoid infinite loop
+            break  
 
     alignment.reverse()
     final_score = int((dp[n][m] / max(1, n)) * 100)  # Normalize to 0-100

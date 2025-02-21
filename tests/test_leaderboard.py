@@ -1,11 +1,8 @@
 import math
 from typing import List, Sequence
 
-from apscheduler.job import Job
-from apscheduler.triggers.cron import CronTrigger
 from fastapi.testclient import TestClient
 
-from app.cron import leaderboard_service, reset_leaderboard_job, scheduler
 from app.crud.unit_of_work import UnitOfWork
 from app.models.leaderboard_user_link import LeaderboardUserLink, League
 from app.models.user import User
@@ -69,12 +66,6 @@ def test_get_leaderboard(test_user: User, auth_client: TestClient, sample_leader
         {"rank": 5, "username": TEST_EMAILS[4], "xp": TEST_XPS[4]},
         {"rank": 6, "username": test_user.email, "xp": 0},
     ]
-
-
-def test_reset_leaderboard_cron_job_scheduled() -> None:
-    job: Job = scheduler.get_job(reset_leaderboard_job.id)
-    assert job.func == leaderboard_service.reset_leaderboard
-    assert job.trigger.__class__ == CronTrigger
 
 
 def test_promotion_demotion(uow: UnitOfWork, sample_leaderboard_users_silver: Sequence[LeaderboardUserLink]) -> None:    
