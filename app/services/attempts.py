@@ -36,7 +36,7 @@ class AttemptService:
             files = {"audio_file": f}
 
             print(get_settings().MODEL_API_URL)
-            model_response = requests.post(f"{get_settings().MODEL_API_URL}/api/v1/infer_phonemes", files=files)
+            model_response = requests.post(f"{get_settings().MODEL_API_URL}/api/v1/eng/infer_phonemes", files=files)
 
         model_response.raise_for_status()
 
