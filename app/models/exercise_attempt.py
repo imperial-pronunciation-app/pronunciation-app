@@ -11,6 +11,12 @@ if TYPE_CHECKING:
 
 class ExerciseAttempt(IdModel, table=True):
   id: int = Field(primary_key=True, foreign_key="attempt.id")
-  attempt: "Attempt" = Relationship()
+  attempt: "Attempt" = Relationship(
+        sa_relationship_kwargs={
+            "primaryjoin": "ExerciseAttempt.id == Attempt.id",
+            "lazy": "joined",
+            "uselist": False
+        }
+    )
   exercise_id: int = Field(foreign_key="exercise.id")
   exercise: "Exercise" = Relationship(back_populates="attempts")
