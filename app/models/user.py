@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from typing import TYPE_CHECKING
 
 from fastapi_users_db_sqlmodel import SQLModelBaseUserDB
@@ -18,3 +18,4 @@ class User(IdModel, SQLModelBaseUserDB, table=True):
     level: int = Field(default=1)
     new_user: bool = Field(default=True)
     leaderboard_entry: "LeaderboardUserLink" = Relationship(back_populates="user")
+    created_at: datetime = Field(default_factory=datetime.now)

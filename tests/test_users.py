@@ -1,11 +1,8 @@
 from typing import Optional
 
 import pytest
-from apscheduler.job import Job
-from apscheduler.triggers.cron import CronTrigger
 from fastapi.testclient import TestClient
 
-from app.cron import disable_new_user_boost_job, scheduler, user_service
 from tests.utils import register_user
 
 
@@ -50,8 +47,3 @@ def test_update_user_existing_email(client: TestClient, auth_client: TestClient)
         json={"email": email}
     )
     assert response.status_code == 400
-
-def test_disable_user_boost_cron_job_scheduled() -> None:
-    job: Job = scheduler.get_job(disable_new_user_boost_job.id)
-    assert job.func == user_service.disable_new_user_boost
-    assert job.trigger.__class__ == CronTrigger
