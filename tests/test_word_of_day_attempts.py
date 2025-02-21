@@ -1,17 +1,68 @@
 # import pytest
-from pytest_mock import mocker
+from fastapi.testclient import TestClient
+from pytest_mock import MockerFixture
+from sqlmodel import Session
 
+from app.crud.unit_of_work import UnitOfWork
+from app.models.exercise import Exercise
+from app.models.lesson import Lesson
+from app.models.phoneme import Phoneme
+from app.models.unit import Unit
+from app.models.word import Word
+from app.models.word_of_day import WordOfDay
+from app.models.word_phoneme_link import WordPhonemeLink
 from app.services.attempts import AttemptService
 
 
-def test_word_of_day_attempts() -> None:
+def test_word_of_day_attempts(session: Session, uow: UnitOfWork, mocker: MockerFixture, auth_client: TestClient, sample_word_of_day: WordOfDay) -> None:
     """Test post_word_of_day_attempt"""
 
-    # BASIC TEST SKELETON
+    test_word = "software"
+    test_word_phonemes = ["s", "oʊ", "f", "t", "w", "ɛ", "r"]
+    similarity = 100
+    recording_id = 1
+    recording_phonemes = [
+            {"ipa": "s", "respelling": "s"},
+            {"ipa": "oʊ", "respelling": "oʊ"},
+            {"ipa": "f", "respelling": "f"},
+            {"ipa": "t", "respelling": "t"},
+            {"ipa": "w", "respelling": "w"},
+            {"ipa": "ɛ", "respelling": "ɛ"},
+            {"ipa": "r", "respelling": "r"},
+        ]
+
+    # mock_os_remove = mocker.patch("os.remove")
     mock_service = mocker.Mock(spec=AttemptService)
     mocker.patch("app.routers.attempts.AttemptService", return_value=mock_service)
 
-    # When
+    mock_service.post_word_of_day_attempt.return_value = {
+        "score": similarity,
+        "xp_gain": 1.5 * similarity,
+        "recording_id": recording_id,
+        "recording_phonemes": recording_phonemes,
+    }
 
-    # Then
-    pass
+    word = uow.words.upsert(Word(text=test_word))
+    phonemes = uow.phonemes.upsert_all([Phoneme(ipa=p, respelling=p) for p in test_word_phonemes])
+    session.add_all([WordPhonemeLink(word_id=word.id, phoneme_id=p.id, index=i) for i, p in enumerate(phonemes)])
+    session.commit()
+    unit = uow.units.upsert(Unit(name="test", description="test", order=1))
+    lesson = uow.lessons.upsert(Lesson(title="test", unit_id=unit.id, order=1))
+    uow.exercises.upsert(Exercise(lesson_id=lesson.id, word_id=word.id, index=0))
+    uow.commit()
+
+    wav_file_path = f"tests/assets/{test_word}.wav"
+
+    with open(wav_file_path, "rb") as f:
+        files = {"audio_file": f}
+
+        recording_response = auth_client.post("/api/v1/word_of_day", files=files)
+    assert recording_response.status_code == 200
+    data = recording_response.json()
+    print(f"\nThe data is: {data}")
+    assert data["score"] == similarity
+    assert data["xp_gain"] == 1.5 * similarity
+    assert data["recording_id"] == recording_id
+    assert all([a["ipa"] == b["ipa"] and a["respelling"] == b["respelling"] for a, b in zip(data["recording_phonemes"], recording_phonemes)])
+
+    mock_service.post_word_of_day_attempt.assert_called_once()
