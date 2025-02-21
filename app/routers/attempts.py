@@ -18,7 +18,7 @@ async def post_exercise_attempt(
     user: User = Depends(current_active_user),
 ) -> AttemptResponse:
     attempt_service = AttemptService(uow)
-    resp = await attempt_service.post_exercise_attempt(audio_file, exercise_id, uow, user)
+    resp = attempt_service.post_exercise_attempt(audio_file, exercise_id, uow, user)
     return resp
 
 
@@ -30,5 +30,5 @@ async def post_word_of_day_attempt(
 ) -> AttemptResponse:
     attempt_service = AttemptService(uow)
     word_of_day_id = uow.word_of_day.get_word_of_day().id
-    resp = await attempt_service.post_word_of_day_attempt(audio_file, word_of_day_id, uow, user)
+    resp = attempt_service.post_word_of_day_attempt(audio_file, word_of_day_id, uow, user)
     return resp
