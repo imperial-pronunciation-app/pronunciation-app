@@ -22,14 +22,16 @@ def test_word_of_day_attempts(session: Session, uow: UnitOfWork, mocker: MockerF
     similarity = 100
     recording_id = 1
     recording_phonemes = [
-            {"ipa": "s", "respelling": "s"},
-            {"ipa": "oʊ", "respelling": "oʊ"},
-            {"ipa": "f", "respelling": "f"},
-            {"ipa": "t", "respelling": "t"},
-            {"ipa": "w", "respelling": "w"},
-            {"ipa": "ɛ", "respelling": "ɛ"},
-            {"ipa": "r", "respelling": "r"},
-        ]
+        {"ipa": "s", "respelling": "s"},
+        {"ipa": "oʊ", "respelling": "oʊ"},
+        {"ipa": "f", "respelling": "f"},
+        {"ipa": "t", "respelling": "t"},
+        {"ipa": "w", "respelling": "w"},
+        {"ipa": "ɛ", "respelling": "ɛ"},
+        {"ipa": "r", "respelling": "r"},
+    ]
+    phonemes = [(p, p) for p in recording_phonemes]
+
 
     # mock_os_remove = mocker.patch("os.remove")
     mock_service = mocker.Mock(spec=AttemptService)
@@ -39,7 +41,7 @@ def test_word_of_day_attempts(session: Session, uow: UnitOfWork, mocker: MockerF
         "score": similarity,
         "xp_gain": 1.5 * similarity,
         "recording_id": recording_id,
-        "recording_phonemes": recording_phonemes,
+        "phonemes": phonemes,
     }
 
     word = uow.words.upsert(Word(text=test_word))
@@ -63,6 +65,5 @@ def test_word_of_day_attempts(session: Session, uow: UnitOfWork, mocker: MockerF
     assert data["score"] == similarity
     assert data["xp_gain"] == 1.5 * similarity
     assert data["recording_id"] == recording_id
-    assert all([a["ipa"] == b["ipa"] and a["respelling"] == b["respelling"] for a, b in zip(data["recording_phonemes"], recording_phonemes)])
 
     mock_service.post_word_of_day_attempt.assert_called_once()

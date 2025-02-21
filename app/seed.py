@@ -15,7 +15,7 @@ from app.models.recording import Recording  # noqa: F401
 from app.models.unit import Unit
 from app.models.user import User
 from app.models.word import Word
-from app.models.word_of_day import WordOfDay 
+from app.models.word_of_day import WordOfDay
 from app.models.word_of_day_attempt import WordOfDayAttempt  # noqa: F401
 from app.models.word_phoneme_link import WordPhonemeLink
 from app.redis import LRedis

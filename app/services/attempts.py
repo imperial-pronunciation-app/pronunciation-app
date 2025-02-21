@@ -10,14 +10,14 @@ from app.models.attempt import Attempt
 from app.models.exercise_attempt import ExerciseAttempt
 from app.models.recording import Recording
 from app.models.user import User
+from app.models.word import Word
 from app.models.word_of_day_attempt import WordOfDayAttempt
 from app.schemas.attempt import AttemptResponse
 from app.schemas.model_api import InferPhonemesResponse
-from app.services.phoneme import PhonemeService
+from app.services.pronunciation import PronunciationService
 from app.services.user import UserService
 from app.users import current_active_user
 from app.utils.s3 import upload_wav_to_s3
-from app.utils.similarity import similarity
 
 
 class AttemptService:
@@ -44,27 +44,26 @@ class AttemptService:
 
         return model_data.phonemes
     
-    def get_attempt_feedback(self, wav_file: str, uow: UnitOfWork, user: User, word_id: int, recording_id: int) -> AttemptResponse:
-        # 3. Dispatch recording to ML backend
+    def get_attempt_feedback(self, wav_file: str, uow: UnitOfWork, user: User, word: Word, recording_id: int) -> AttemptResponse:
+         # 3. Dispatch recording to ML backend
         inferred_phoneme_strings = self.dispatch_to_model(wav_file)
-        phoneme_service = PhonemeService(uow)
-        inferred_phonemes = phoneme_service.get_public_phonemes(inferred_phoneme_strings)
-
+        
         # 4. Form feedback based on model response
-
-        word_phonemes = list(map(lambda x: x.ipa, uow.phonemes.find_phonemes_by_word(word_id)))
-        feedback = similarity(word_phonemes, inferred_phoneme_strings)
-
+        aligned_phonemes, score = PronunciationService(uow).evaluate_pronunciation(word, inferred_phoneme_strings)
+        
         # 5. Update user xp based on feedback
         user_service = UserService(uow)
-        xp_gain = user_service.update_xp_with_boost(user, feedback)
+        xp_gain = user_service.update_xp_with_boost(user, score)
 
         # 6. Delete temporary file
         os.remove(wav_file)
-
+        
         # 7. Serve response to user
         return AttemptResponse(
-            recording_id=recording_id, score=feedback, recording_phonemes=inferred_phonemes, xp_gain=xp_gain
+            recording_id=recording_id,
+            score=score,
+            phonemes=aligned_phonemes,
+            xp_gain=xp_gain
         )
 
     async def post_exercise_attempt(
@@ -77,7 +76,6 @@ class AttemptService:
         exercise = uow.exercises.find_by_id(id=exercise_id)
         if not exercise:
             raise HTTPException(status_code=404, detail="Exercise not found")
-        word_id = exercise.word.id
         
         audio_bytes = await audio_file.read()
 
@@ -91,7 +89,7 @@ class AttemptService:
         recording = uow.recordings.upsert(Recording(attempt_id=attempt.id, s3_key=s3_key))
         uow.commit()
         
-        return self.get_attempt_feedback(wav_file, uow, user, word_id, recording.id)
+        return self.get_attempt_feedback(wav_file, uow, user, exercise.word, recording.id)
 
     async def post_word_of_day_attempt(
         self,
@@ -103,7 +101,6 @@ class AttemptService:
         word_of_day = uow.word_of_day.find_by_id(id=word_of_day_id)
         if not word_of_day:
             raise HTTPException(status_code=404, detail="Word of the day not found")
-        word_id = word_of_day.word.id
         
         audio_bytes = await audio_file.read()
 
@@ -117,5 +114,5 @@ class AttemptService:
         recording = uow.recordings.upsert(Recording(attempt_id=attempt.id, s3_key=s3_key))
         uow.commit()
         
-        return self.get_attempt_feedback(wav_file, uow, user, word_id, recording.id)
+        return self.get_attempt_feedback(wav_file, uow, user, word_of_day.word, recording.id)
 
