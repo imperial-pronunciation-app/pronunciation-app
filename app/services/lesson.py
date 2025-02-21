@@ -21,3 +21,7 @@ class LessonService:
         """Returns True if the user has completed this lesson. i.e. if all exercises were attempted"""
         exercise_service = ExerciseService(self._uow)
         return all(exercise_service.is_completed_by(exercise, user) for exercise in lesson.exercises)
+
+    def _is_last_lesson(self, lesson: Lesson) -> bool:
+        """Returns True if this is the last lesson within the unit."""
+        return lesson.order == len(lesson.unit.lessons)

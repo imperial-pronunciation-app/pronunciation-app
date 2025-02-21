@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel
 
@@ -8,6 +8,7 @@ from app.schemas.lesson import LessonResponse
 
 class UnitPublicWithLessons(UnitBase):
     lessons: List[LessonResponse]
+    recap_lesson: Optional[LessonResponse]
 
 
 class UnitsResponse(BaseModel):

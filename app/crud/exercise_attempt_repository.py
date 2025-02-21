@@ -18,3 +18,6 @@ class ExerciseAttemptRepository(GenericRepository[ExerciseAttempt]):
             .where(Attempt.user_id == user_id, ExerciseAttempt.exercise_id == exercise_id)
         )
         return self._session.exec(stmt).all()
+
+    def get_max_score_by_user_id_and_exercise_id(self, user_id: int, exercise_id: int) -> int:
+        return max([attempt.attempt.score for attempt in self.find_by_user_id_and_exercise_id(user_id, exercise_id)])

@@ -12,4 +12,5 @@ if TYPE_CHECKING:
 
 class Attempt(IdModel, table=True):
     user_id: int = Field(foreign_key="user.id")
+    score: int
     created_at: datetime = Field(default_factory=datetime.now)

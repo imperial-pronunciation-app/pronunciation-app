@@ -16,6 +16,10 @@ class ExerciseService:
     def next_exercise(self, exercise: Exercise) -> Optional[Exercise]:
         """Returns the next exercise within the lesson, or None if it's the last exercise."""
         return exercise.lesson.exercises[exercise.index + 1] if exercise.index < len(exercise.lesson.exercises) - 1 else None
+    
+    def _is_last_exercise(self, exercise: Exercise) -> bool:
+        """Returns True if this is the last exercise within the lesson."""
+        return exercise.index == len(exercise.lesson.exercises) - 1
 
 
     def is_completed_by(self, exercise: Exercise, user: User) -> bool:
