@@ -1,0 +1,1057 @@
+[
+    {
+        "word": "apple",
+        "phonemes": [
+            "\u00e6",
+            "p",
+            "\u0259",
+            "l"
+        ]
+    },
+    {
+        "word": "banana",
+        "phonemes": [
+            "b",
+            "\u0259",
+            "n",
+            "\u0251",
+            "n",
+            "\u0259"
+        ]
+    },
+    {
+        "word": "chair",
+        "phonemes": [
+            "t\u0283",
+            "e",
+            "\u0259",
+            "r"
+        ]
+    },
+    {
+        "word": "table",
+        "phonemes": [
+            "t",
+            "e\u026a",
+            "b",
+            "\u0259",
+            "l"
+        ]
+    },
+    {
+        "word": "ocean",
+        "phonemes": [
+            "\u0259",
+            "\u028a",
+            "\u0283",
+            "\u0259",
+            "n"
+        ]
+    },
+    {
+        "word": "mountain",
+        "phonemes": [
+            "m",
+            "a\u028a",
+            "n",
+            "t",
+            "\u026a",
+            "n"
+        ]
+    },
+    {
+        "word": "river",
+        "phonemes": [
+            "r",
+            "\u026a",
+            "v",
+            "\u0259",
+            "r"
+        ]
+    },
+    {
+        "word": "sky",
+        "phonemes": [
+            "s",
+            "k",
+            "a\u026a"
+        ]
+    },
+    {
+        "word": "cloud",
+        "phonemes": [
+            "k",
+            "l",
+            "a\u028a",
+            "d"
+        ]
+    },
+    {
+        "word": "storm",
+        "phonemes": [
+            "s",
+            "t",
+            "\u0254",
+            "m"
+        ]
+    },
+    {
+        "word": "window",
+        "phonemes": [
+            "w",
+            "\u026a",
+            "n",
+            "d",
+            "\u0259",
+            "\u028a"
+        ]
+    },
+    {
+        "word": "door",
+        "phonemes": [
+            "d",
+            "\u0254",
+            "r"
+        ]
+    },
+    {
+        "word": "floor",
+        "phonemes": [
+            "f",
+            "l",
+            "\u0254",
+            "r"
+        ]
+    },
+    {
+        "word": "ceiling",
+        "phonemes": [
+            "s",
+            "i",
+            "l",
+            "\u026a",
+            "\u014b"
+        ]
+    },
+    {
+        "word": "lamp",
+        "phonemes": [
+            "l",
+            "\u00e6",
+            "m",
+            "p"
+        ]
+    },
+    {
+        "word": "computer",
+        "phonemes": [
+            "k",
+            "\u0259",
+            "m",
+            "p",
+            "j",
+            "u",
+            "t",
+            "\u0259",
+            "r"
+        ]
+    },
+    {
+        "word": "keyboard",
+        "phonemes": [
+            "k",
+            "i",
+            "b",
+            "\u0254",
+            "d"
+        ]
+    },
+    {
+        "word": "mouse",
+        "phonemes": [
+            "m",
+            "a\u028a",
+            "s"
+        ]
+    },
+    {
+        "word": "screen",
+        "phonemes": [
+            "s",
+            "k",
+            "r",
+            "i",
+            "n"
+        ]
+    },
+    {
+        "word": "printer",
+        "phonemes": [
+            "p",
+            "r",
+            "\u026a",
+            "n",
+            "t",
+            "\u0259",
+            "r"
+        ]
+    },
+    {
+        "word": "paper",
+        "phonemes": [
+            "p",
+            "e\u026a",
+            "p",
+            "\u0259",
+            "r"
+        ]
+    },
+    {
+        "word": "pencil",
+        "phonemes": [
+            "p",
+            "e",
+            "n",
+            "s",
+            "\u0259",
+            "l"
+        ]
+    },
+    {
+        "word": "notebook",
+        "phonemes": [
+            "n",
+            "\u0259",
+            "\u028a",
+            "t",
+            "b",
+            "\u028a",
+            "k"
+        ]
+    },
+    {
+        "word": "backpack",
+        "phonemes": [
+            "b",
+            "\u00e6",
+            "k",
+            "p",
+            "\u00e6",
+            "k"
+        ]
+    },
+    {
+        "word": "school",
+        "phonemes": [
+            "s",
+            "k",
+            "u",
+            "l"
+        ]
+    },
+    {
+        "word": "university",
+        "phonemes": [
+            "\u02cc",
+            "j",
+            "u",
+            "n",
+            "\u026a",
+            "v",
+            "\u025c",
+            "s",
+            "\u0259",
+            "t",
+            "i"
+        ]
+    },
+    {
+        "word": "library",
+        "phonemes": [
+            "l",
+            "a\u026a",
+            "b",
+            "r",
+            "\u0259",
+            "r",
+            "i"
+        ]
+    },
+    {
+        "word": "teacher",
+        "phonemes": [
+            "t",
+            "i",
+            "t\u0283",
+            "\u0259",
+            "r"
+        ]
+    },
+    {
+        "word": "student",
+        "phonemes": [
+            "s",
+            "t",
+            "j",
+            "u",
+            "d",
+            "\u0259",
+            "n",
+            "t"
+        ]
+    },
+    {
+        "word": "lesson",
+        "phonemes": [
+            "l",
+            "e",
+            "s",
+            "\u0259",
+            "n"
+        ]
+    },
+    {
+        "word": "car",
+        "phonemes": [
+            "k",
+            "\u0251",
+            "r"
+        ]
+    },
+    {
+        "word": "bicycle",
+        "phonemes": [
+            "b",
+            "a\u026a",
+            "s",
+            "\u026a",
+            "k",
+            "\u0259",
+            "l"
+        ]
+    },
+    {
+        "word": "train",
+        "phonemes": [
+            "t",
+            "r",
+            "e\u026a",
+            "n"
+        ]
+    },
+    {
+        "word": "airplane",
+        "phonemes": [
+            "e",
+            "\u0259",
+            "p",
+            "l",
+            "e\u026a",
+            "n"
+        ]
+    },
+    {
+        "word": "boat",
+        "phonemes": [
+            "b",
+            "\u0259",
+            "\u028a",
+            "t"
+        ]
+    },
+    {
+        "word": "bridge",
+        "phonemes": [
+            "b",
+            "r",
+            "\u026a",
+            "d\u0292"
+        ]
+    },
+    {
+        "word": "road",
+        "phonemes": [
+            "r",
+            "\u0259",
+            "\u028a",
+            "d"
+        ]
+    },
+    {
+        "word": "tunnel",
+        "phonemes": [
+            "t",
+            "\u028c",
+            "n",
+            "\u0259",
+            "l"
+        ]
+    },
+    {
+        "word": "traffic",
+        "phonemes": [
+            "t",
+            "r",
+            "\u00e6",
+            "f",
+            "\u026a",
+            "k"
+        ]
+    },
+    {
+        "word": "signal",
+        "phonemes": [
+            "s",
+            "\u026a",
+            "\u0261",
+            "n",
+            "\u0259",
+            "l"
+        ]
+    },
+    {
+        "word": "flower",
+        "phonemes": [
+            "f",
+            "l",
+            "a\u028a",
+            "\u0259",
+            "r"
+        ]
+    },
+    {
+        "word": "tree",
+        "phonemes": [
+            "t",
+            "r",
+            "i"
+        ]
+    },
+    {
+        "word": "grass",
+        "phonemes": [
+            "\u0261",
+            "r",
+            "\u0251",
+            "s"
+        ]
+    },
+    {
+        "word": "leaf",
+        "phonemes": [
+            "l",
+            "i",
+            "f"
+        ]
+    },
+    {
+        "word": "branch",
+        "phonemes": [
+            "b",
+            "r",
+            "\u0251",
+            "n",
+            "t\u0283"
+        ]
+    },
+    {
+        "word": "root",
+        "phonemes": [
+            "r",
+            "u",
+            "t"
+        ]
+    },
+    {
+        "word": "garden",
+        "phonemes": [
+            "\u0261",
+            "\u0251",
+            "d",
+            "\u0259",
+            "n"
+        ]
+    },
+    {
+        "word": "forest",
+        "phonemes": [
+            "f",
+            "o\u028a",
+            "r",
+            "\u026a",
+            "s",
+            "t"
+        ]
+    },
+    {
+        "word": "jungle",
+        "phonemes": [
+            "d\u0292",
+            "\u028c",
+            "\u014b",
+            "\u0261",
+            "\u0259",
+            "l"
+        ]
+    },
+    {
+        "word": "desert",
+        "phonemes": [
+            "d",
+            "e",
+            "z",
+            "\u0259",
+            "t"
+        ]
+    },
+    {
+        "word": "sun",
+        "phonemes": [
+            "s",
+            "\u028c",
+            "n"
+        ]
+    },
+    {
+        "word": "moon",
+        "phonemes": [
+            "m",
+            "u",
+            "n"
+        ]
+    },
+    {
+        "word": "star",
+        "phonemes": [
+            "s",
+            "t",
+            "\u0251",
+            "r"
+        ]
+    },
+    {
+        "word": "planet",
+        "phonemes": [
+            "p",
+            "l",
+            "\u00e6",
+            "n",
+            "\u026a",
+            "t"
+        ]
+    },
+    {
+        "word": "galaxy",
+        "phonemes": [
+            "\u0261",
+            "\u00e6",
+            "l",
+            "\u0259",
+            "k",
+            "s",
+            "i"
+        ]
+    },
+    {
+        "word": "universe",
+        "phonemes": [
+            "j",
+            "u",
+            "n",
+            "\u026a",
+            "v",
+            "\u025c",
+            "s"
+        ]
+    },
+    {
+        "word": "astronaut",
+        "phonemes": [
+            "\u00e6",
+            "s",
+            "t",
+            "r",
+            "\u0259",
+            "n",
+            "\u0254",
+            "t"
+        ]
+    },
+    {
+        "word": "rocket",
+        "phonemes": [
+            "r",
+            "o\u028a",
+            "k",
+            "\u026a",
+            "t"
+        ]
+    },
+    {
+        "word": "satellite",
+        "phonemes": [
+            "s",
+            "\u00e6",
+            "t",
+            "\u0259",
+            "l",
+            "a\u026a",
+            "t"
+        ]
+    },
+    {
+        "word": "telescope",
+        "phonemes": [
+            "t",
+            "e",
+            "l",
+            "\u026a",
+            "s",
+            "k",
+            "\u0259",
+            "\u028a",
+            "p"
+        ]
+    },
+    {
+        "word": "house",
+        "phonemes": [
+            "h",
+            "a\u028a",
+            "s"
+        ]
+    },
+    {
+        "word": "apartment",
+        "phonemes": [
+            "\u0259",
+            "p",
+            "\u0251",
+            "t",
+            "m",
+            "\u0259",
+            "n",
+            "t"
+        ]
+    },
+    {
+        "word": "building",
+        "phonemes": [
+            "b",
+            "\u026a",
+            "l",
+            "d",
+            "\u026a",
+            "\u014b"
+        ]
+    },
+    {
+        "word": "skyscraper",
+        "phonemes": [
+            "s",
+            "k",
+            "a\u026a",
+            "\u02cc",
+            "s",
+            "k",
+            "r",
+            "e\u026a",
+            "p",
+            "\u0259",
+            "r"
+        ]
+    },
+    {
+        "word": "elevator",
+        "phonemes": [
+            "e",
+            "l",
+            "\u026a",
+            "v",
+            "e\u026a",
+            "t",
+            "\u0259",
+            "r"
+        ]
+    },
+    {
+        "word": "staircase",
+        "phonemes": [
+            "s",
+            "t",
+            "e",
+            "\u0259",
+            "k",
+            "e\u026a",
+            "s"
+        ]
+    },
+    {
+        "word": "balcony",
+        "phonemes": [
+            "b",
+            "\u00e6",
+            "l",
+            "k",
+            "\u0259",
+            "n",
+            "i"
+        ]
+    },
+    {
+        "word": "roof",
+        "phonemes": [
+            "r",
+            "u",
+            "f"
+        ]
+    },
+    {
+        "word": "chimney",
+        "phonemes": [
+            "t\u0283",
+            "\u026a",
+            "m",
+            "n",
+            "i"
+        ]
+    },
+    {
+        "word": "garage",
+        "phonemes": [
+            "\u0261",
+            "\u00e6",
+            "r",
+            "\u0251",
+            "\u0292"
+        ]
+    },
+    {
+        "word": "book",
+        "phonemes": [
+            "b",
+            "\u028a",
+            "k"
+        ]
+    },
+    {
+        "word": "magazine",
+        "phonemes": [
+            "\u02cc",
+            "m",
+            "\u00e6",
+            "\u0261",
+            "\u0259",
+            "z",
+            "i",
+            "n"
+        ]
+    },
+    {
+        "word": "newspaper",
+        "phonemes": [
+            "n",
+            "j",
+            "u",
+            "z",
+            "\u02cc",
+            "p",
+            "e\u026a",
+            "p",
+            "\u0259",
+            "r"
+        ]
+    },
+    {
+        "word": "letter",
+        "phonemes": [
+            "l",
+            "e",
+            "t",
+            "\u0259",
+            "r"
+        ]
+    },
+    {
+        "word": "envelope",
+        "phonemes": [
+            "e",
+            "n",
+            "v",
+            "\u0259",
+            "l",
+            "\u0259",
+            "\u028a",
+            "p"
+        ]
+    },
+    {
+        "word": "postcard",
+        "phonemes": [
+            "p",
+            "\u0259",
+            "\u028a",
+            "s",
+            "t",
+            "k",
+            "\u0251",
+            "d"
+        ]
+    },
+    {
+        "word": "stamp",
+        "phonemes": [
+            "s",
+            "t",
+            "\u00e6",
+            "m",
+            "p"
+        ]
+    },
+    {
+        "word": "package",
+        "phonemes": [
+            "p",
+            "\u00e6",
+            "k",
+            "\u026a",
+            "d\u0292"
+        ]
+    },
+    {
+        "word": "parcel",
+        "phonemes": [
+            "p",
+            "\u0251",
+            "s",
+            "\u0259",
+            "l"
+        ]
+    },
+    {
+        "word": "delivery",
+        "phonemes": [
+            "d",
+            "\u026a",
+            "l",
+            "\u026a",
+            "v",
+            "\u0259",
+            "r",
+            "i"
+        ]
+    },
+    {
+        "word": "music",
+        "phonemes": [
+            "m",
+            "j",
+            "u",
+            "z",
+            "\u026a",
+            "k"
+        ]
+    },
+    {
+        "word": "guitar",
+        "phonemes": [
+            "\u0261",
+            "\u026a",
+            "t",
+            "\u0251",
+            "r"
+        ]
+    },
+    {
+        "word": "piano",
+        "phonemes": [
+            "p",
+            "i",
+            "\u00e6",
+            "n",
+            "\u0259",
+            "\u028a"
+        ]
+    },
+    {
+        "word": "violin",
+        "phonemes": [
+            "\u02cc",
+            "v",
+            "a\u026a",
+            "\u0259",
+            "l",
+            "\u026a",
+            "n"
+        ]
+    },
+    {
+        "word": "drums",
+        "phonemes": [
+            "m",
+            "\u026a",
+            "s",
+            "\u026a",
+            "\u014b"
+        ]
+    },
+    {
+        "word": "singer",
+        "phonemes": [
+            "s",
+            "\u026a",
+            "\u014b",
+            "\u0259",
+            "r"
+        ]
+    },
+    {
+        "word": "band",
+        "phonemes": [
+            "b",
+            "\u00e6",
+            "n",
+            "d"
+        ]
+    },
+    {
+        "word": "concert",
+        "phonemes": [
+            "k",
+            "o\u028a",
+            "n",
+            "s",
+            "\u0259",
+            "t"
+        ]
+    },
+    {
+        "word": "microphone",
+        "phonemes": [
+            "m",
+            "a\u026a",
+            "k",
+            "r",
+            "\u0259",
+            "f",
+            "\u0259",
+            "\u028a",
+            "n"
+        ]
+    },
+    {
+        "word": "headphones",
+        "phonemes": [
+            "h",
+            "e",
+            "d",
+            "f",
+            "\u0259",
+            "\u028a",
+            "n",
+            "z"
+        ]
+    },
+    {
+        "word": "movie",
+        "phonemes": [
+            "m",
+            "u",
+            "v",
+            "i"
+        ]
+    },
+    {
+        "word": "theater",
+        "phonemes": [
+            "\u03b8",
+            "\u026a",
+            "\u0259",
+            "t",
+            "\u0259",
+            "r"
+        ]
+    },
+    {
+        "word": "actor",
+        "phonemes": [
+            "\u00e6",
+            "k",
+            "t",
+            "\u0259",
+            "r"
+        ]
+    },
+    {
+        "word": "director",
+        "phonemes": [
+            "d",
+            "a\u026a",
+            "r",
+            "e",
+            "k",
+            "t",
+            "\u0259",
+            "r"
+        ]
+    },
+    {
+        "word": "script",
+        "phonemes": [
+            "s",
+            "k",
+            "r",
+            "\u026a",
+            "p",
+            "t"
+        ]
+    },
+    {
+        "word": "camera",
+        "phonemes": [
+            "k",
+            "\u00e6",
+            "m",
+            "r",
+            "\u0259"
+        ]
+    },
+    {
+        "word": "scene",
+        "phonemes": [
+            "s",
+            "i",
+            "n"
+        ]
+    },
+    {
+        "word": "costume",
+        "phonemes": [
+            "k",
+            "o\u028a",
+            "s",
+            "t\u0283",
+            "u",
+            "m"
+        ]
+    },
+    {
+        "word": "makeup",
+        "phonemes": [
+            "m",
+            "e\u026a",
+            "k",
+            "\u028c",
+            "p"
+        ]
+    },
+    {
+        "word": "stage",
+        "phonemes": [
+            "s",
+            "t",
+            "e\u026a",
+            "d\u0292"
+        ]
+    }
+]

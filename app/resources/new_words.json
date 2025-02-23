@@ -1,0 +1,12 @@
+[
+    "apple", "banana", "chair", "table", "ocean", "mountain", "river", "sky", "cloud", "storm",
+    "window", "door", "floor", "ceiling", "lamp", "computer", "keyboard", "mouse", "screen", "printer",
+    "paper", "pencil", "notebook", "backpack", "school", "university", "library", "teacher", "student", "lesson",
+    "car", "bicycle", "train", "airplane", "boat", "bridge", "road", "tunnel", "traffic", "signal",
+    "flower", "tree", "grass", "leaf", "branch", "root", "garden", "forest", "jungle", "desert",
+    "sun", "moon", "star", "planet", "galaxy", "universe", "astronaut", "rocket", "satellite", "telescope",
+    "house", "apartment", "building", "skyscraper", "elevator", "staircase", "balcony", "roof", "chimney", "garage",
+    "book", "magazine", "newspaper", "letter", "envelope", "postcard", "stamp", "package", "parcel", "delivery",
+    "music", "guitar", "piano", "violin", "drums", "singer", "band", "concert", "microphone", "headphones",
+    "movie", "theater", "actor", "director", "script", "camera", "scene", "costume", "makeup", "stage"
+]
