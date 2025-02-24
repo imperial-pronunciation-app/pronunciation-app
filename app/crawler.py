@@ -15,7 +15,6 @@ word_data: List[WordEntry] = [
 """
 
 import json
-import time
 from typing import List, TypedDict
 
 import requests
@@ -51,8 +50,13 @@ class CrawlingService:
                 phonemes_list.append(ipa[i : i + 2])
                 i += 2
             else:
-                phonemes_list.append(ipa[i])
-                i += 1
+                # 'e' edge case
+                if ipa[i] == "e":
+                    phonemes_list.append("ɛ")
+                    i += 1
+                else:
+                    phonemes_list.append(ipa[i])
+                    i += 1
 
         return phonemes_list
 
@@ -64,7 +68,7 @@ class CrawlingService:
                 bs4 = BeautifulSoup(res.text, "html.parser")
                 ipa = bs4.find("span", class_="ipa").text
                 ipa_data.append({"word": word, "ipa": ipa})
-                time.sleep(1)  # Dont want to piss off the server (specified in the robots.txt)
+                # time.sleep(1)  # Dont want to piss off the server (specified in the robots.txt)
             except requests.exceptions.RequestException as e:
                 print(e)
 
@@ -91,6 +95,71 @@ class CrawlingService:
 
 
 if __name__ == "__main__":
-    words = json.load(open("app/resources/new_words.json"))
-    service = CrawlingService()
-    service.get_phonemes_and_save(words)
+    # words = json.load(open("app/resources/new_words.json"))
+    # service = CrawlingService()
+    # service.get_phonemes_and_save(words)
+    phonemes = [
+        {"word": "software", "phonemes": ["s", "oʊ", "f", "t", "w", "ɛ", "r"]},
+        {"word": "hardware", "phonemes": ["h", "ɑː", "ɹ", "d", "w", "ɛ", "ɹ"]},
+        {"word": "computer", "phonemes": ["k", "ə", "m", "p", "j", "uː", "t", "ə"]},
+        {"word": "compilers", "phonemes": ["k", "ə", "m", "p", "aɪ", "l", "ə", "r"]},
+        {"word": "keyboard", "phonemes": ["k", "iː", "b", "ɔː", "d"]},
+        {"word": "mouse", "phonemes": ["m", "aʊ", "s"]},
+        {"word": "parrot", "phonemes": ["p", "æ", "r", "ə", "t"]},
+        {"word": "chocolate", "phonemes": ["tʃ", "ɒ", "k", "l", "ə", "t"]},
+        {"word": "cat", "phonemes": ["k", "æ", "t"]},
+        {"word": "cut", "phonemes": ["k", "ʌ", "t"]},
+        {"word": "hat", "phonemes": ["h", "æ", "t"]},
+        {"word": "hut", "phonemes": ["h", "ʌ", "t"]},
+        {"word": "bat", "phonemes": ["b", "æ", "t"]},
+        {"word": "bet", "phonemes": ["b", "ɛ", "t"]},
+        {"word": "pan", "phonemes": ["p", "æ", "n"]},
+        {"word": "pen", "phonemes": ["p", "ɛ", "n"]},
+        {"word": "man", "phonemes": ["m", "æ", "n"]},
+        {"word": "bag", "phonemes": ["b", "æ", "ɡ"]},
+        {"word": "cap", "phonemes": ["k", "æ", "p"]},
+        {"word": "sat", "phonemes": ["s", "æ", "t"]},
+        {"word": "dad", "phonemes": ["d", "æ", "d"]},
+        {"word": "jam", "phonemes": ["dʒ", "æ", "m"]},
+        {"word": "map", "phonemes": ["m", "æ", "p"]},
+        {"word": "nap", "phonemes": ["n", "æ", "p"]},
+        {"word": "pat", "phonemes": ["p", "æ", "t"]},
+        {"word": "pot", "phonemes": ["p", "ɒ", "t"]},
+        {"word": "pig", "phonemes": ["p", "ɪ", "ɡ"]},
+        {"word": "pop", "phonemes": ["p", "ɒ", "p"]},
+        {"word": "pet", "phonemes": ["p", "ɛ", "t"]},
+        {"word": "pit", "phonemes": ["p", "ɪ", "t"]},
+        {"word": "pin", "phonemes": ["p", "ɪ", "n"]},
+        {"word": "pack", "phonemes": ["p", "æ", "k"]},
+        {"word": "puff", "phonemes": ["p", "ʌ", "f"]},
+        {"word": "pair", "phonemes": ["p", "ɛ", "ə", "ɹ"]},
+        {"word": "page", "phonemes": ["p", "eɪ", "dʒ"]},
+        {"word": "pine", "phonemes": ["p", "aɪ", "n"]},
+        {"word": "see", "phonemes": ["s", "iː"]},
+        {"word": "sit", "phonemes": ["s", "ɪ", "t"]},
+        {"word": "feel", "phonemes": ["f", "iː", "l"]},
+        {"word": "fill", "phonemes": ["f", "ɪ", "l"]},
+        {"word": "sheep", "phonemes": ["ʃ", "iː", "p"]},
+        {"word": "ship", "phonemes": ["ʃ", "ɪ", "p"]},
+        {"word": "heel", "phonemes": ["h", "iː", "l"]},
+        {"word": "hill", "phonemes": ["h", "ɪ", "l"]},
+        {"word": "tree", "phonemes": ["t", "r", "iː"]},
+        {"word": "keep", "phonemes": ["k", "iː", "p"]},
+        {"word": "tea", "phonemes": ["t", "iː"]},
+        {"word": "free", "phonemes": ["f", "r", "iː"]},
+        {"word": "pea", "phonemes": ["p", "iː"]},
+        {"word": "neat", "phonemes": ["n", "iː", "t"]},
+        {"word": "green", "phonemes": ["ɡ", "r", "iː", "n"]},
+        {"word": "heat", "phonemes": ["h", "iː", "t"]},
+    ]
+
+    with open("app/resources/test.json", "w") as f:
+        json.dump(phonemes, f, indent=4)
+    print("""
+              _______________________________________________________
+              |                                                     |
+              |     Data saved to app/resources/word_data.json      |
+              |_____________________________________________________|
+              """)
+    
+    print(json.load(open("app/resources/word_data.json")))
