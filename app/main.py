@@ -15,7 +15,7 @@ from app.routers import routers
 
 rollbar.init(
     get_settings().ROLLBAR_ACCESS_TOKEN,
-    environment=get_settings().ENVIRONMENT,
+    environment=get_settings().ROLLBAR_ENVIRONMENT,
     handler="async",
     include_request_body=True,
 )

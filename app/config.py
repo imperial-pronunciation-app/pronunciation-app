@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     MODEL_API_URL: str
     ADMIN_USERNAME: str
     ADMIN_PASSWORD_HASH: str
-    ENVIRONMENT: str
+    ROLLBAR_ENVIRONMENT: str
     ROLLBAR_ACCESS_TOKEN: str
 
     model_config = SettingsConfigDict(env_file=".env")
