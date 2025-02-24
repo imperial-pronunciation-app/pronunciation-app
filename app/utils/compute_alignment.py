@@ -1,8 +1,9 @@
 from collections import deque
 from enum import Enum, auto
 from typing import Callable, List, Optional, Tuple, TypeVar
-    
+
 import numpy as np
+
 
 T = TypeVar("T")
 
