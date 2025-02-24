@@ -79,4 +79,4 @@ def compute_alignment(
 
     final_score = int((score_dp[n][m] / max(1, n)) * 100)  # Normalize to 0-100
 
-    return alignment, max(0, min(100, final_score))  # Clamp score between 0-100
+    return list(alignment), max(0, min(100, final_score))  # Clamp score between 0-100
