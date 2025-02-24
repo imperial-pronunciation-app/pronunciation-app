@@ -17,3 +17,4 @@ redis
 sqladmin
 itsdangerous
 numpy
+rollbar

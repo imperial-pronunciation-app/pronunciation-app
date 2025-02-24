@@ -13,9 +13,12 @@ class Settings(BaseSettings):
     MODEL_API_URL: str
     ADMIN_USERNAME: str
     ADMIN_PASSWORD_HASH: str
+    ENVIRONMENT: str
+    ROLLBAR_ACCESS_TOKEN: str
 
     model_config = SettingsConfigDict(env_file=".env")
 
+
 @lru_cache
 def get_settings() -> Settings:
-    return Settings() # type: ignore[call-arg]
+    return Settings()  # type: ignore[call-arg]
