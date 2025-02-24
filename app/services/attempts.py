@@ -94,8 +94,9 @@ class AttemptService:
 
         # 4. Generate recap lesson if this is the last exercise of the last lesson
         unit_service = UnitService(uow)
-        if unit_service._is_completed_by(exercise.lesson.unit, user) and uow.lessons.find_recap_by_user_id_and_unit_id(user.id, exercise.lesson.unit_id) is None:
-            unit_service.generate_recap_lesson(exercise.lesson.unit, user)
+        unit = uow.basic_lessons.get_by_id(exercise.lesson_id).unit
+        if unit_service._is_completed_by(unit, user) and uow.recap_lessons.find_recap_by_user_id_and_unit_id(user.id, unit.id) is None:
+            unit_service.generate_recap_lesson(unit, user)
 
         return AttemptResponse(recording_id=recording_id, score=score, phonemes=aligned_phonemes, xp_gain=xp_gain)
     

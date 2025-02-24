@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 class BasicLesson(IdModel, table=True):
     id: int = Field(primary_key=True, foreign_key="lesson.id")
-    order: int
+    index: int
     # TODO: Discuss, should this be on Lesson instead?
     # A Unit only needs to know about its basic lessons,
     # so that's the relationship
