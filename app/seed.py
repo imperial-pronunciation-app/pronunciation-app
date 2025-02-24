@@ -6,11 +6,13 @@ from sqlmodel import Session, SQLModel, text
 
 from app.database import engine
 from app.models.attempt import Attempt  # noqa: F401
+from app.models.basic_lesson import BasicLesson  # noqa: F401
 from app.models.exercise import Exercise
 from app.models.exercise_attempt import ExerciseAttempt  # noqa: F401
 from app.models.leaderboard_user_link import LeaderboardUserLink  # noqa: F401
 from app.models.lesson import Lesson
 from app.models.phoneme import Phoneme
+from app.models.recap_lesson import RecapLesson  # noqa: F401
 from app.models.recording import Recording  # noqa: F401
 from app.models.unit import Unit
 from app.models.user import User

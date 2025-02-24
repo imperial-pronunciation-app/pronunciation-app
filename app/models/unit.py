@@ -6,9 +6,9 @@ from app.models.base.unit_base import UnitBase
 
 
 if TYPE_CHECKING:
-    from app.models.lesson import Lesson
+    from app.models.basic_lesson import BasicLesson
 
 
 class Unit(UnitBase, table=True):
     order: int
-    lessons: List["Lesson"] = Relationship(back_populates="unit", cascade_delete=True)
+    lessons: List["BasicLesson"] = Relationship(back_populates="unit", cascade_delete=True)
