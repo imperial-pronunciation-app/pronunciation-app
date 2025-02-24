@@ -16,8 +16,8 @@ def compute_alignment(
     expected: List[T],
     actual: List[T],
     similarity_func: Callable[[T, T], float],
-    deletion_penalty,
-    insertion_penalty
+    deletion_penalty: float,
+    insertion_penalty: float,
 ) -> Tuple[List[Tuple[Optional[T], Optional[T]]], int]:
     """
     Generalized function to align two sequences using dynamic programming.
