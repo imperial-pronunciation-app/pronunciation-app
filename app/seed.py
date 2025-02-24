@@ -60,6 +60,8 @@ def seed(session: Session) -> None:
     for word_entry in word_data:
         word_obj = words[word_entry["word"]]
         for index, ipa in enumerate(word_entry["phonemes"]):
+            # This is helpful incase when we add new words, we don't have the
+            # phoneme in the database and need to add them
             try:
                 word_phoneme_links.append(
                     WordPhonemeLink(word_id=word_obj.id, phoneme_id=phonemes[ipa].id, index=index)
