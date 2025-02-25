@@ -1,6 +1,10 @@
+from random import choice
+from typing import Dict
+
 from app.crud.unit_of_work import UnitOfWork
 from app.models.exercise import Exercise
 from app.models.lesson import Lesson
+from app.models.phoneme import Phoneme
 from app.models.recap_lesson import RecapLesson
 from app.models.unit import Unit
 from app.models.user import User
@@ -31,16 +35,40 @@ class UnitService:
 
     def generate_recap_lesson(self, unit: Unit, user: User) -> None:
         # Precondition: all exercises in the unit have been attempted at least once
-        exercise_scores = [
-            (exercise, self._uow.exercise_attempts.get_max_score_by_user_id_and_exercise_id(user.id, exercise.id)) 
-            for basic_lesson in unit.lessons 
-            for exercise in self._uow.lessons.get_by_id(basic_lesson.id).exercises]
+        """
+            For each BasicLesson in the Unit, for each Exercise in the BasicLesson, for each ExerciseAttempt for the Exercise, retrieve the incorrect phonemes
 
-        exercise_scores.sort(key=lambda x: x[1])
-        exercises = [exercise for exercise, _ in exercise_scores[:5]]
+            Use the top five/ten
+
+            Find words containing them
+        """
+        # 1. For each BasicLesson in the Unit, for each Exercise in the BasicLesson, for each exercise attempt, join with phonemes
+        # on the exercise attempt phoneme link table, and return the phoneme and weight
+        phoneme_difficulties: Dict[Phoneme, int] = {}
+        for basic_lesson in unit.lessons:
+            lesson = self._uow.lessons.get_by_id(basic_lesson.id)
+            for exercise in lesson.exercises:
+                exercise_attempts = self._uow.exercise_attempts.find_by_user_id_and_exercise_id(user.id, exercise.id)
+                for attempt in exercise_attempts:
+                    for phoneme, weight in self._uow.exercise_attempts.get_phoneme_difficulties(attempt.id):
+                        if phoneme in phoneme_difficulties:
+                            phoneme_difficulties[phoneme] += weight
+                        else:
+                            phoneme_difficulties[phoneme] = weight
+        
+        worst_phonemes = sorted(phoneme_difficulties.items(), key=lambda x: x[1])[:10]
+        
+        # 2. For each phoneme, find a word containing that phoneme
+        words = []
+        for phoneme, weight in worst_phonemes:
+            options = self._uow.words.find_with_phoneme(phoneme)
+            if options:
+                words.append(choice(options))
+        
+        # 3. Create a RecapLesson, containing exercises for each of those words
         lesson = self._uow.lessons.upsert(Lesson(
             title=f"Recap of {unit.name}",
-            exercises=[Exercise(index=i, word_id=exercise.word_id) for i, exercise in enumerate(exercises)],
+            exercises=[Exercise(index=i, word_id=word.id) for i, word in enumerate(words)],
         ))
         self._uow.recap_lessons.upsert(RecapLesson(
             id=lesson.id,
