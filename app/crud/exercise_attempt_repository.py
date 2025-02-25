@@ -21,9 +21,6 @@ class ExerciseAttemptRepository(GenericRepository[ExerciseAttempt]):
         )
         return self._session.exec(stmt).all()
 
-    def get_max_score_by_user_id_and_exercise_id(self, user_id: int, exercise_id: int) -> int:
-        return max([attempt.attempt.score for attempt in self.find_by_user_id_and_exercise_id(user_id, exercise_id)])
-    
     def get_phoneme_difficulties(self, attempt_id: int) -> Sequence[Tuple[Phoneme, int]]:
         stmt = (
             select(Phoneme, ExerciseAttemptPhonemeLink.weight)
