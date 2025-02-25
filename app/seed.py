@@ -9,6 +9,7 @@ from app.models.attempt import Attempt  # noqa: F401
 from app.models.basic_lesson import BasicLesson  # noqa: F401
 from app.models.exercise import Exercise
 from app.models.exercise_attempt import ExerciseAttempt  # noqa: F401
+from app.models.exercise_attempt_phoneme_link import ExerciseAttemptPhonemeLink  # noqa: F401
 from app.models.leaderboard_user_link import LeaderboardUserLink  # noqa: F401
 from app.models.lesson import Lesson
 from app.models.phoneme import Phoneme
