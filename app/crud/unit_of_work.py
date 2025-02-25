@@ -5,11 +5,13 @@ from fastapi import Depends
 from sqlmodel import Session
 
 from app.crud.attempts_repository import AttemptRepository
+from app.crud.basic_lesson_repository import BasicLessonRepository
 from app.crud.exercise_attempt_repository import ExerciseAttemptRepository
 from app.crud.exercise_repository import ExerciseRepository
 from app.crud.leaderboard_user_repository import LeaderboardUserRepository
 from app.crud.lesson_repository import LessonRepository
 from app.crud.phoneme_repository import PhonemeRepository
+from app.crud.recap_lesson_repository import RecapLessonRepository
 from app.crud.recording_repository import RecordingRepository
 from app.crud.unit_repository import UnitRepository
 from app.crud.user_repository import UserRepository
@@ -29,6 +31,8 @@ class UnitOfWork:
         self.users = UserRepository(self._session)
         self.exercises = ExerciseRepository(self._session)
         self.units = UnitRepository(self._session)
+        self.recap_lessons = RecapLessonRepository(self._session)
+        self.basic_lessons = BasicLessonRepository(self._session)
         self.lessons = LessonRepository(self._session)
         self.attempts = AttemptRepository(self._session)
         self.exercise_attempts = ExerciseAttemptRepository(self._session)
