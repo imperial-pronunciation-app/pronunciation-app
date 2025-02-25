@@ -8,7 +8,6 @@ from sqladmin import Admin
 from app.admin import views
 from app.admin.auth import AdminAuth
 from app.config import get_settings
-from app.cron import lifespan
 from app.database import engine
 from app.routers import routers
 
@@ -20,7 +19,7 @@ rollbar.init(
     include_request_body=True,
 )
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI()
 rollbar_add_to(app)
 
 admin = Admin(app, engine, authentication_backend=AdminAuth())
