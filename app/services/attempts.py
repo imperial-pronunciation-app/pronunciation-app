@@ -1,6 +1,6 @@
 import os
 import uuid
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
 import requests
 from fastapi import Depends, HTTPException, UploadFile
@@ -9,6 +9,7 @@ from app.config import get_settings
 from app.crud.unit_of_work import UnitOfWork, get_unit_of_work
 from app.models.attempt import Attempt
 from app.models.exercise_attempt import ExerciseAttempt
+from app.models.exercise_attempt_phoneme_link import ExerciseAttemptPhonemeLink
 from app.models.recording import Recording
 from app.models.user import User
 from app.models.word import Word
@@ -16,7 +17,6 @@ from app.models.word_of_day_attempt import WordOfDayAttempt
 from app.schemas.aligned_phonemes import AlignedPhonemes
 from app.schemas.attempt import AttemptResponse
 from app.schemas.model_api import InferPhonemesResponse
-from app.schemas.phoneme import PhonemePublic
 from app.services.pronunciation import PronunciationService
 from app.services.unit import UnitService
 from app.services.user import UserService
@@ -65,14 +65,26 @@ class AttemptService:
         attempt = self._uow.attempts.upsert(Attempt(user_id=user.id, score=score))
         recording = self._uow.recordings.upsert(Recording(attempt_id=attempt.id, s3_key=s3_key))
         return attempt.id, recording.id
-    
+
+    def extract_poor_phonemes(self, aligned_phonemes: AlignedPhonemes) -> List[Tuple[int, int]]:
+        # returns a list mapping phoneme id to weight
+        
+        # Basic: The weight of a phoneme is the number of occurrences of a mistake
+        # (expected, actual)
+        weights: Dict[int, int] = {}
+        for expected, actual in aligned_phonemes:
+            if expected and actual is None:
+                # got expected wrong, need to practice it
+                weights[expected.id] = weights.get(expected.id, 0) + 1
+        return []
+
     async def post_exercise_attempt(
-            self, 
-            audio_file: UploadFile, 
-            exercise_id: int, 
-            uow: UnitOfWork = Depends(get_unit_of_work), 
-            user: User = Depends(current_active_user)
-            ) -> AttemptResponse:
+        self,
+        audio_file: UploadFile,
+        exercise_id: int,
+        uow: UnitOfWork = Depends(get_unit_of_work),
+        user: User = Depends(current_active_user),
+    ) -> AttemptResponse:
         exercise = uow.exercises.find_by_id(id=exercise_id)
         if not exercise:
             raise HTTPException(status_code=404, detail="Exercise not found")
@@ -91,14 +103,24 @@ class AttemptService:
         uow.exercise_attempts.upsert(ExerciseAttempt(id=attempt_id, user_id=user.id, exercise_id=exercise_id))
         uow.commit()
 
+        # 3b. Link challenging phonemes to this exercise attempt
+        poor_phonemes = self.extract_poor_phonemes(aligned_phonemes)
+        for phoneme_id, weight in poor_phonemes:
+            uow.exercise_attempt_phonemes.upsert(
+                ExerciseAttemptPhonemeLink(exercise_attempt_id=attempt_id, phoneme_id=phoneme_id, weight=weight)
+            )
+
         # 4. Generate recap lesson if this is the last exercise of the last lesson
         unit_service = UnitService(uow)
         unit = uow.basic_lessons.get_by_id(exercise.lesson_id).unit
-        if unit_service._is_completed_by(unit, user) and uow.recap_lessons.find_recap_by_user_id_and_unit_id(user.id, unit.id) is None:
+        if (
+            unit_service._is_completed_by(unit, user)
+            and uow.recap_lessons.find_recap_by_user_id_and_unit_id(user.id, unit.id) is None
+        ):
             unit_service.generate_recap_lesson(unit, user)
 
         return AttemptResponse(recording_id=recording_id, score=score, phonemes=aligned_phonemes, xp_gain=xp_gain)
-    
+
     async def post_word_of_day_attempt(
         self,
         audio_file: UploadFile,
@@ -109,7 +131,7 @@ class AttemptService:
         word_of_day = uow.word_of_day.find_by_id(id=word_of_day_id)
         if not word_of_day:
             raise HTTPException(status_code=404, detail="Word of the day not found")
-        
+
         wav_file = await self.create_wav_file(audio_file)
         aligned_phonemes, score = self.get_attempt_feedback(wav_file, word_of_day.word)
         user_service = UserService(uow)
