@@ -27,16 +27,15 @@ class AttemptService:
     def __init__(self, uow: UnitOfWork):
         self._uow = uow
 
-    def create_wav_file(self, audio_bytes: bytes) -> str:
+    async def create_wav_file(self, audio_file: UploadFile) -> str:
+        audio_bytes = await audio_file.read()
         temp_file = uuid.uuid4()
         filename = f"{temp_file}.wav"
         with open(filename, "bx") as f:
             f.write(audio_bytes)
         return filename
 
-    async def dispatch_to_model(self, audio_file: UploadFile) -> Tuple[List[str], str]:
-        audio_bytes = await audio_file.read() # TODO: Check if await is needed
-        wav_file = self.create_wav_file(audio_bytes)
+    def dispatch_to_model(self, wav_file: str) -> List[str]:
         with open(wav_file, "rb") as f:
             files = {"audio_file": f}
 
@@ -47,16 +46,16 @@ class AttemptService:
 
         model_data = InferPhonemesResponse.model_validate(model_response.json())
 
-        return model_data.phonemes, wav_file
+        return model_data.phonemes
 
-    async def get_attempt_feedback(
+    def get_attempt_feedback(
             self,
-            audio_file: UploadFile,
+            wav_file: str,
             word: Word
-    ) -> Tuple[List[Tuple[PhonemePublic | None, PhonemePublic | None]], int, str]:
-        inferred_phoneme_strings, wav_file = await self.dispatch_to_model(audio_file)
+    ) -> Tuple[List[Tuple[PhonemePublic | None, PhonemePublic | None]], int]:
+        inferred_phoneme_strings = self.dispatch_to_model(wav_file)
         aligned_phonemes, score = PronunciationService(self._uow).evaluate_pronunciation(word, inferred_phoneme_strings)
-        return aligned_phonemes, score, wav_file
+        return aligned_phonemes, score
     
     def save_to_s3(self, wav_file: str) -> str:
         s3_key = upload_wav_to_s3(wav_file)
@@ -80,7 +79,8 @@ class AttemptService:
             raise HTTPException(status_code=404, detail="Exercise not found")
         
         # 1. Send .wav file to model for response
-        aligned_phonemes, score, wav_file = await self.get_attempt_feedback(audio_file, exercise.word)
+        wav_file = await self.create_wav_file(audio_file)
+        aligned_phonemes, score = self.get_attempt_feedback(wav_file, exercise.word)
         user_service = UserService(uow)
         xp_gain = user_service.update_xp_with_boost(user, score)
 
@@ -111,7 +111,8 @@ class AttemptService:
         if not word_of_day:
             raise HTTPException(status_code=404, detail="Word of the day not found")
         
-        aligned_phonemes, score, wav_file = await self.get_attempt_feedback(audio_file, word_of_day.word)
+        wav_file = await self.create_wav_file(audio_file)
+        aligned_phonemes, score = self.get_attempt_feedback(wav_file, word_of_day.word)
         user_service = UserService(uow)
         xp_gain = user_service.update_xp_with_boost(user, score)
 
