@@ -3,6 +3,7 @@ from typing import List
 import pytest
 from sqlmodel import Session
 
+from app.models.basic_lesson import BasicLesson
 from app.models.exercise import Exercise
 from app.models.lesson import Lesson
 from app.models.phoneme import Phoneme
@@ -11,9 +12,9 @@ from app.models.word import Word
 from app.models.word_phoneme_link import WordPhonemeLink
 
 
-@pytest.fixture
-def sample_units(sample_exercise: Exercise) -> List[Unit]:
-    return [sample_exercise.lesson.unit]
+# @pytest.fixture
+# def sample_units(sample_exercise: Exercise) -> List[Unit]:
+#     return [sample_exercise.lesson.unit]
 
 
 @pytest.fixture
@@ -27,9 +28,18 @@ def sample_unit(session: Session) -> Unit:
 
 
 @pytest.fixture
-def sample_lesson(session: Session, sample_unit: Unit) -> Lesson:
+def sample_lesson(session: Session) -> Lesson:
     """Fixture to create a lesson for exercises."""
-    lesson = Lesson(title="Test Lesson", unit_id=sample_unit.id, order=0)
+    lesson = Lesson(title="Test Lesson")
+    session.add(lesson)
+    session.commit()
+    session.refresh(lesson)
+    return lesson
+
+@pytest.fixture
+def sample_basic_lesson(session: Session, sample_lesson: Lesson, sample_unit: Unit) -> BasicLesson:
+    """Fixture to create a lesson for exercises."""
+    lesson = BasicLesson(id=sample_lesson.id, index=0, unit_id=sample_unit.id)
     session.add(lesson)
     session.commit()
     session.refresh(lesson)

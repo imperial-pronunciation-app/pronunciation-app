@@ -11,7 +11,6 @@ from app.models.unit import Unit
 from app.models.word import Word
 from app.models.word_of_day import WordOfDay
 from app.models.word_phoneme_link import WordPhonemeLink
-from app.schemas.attempt import AttemptResponse
 from app.services.attempts import AttemptService
 
 
@@ -55,7 +54,6 @@ def test_word_of_day_attempts(
     uow.commit()
 
     wav_file_path = f"tests/assets/{test_word}.wav"
-    print(AttemptResponse.schema())
     with open(wav_file_path, "rb") as f:
         files = {"audio_file": f}
 
