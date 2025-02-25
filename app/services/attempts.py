@@ -13,6 +13,7 @@ from app.models.recording import Recording
 from app.models.user import User
 from app.models.word import Word
 from app.models.word_of_day_attempt import WordOfDayAttempt
+from app.schemas.aligned_phonemes import AlignedPhonemes
 from app.schemas.attempt import AttemptResponse
 from app.schemas.model_api import InferPhonemesResponse
 from app.schemas.phoneme import PhonemePublic
@@ -49,19 +50,17 @@ class AttemptService:
         return model_data.phonemes
 
     def get_attempt_feedback(
-            self,
-            wav_file: str,
-            word: Word
-    ) -> Tuple[List[Tuple[PhonemePublic | None, PhonemePublic | None]], int]:
+        self, wav_file: str, word: Word
+    ) -> Tuple[AlignedPhonemes, int]:
         inferred_phoneme_strings = self.dispatch_to_model(wav_file)
         aligned_phonemes, score = PronunciationService(self._uow).evaluate_pronunciation(word, inferred_phoneme_strings)
         return aligned_phonemes, score
-    
+
     def save_to_s3(self, wav_file: str) -> str:
         s3_key = upload_wav_to_s3(wav_file)
         os.remove(wav_file)
         return s3_key
-    
+
     def create_attempt_and_recording(self, user: User, score: int, s3_key: str) -> Tuple[int, int]:
         attempt = self._uow.attempts.upsert(Attempt(user_id=user.id, score=score))
         recording = self._uow.recordings.upsert(Recording(attempt_id=attempt.id, s3_key=s3_key))
@@ -77,7 +76,7 @@ class AttemptService:
         exercise = uow.exercises.find_by_id(id=exercise_id)
         if not exercise:
             raise HTTPException(status_code=404, detail="Exercise not found")
-        
+
         # 1. Send .wav file to model for response
         wav_file = await self.create_wav_file(audio_file)
         aligned_phonemes, score = self.get_attempt_feedback(wav_file, exercise.word)
