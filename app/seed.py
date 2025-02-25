@@ -9,7 +9,7 @@ from app.models.attempt import Attempt  # noqa: F401
 from app.models.basic_lesson import BasicLesson  # noqa: F401
 from app.models.exercise import Exercise
 from app.models.exercise_attempt import ExerciseAttempt  # noqa: F401
-from app.models.leaderboard_user_link import LeaderboardUserLink  # noqa: F401
+from app.models.leaderboard_user_link import LeaderboardUserLink, League  # noqa: F401
 from app.models.lesson import Lesson
 from app.models.phoneme import Phoneme
 from app.models.recap_lesson import RecapLesson  # noqa: F401
@@ -40,11 +40,41 @@ word_data = json.load(open("app/resources/word_data.json"))
 def seed(session: Session) -> None:
     print("👤 Inserting Users...")
     users = [
-        User(email="user1@example.com", hashed_password=password_helper.hash("password")),
-        User(email="user2@example.com", hashed_password=password_helper.hash("password")),
+        User(email="john.doe@example.com", hashed_password=password_helper.hash("password")),
+        User(email="emma.smith@example.com", hashed_password=password_helper.hash("password")),
+        User(email="liam.johnson@example.com", hashed_password=password_helper.hash("password")),
+        User(email="olivia.brown@example.com", hashed_password=password_helper.hash("password")),
+        User(email="noah.williams@example.com", hashed_password=password_helper.hash("password")),
+        User(email="ava.jones@example.com", hashed_password=password_helper.hash("password")),
+        User(email="sophia.miller@example.com", hashed_password=password_helper.hash("password")),
+        User(email="mason.davis@example.com", hashed_password=password_helper.hash("password")),
+        User(email="isabella.garcia@example.com", hashed_password=password_helper.hash("password")),
+        User(email="logan.martinez@example.com", hashed_password=password_helper.hash("password")),
+        User(email="lucas.anderson@example.com", hashed_password=password_helper.hash("password")),
+        User(email="mia.thomas@example.com", hashed_password=password_helper.hash("password")),
+        User(email="harper.taylor@example.com", hashed_password=password_helper.hash("password")),
+        User(email="elijah.moore@example.com", hashed_password=password_helper.hash("password")),
+        User(email="amelia.white@example.com", hashed_password=password_helper.hash("password")),
+        User(email="james.harris@example.com", hashed_password=password_helper.hash("password")),
+        User(email="charlotte.clark@example.com", hashed_password=password_helper.hash("password")),
+        User(email="benjamin.lewis@example.com", hashed_password=password_helper.hash("password")),
+        User(email="henry.walker@example.com", hashed_password=password_helper.hash("password")),
+        User(email="evelyn.hall@example.com", hashed_password=password_helper.hash("password")),
     ]
     session.add_all(users)
     session.commit()
+
+    print("🏆 Inserting Leaderboard...")
+    xps = [1200, 1650, 3280, 4090, 4650, 6400, 7250, 8630, 9480, 9610] * 2
+    leagues = [League.BRONZE] * 10 + [League.SILVER] * 10
+    leaderboard_users = [
+        LeaderboardUserLink(user_id=user.id, xp=xp, league=league) for user, xp, league in zip(users, xps, leagues)
+    ]
+    session.add_all(leaderboard_users)
+    session.commit()
+    LRedis.clear()
+    LRedis.create_entries_from_users(League.BRONZE, leaderboard_users[:10])
+    LRedis.create_entries_from_users(League.SILVER, leaderboard_users[10:])
 
     print("📝 Inserting Words...")
     words = {w["word"]: Word(text=w["word"]) for w in word_data}
@@ -209,7 +239,6 @@ def seed(session: Session) -> None:
     session.add_all(basic_lessons)
     session.add_all(units)
     session.commit()
-    LRedis.clear()
 
     print("🎉✅ Database seeding completed successfully!")
 
