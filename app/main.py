@@ -1,3 +1,4 @@
+import os
 from typing import Dict
 
 import rollbar
@@ -6,7 +7,6 @@ from rollbar.contrib.fastapi import add_to as rollbar_add_to
 from sqladmin import Admin
 
 from app.admin import views
-from app.admin.analytics import EndpointAnalyticsAdmin
 from app.admin.auth import AdminAuth
 from app.config import get_settings
 from app.cron import lifespan
@@ -26,8 +26,9 @@ app = FastAPI(lifespan=lifespan)
 app.add_middleware(AnalyticsMiddleware)
 rollbar_add_to(app)
 
-admin = Admin(app, engine, authentication_backend=AdminAuth())
-admin.add_view(EndpointAnalyticsAdmin)
+base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+templates_dir = os.path.join(base_dir, "app", "admin", "templates")
+admin = Admin(app, engine, authentication_backend=AdminAuth(), templates_dir=templates_dir)
 
 
 for view in views:
