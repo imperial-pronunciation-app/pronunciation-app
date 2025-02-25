@@ -251,7 +251,7 @@ def seed(session: Session) -> None:
             ]
         )
     ]
-    session.add_all(lessons)
+    session.add_all(basic_lessons)
     session.add_all(units)
     session.commit()
     LRedis.clear()
