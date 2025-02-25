@@ -6,10 +6,12 @@ from rollbar.contrib.fastapi import add_to as rollbar_add_to
 from sqladmin import Admin
 
 from app.admin import views
+from app.admin.analytics import EndpointAnalyticsAdmin
 from app.admin.auth import AdminAuth
 from app.config import get_settings
 from app.cron import lifespan
 from app.database import engine
+from app.middleware.analytics import AnalyticsMiddleware
 from app.routers import routers
 
 
@@ -21,9 +23,13 @@ rollbar.init(
 )
 
 app = FastAPI(lifespan=lifespan)
+app.add_middleware(AnalyticsMiddleware)
 rollbar_add_to(app)
 
 admin = Admin(app, engine, authentication_backend=AdminAuth())
+admin.add_view(EndpointAnalyticsAdmin)
+
+
 for view in views:
     admin.add_view(view)
 
