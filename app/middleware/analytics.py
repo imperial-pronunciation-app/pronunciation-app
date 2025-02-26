@@ -1,10 +1,9 @@
 from datetime import datetime
 
 from fastapi import FastAPI, Request
-from sqlmodel import Session
 from starlette.types import Receive, Scope, Send
 
-from app.database import engine
+from app.crud.analysis_repository import AnalyticsRepository
 from app.models.analytics import EndpointAnalytics
 
 
@@ -37,18 +36,13 @@ class AnalyticsMiddleware:
         duration = (datetime.now() - start_time).total_seconds()
 
         try:
-            # Record analytics
-            analytics = EndpointAnalytics(
-                endpoint=request.url.path,
-                method=request.method,
-                status_code=response_info["status_code"],
-                duration=duration,
-                timestamp=start_time,
+            AnalyticsRepository().upsert_analytics(
+                EndpointAnalytics(
+                    endpoint=request.url.path,
+                    method=request.method,
+                    status_code=response_info["status_code"],
+                    duration=duration,
+                )
             )
-
-            # Save to database
-            with Session(engine) as session:
-                session.add(analytics)
-                session.commit()
         except Exception as e:
             print(f"Error saving analytics: {e}")
