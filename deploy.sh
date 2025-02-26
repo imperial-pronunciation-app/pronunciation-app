@@ -18,6 +18,8 @@ set -e  # Exit on any error
 : "${MODEL_API_URL:?Must set MODEL_API_URL}"
 : "${ADMIN_USERNAME:?Must set ADMIN_USERNAME}"
 : "${ADMIN_PASSWORD_HASH:?Must set ADMIN_PASSWORD_HASH}"
+: "${ROLLBAR_ENVIRONMENT:?Must set ROLLBAR_ENVIRONMENT}"
+: "${ROLLBAR_ACCESS_TOKEN:?Must set ROLLBAR_ACCESS_TOKEN}"
 
 # Optional configuration with defaults
 # CONTAINER_NAME=${CONTAINER_NAME:-"flask-api"}

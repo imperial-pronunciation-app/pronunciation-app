@@ -22,7 +22,7 @@ async def post_exercise_attempt(
     return resp
 
 
-@router.post("/api/v1/word_of_day", response_model=AttemptResponse)
+@router.post("/api/v1/word_of_day/attempts", response_model=AttemptResponse)
 async def post_word_of_day_attempt(
     audio_file: UploadFile,
     uow: UnitOfWork = Depends(get_unit_of_work),

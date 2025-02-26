@@ -1,9 +1,10 @@
 from typing import List, Optional, Sequence, Tuple
 
-from sqlmodel import Session, select
+from sqlmodel import Session, col, func, select
 
 from app.crud.generic_repository import GenericRepository
 from app.models.attempt import Attempt
+from app.models.exercise import Exercise
 from app.models.exercise_attempt import ExerciseAttempt
 from app.models.exercise_attempt_phoneme_link import ExerciseAttemptPhonemeLink
 from app.models.phoneme import Phoneme
@@ -44,3 +45,23 @@ class ExerciseAttemptRepository(GenericRepository[ExerciseAttempt]):
             phoneme_pairs.append((expected_phoneme, actual_phoneme))
         
         return phoneme_pairs
+    
+    def average_max_score_for_lesson(self, user_id: int, lesson_id: int) -> float:
+        subquery = (
+            select(
+                ExerciseAttempt.exercise_id,
+                func.max(Attempt.score).label("max_score")
+            )
+            .join(Exercise)
+            .join(Attempt)
+            .where(
+                Attempt.user_id == user_id,
+                Exercise.lesson_id == lesson_id
+            )
+            .group_by(col(ExerciseAttempt.exercise_id))
+            .subquery()
+        )
+
+        return self._session.exec(
+            select(func.avg(subquery.c.max_score))
+        ).first() or 0.0
