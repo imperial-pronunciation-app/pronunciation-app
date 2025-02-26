@@ -4,6 +4,7 @@ from typing import Iterator, Self
 from fastapi import Depends
 from sqlmodel import Session
 
+from app.crud.analysis_repository import AnalyticsRepository  # noqa: F401
 from app.crud.attempts_repository import AttemptRepository
 from app.crud.exercise_attempt_repository import ExerciseAttemptRepository
 from app.crud.exercise_repository import ExerciseRepository
@@ -34,7 +35,7 @@ class UnitOfWork:
         self.exercise_attempts = ExerciseAttemptRepository(self._session)
         self.word_of_day_attempts = WordOfDayAttemptRepository(self._session)
         self.word_of_day = WordOfDayRepository(self._session)
-        self.word_of_day_attempts = WordOfDayAttemptRepository(self._session)
+        # self.analytics = AnalyticsRepository(self._session)
 
     def __enter__(self) -> Self:
         return self
