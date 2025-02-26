@@ -8,7 +8,6 @@ from sqlmodel.pool import StaticPool
 from app.crud.unit_of_work import UnitOfWork
 from app.database import get_session
 from app.main import app
-from app.models.analytics import EndpointAnalytics  # noqa: F401
 from app.models.user import User
 from app.redis import LRedis
 
