@@ -1,3 +1,4 @@
+from random import shuffle
 from typing import List
 
 import pytest
@@ -39,9 +40,17 @@ def sample_phonemes(session: Session) -> List[Phoneme]:
 @pytest.fixture
 def sample_attempt_phoneme_links(session: Session, sample_exercise_attempt: ExerciseAttempt, sample_phonemes: List[Phoneme]) -> List[ExerciseAttemptPhonemeLink]:
     """Fixture to create phoneme links for an exercise attempt."""
+    expected = sample_phonemes.copy()
+    actual = sample_phonemes.copy()
+    shuffle(actual)
     phoneme_links = [
-      ExerciseAttemptPhonemeLink(exercise_attempt_id=sample_exercise_attempt.id, phoneme_id=sample_phoneme, weight=i)
-      for i, sample_phoneme in enumerate(sample_phonemes)
+      ExerciseAttemptPhonemeLink(
+        exercise_attempt_id=sample_exercise_attempt.id,
+        expected_phoneme_id=expected[i].id,
+        actual_phoneme_id=actual[i].id,
+        index=i
+      )
+      for i in range(len(expected))
     ]
     session.add_all(phoneme_links)
     session.commit()
