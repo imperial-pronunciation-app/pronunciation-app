@@ -5,7 +5,9 @@ from app.models.recap_lesson import RecapLesson
 from app.models.unit import Unit
 from app.models.user import User
 from app.schemas.unit import UnitPublicWithLessons
+from app.services.basic_lesson import BasicLessonService
 from app.services.lesson import LessonService
+from app.services.recap_lesson import RecapLessonService
 
 
 class UnitService:
@@ -13,15 +15,20 @@ class UnitService:
         self._uow = uow
     
     def to_public_with_lessons(self, unit: Unit, user: User) -> UnitPublicWithLessons:
-        lesson_service = LessonService(self._uow)
+        basic_lesson_service = BasicLessonService(self._uow)
+        recap_lesson_service = RecapLessonService(self._uow)
         recap_lesson = self._uow.recap_lessons.find_recap_by_user_id_and_unit_id(user.id, unit.id)
+
+        is_locked = not (unit.index == 0 or self._is_completed_by(self._uow.units.all_ordered()[unit.index - 1], user))
 
         return UnitPublicWithLessons(
             id=unit.id,
             name=unit.name,
             description=unit.description,
-            lessons=[lesson_service.basic_to_response(lesson, user) for lesson in unit.lessons],
-            recap_lesson=recap_lesson and lesson_service.recap_to_response(recap_lesson, user) or None
+            lessons=[basic_lesson_service.to_response(lesson, user) for lesson in unit.lessons] if not is_locked else None,
+            recap_lesson=recap_lesson and recap_lesson_service.to_response(recap_lesson, user) or None,
+            is_completed=self._is_completed_by(unit, user),
+            is_locked=is_locked
         )
 
     def _is_completed_by(self, unit: Unit, user: User) -> bool:
