@@ -108,6 +108,8 @@ jobs:
                         MODEL_API_URL='${{ secrets.MODEL_API_URL }}' \
                         ADMIN_USERNAME='${{ secrets.ADMIN_USERNAME }}' \
                         ADMIN_PASSWORD_HASH='${{ secrets.ADMIN_PASSWORD_HASH }}' \
+                        ROLLBAR_ENVIRONMENT='${{ secrets.ROLLBAR_ENVIRONMENT }}' \
+                        ROLLBAR_ACCESS_TOKEN='${{ secrets.ROLLBAR_ACCESS_TOKEN }}' \
                         bash ~/deploy.sh"
 
       - name: Wait for container to be up
