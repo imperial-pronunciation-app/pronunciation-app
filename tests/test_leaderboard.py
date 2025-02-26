@@ -64,9 +64,9 @@ def test_get_leaderboard(test_user: User, auth_client: TestClient, sample_leader
         {"id": email_to_id[TEST_EMAILS[2]], "rank": 3, "display_name": TEST_DISPLAY_NAMES[2], "xp": TEST_XPS[2]},
     ]
     assert json["user_position"] == [
-        {"id": email_to_id[TEST_EMAILS[3]], "rank": 4, "username": TEST_DISPLAY_NAMES[3], "xp": TEST_XPS[3]},
-        {"id": email_to_id[TEST_EMAILS[4]], "rank": 5, "username": TEST_DISPLAY_NAMES[4], "xp": TEST_XPS[4]},
-        {"id": test_user.id, "rank": 6, "username": test_user.display_name, "xp": 0},
+        {"id": email_to_id[TEST_EMAILS[3]], "rank": 4, "display_name": TEST_DISPLAY_NAMES[3], "xp": TEST_XPS[3]},
+        {"id": email_to_id[TEST_EMAILS[4]], "rank": 5, "display_name": TEST_DISPLAY_NAMES[4], "xp": TEST_XPS[4]},
+        {"id": test_user.id, "rank": 6, "display_name": test_user.display_name, "xp": 0},
     ]
 
 
