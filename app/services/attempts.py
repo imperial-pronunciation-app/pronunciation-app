@@ -35,12 +35,12 @@ class AttemptService:
             f.write(audio_bytes)
         return filename
 
-    def dispatch_to_model(self, wav_file: str) -> List[str]:
+    def dispatch_to_model(self, wav_file: str, attempt_word: str) -> List[str]:
         with open(wav_file, "rb") as f:
             files = {"audio_file": f}
-
-            print(get_settings().MODEL_API_URL)
-            model_response = requests.post(f"{get_settings().MODEL_API_URL}/api/v1/eng/infer_phonemes", files=files)
+            
+            data = {"attempt_word": attempt_word}
+            model_response = requests.post(f"{get_settings().MODEL_API_URL}/api/v1/eng/infer_phonemes", files=files, data=data)
 
         model_response.raise_for_status()
 
@@ -51,7 +51,7 @@ class AttemptService:
     def get_attempt_feedback(
         self, wav_file: str, word: Word
     ) -> Tuple[AlignedPhonemes, int]:
-        inferred_phoneme_strings = self.dispatch_to_model(wav_file)
+        inferred_phoneme_strings = self.dispatch_to_model(wav_file, word.text)
         aligned_phonemes, score = PronunciationService(self._uow).evaluate_pronunciation(word, inferred_phoneme_strings)
         return aligned_phonemes, score
 
