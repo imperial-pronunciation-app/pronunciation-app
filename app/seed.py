@@ -197,6 +197,9 @@ def seed(session: Session) -> None:
             Exercise(index=0, word_id=words["keyboard"].id),
             Exercise(index=1, word_id=words["mouse"].id),
             Exercise(index=2, word_id=words["computer"].id)
+        ]),
+        Lesson(title="Short Lesson", exercises=[
+            Exercise(index=0, word_id=words["parrot"].id)
         ])
     ]
     
@@ -211,7 +214,8 @@ def seed(session: Session) -> None:
         BasicLesson(id=lessons[4].id, index=0),
         BasicLesson(id=lessons[5].id, index=1),
         BasicLesson(id=lessons[6].id, index=0),
-        BasicLesson(id=lessons[7].id, index=1)
+        BasicLesson(id=lessons[7].id, index=1),
+        BasicLesson(id=lessons[8].id, index=0),
     ]
 
     units = [
@@ -249,6 +253,14 @@ def seed(session: Session) -> None:
             lessons=[
                 basic_lessons[6],
                 basic_lessons[7]
+            ]
+        ),
+        Unit(
+            name="Short Unit",
+            description="Short unit",
+            order=5,
+            lessons=[
+                basic_lessons[8]
             ]
         )
     ]

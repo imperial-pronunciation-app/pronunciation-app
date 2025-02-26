@@ -72,10 +72,10 @@ class AttemptService:
         # (expected, actual)
         weights: Dict[int, int] = {}
         for expected, actual in aligned_phonemes:
-            if expected and actual is None:
+            if expected and expected != actual:
                 # got expected wrong, need to practice it
                 weights[expected.id] = weights.get(expected.id, 0) + 1
-        return []
+        return list(weights.items())
 
     async def post_exercise_attempt(
         self,
@@ -108,6 +108,7 @@ class AttemptService:
             uow.exercise_attempt_phonemes.upsert(
                 ExerciseAttemptPhonemeLink(exercise_attempt_id=attempt_id, phoneme_id=phoneme_id, weight=weight)
             )
+            uow.commit()
 
         # 4. Generate recap lesson if this is the last exercise of the last lesson
         unit_service = UnitService(uow)
