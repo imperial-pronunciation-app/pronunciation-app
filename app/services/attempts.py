@@ -55,8 +55,6 @@ class AttemptService:
         aligned_phonemes, score = PronunciationService(self._uow).evaluate_pronunciation(word, inferred_phoneme_strings)
         return aligned_phonemes, score
 
-        return aligned_phonemes, score
-
     def save_to_s3(self, wav_file: str) -> str:
         s3_key = upload_wav_to_s3(wav_file)
         os.remove(wav_file)
@@ -81,8 +79,6 @@ class AttemptService:
 
 
         # 1. Send .wav file to model for response
-        wav_file = await self.create_wav_file(audio_file)
-        aligned_phonemes, score = self.get_attempt_feedback(wav_file, exercise.word)
         wav_file = await self.create_wav_file(audio_file)
         aligned_phonemes, score = self.get_attempt_feedback(wav_file, exercise.word)
         user_service = UserService(uow)
