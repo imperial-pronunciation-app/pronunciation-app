@@ -57,7 +57,7 @@ def test_word_of_day_attempts(
     with open(wav_file_path, "rb") as f:
         files = {"audio_file": f}
 
-        recording_response = auth_client.post("/api/v1/word_of_day", files=files)
+        recording_response = auth_client.post("/api/v1/word_of_day/attempts", files=files)
     assert recording_response.status_code == 200
     data = recording_response.json()
     print(f"\nThe data is: {data}")
