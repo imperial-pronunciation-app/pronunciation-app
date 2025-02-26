@@ -26,7 +26,7 @@ class UnitService:
             name=unit.name,
             description=unit.description,
             lessons=[basic_lesson_service.to_response(lesson, user) for lesson in unit.lessons] if not is_locked else None,
-            recap_lesson=recap_lesson and recap_lesson_service.to_response(recap_lesson, user) or None,
+            recap_lesson=recap_lesson_service.to_response(recap_lesson, user) if recap_lesson else None,
             is_completed=self._is_completed_by(unit, user),
             is_locked=is_locked
         )
