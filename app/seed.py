@@ -213,7 +213,7 @@ def seed(session: Session) -> None:
         Unit(
             name="Short Vowel Sound",
             description="Focus on /æ/",
-            order=1,
+            index=0,
             lessons=[
                 basic_lessons[0],
                 basic_lessons[1]
@@ -222,7 +222,7 @@ def seed(session: Session) -> None:
         Unit(
             name="Consonant Sound",
             description="Focus on /p/",
-            order=2,
+            index=1,
             lessons=[
                 basic_lessons[2],
                 basic_lessons[3]
@@ -231,7 +231,7 @@ def seed(session: Session) -> None:
         Unit(
             name="Long Vowel Sound",
             description="Focus on /iː/",
-            order=3,
+            index=2,
             lessons=[
                 basic_lessons[4],
                 basic_lessons[5]
@@ -240,7 +240,7 @@ def seed(session: Session) -> None:
         Unit(
             name="Advanced Topics",
             description="More complex topics",
-            order=4,
+            index=3,
             lessons=[
                 basic_lessons[6],
                 basic_lessons[7]

@@ -8,6 +8,7 @@ from app.models.leaderboard_user_link import League
 
 @dataclass
 class LeaderboardEntry:
+    id: int
     rank: int
     display_name: str
     xp: int
