@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel
 
 
@@ -7,3 +9,4 @@ class LessonResponse(BaseModel):
     first_exercise_id: int
     is_completed: bool
     is_locked: bool
+    stars: Optional[int]
