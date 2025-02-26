@@ -20,6 +20,7 @@ pytest_plugins = [
     "tests.fixtures.leaderboard_data",
     "tests.fixtures.word_of_day_data",
     "tests.fixtures.pronunciation_data",
+    "tests.fixtures.analytics_data",
 ]
 
 
