@@ -13,6 +13,5 @@ class EndpointAnalyticsAdmin(ModelView, model=EndpointAnalytics):  # type: ignor
     ]
     name = "Endpoint Analytics"
     name_plural = "Endpoint Analytics"
-    icon = "fa-chart-line"
     can_create = False
     can_edit = False

@@ -1,18 +1,29 @@
+{% extends 'admin/master.jinja2' %}
+
+{% block head %}
+{{ super() }}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
     .analytics-container {
         padding: 20px;
         max-width: 1200px;
-        margin: 0 auto;
+        margin-left: 20%;  
+        position: relative; 
+        z-index: 1;      
     }
+    
     .chart-container {
         background: white;
         padding: 20px;
         border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        width: 100%;       
+        position: relative; 
     }
 </style>
+{% endblock %}
 
+{% block content %}
 <div class="analytics-container">
     <div class="chart-container">
         <canvas id="endpointHistogram"></canvas>
@@ -62,3 +73,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+{% endblock %}
