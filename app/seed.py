@@ -246,7 +246,7 @@ def seed(session: Session) -> None:
         Unit(
             name="Short Unit",
             description="Short unit",
-            order=5,
+            index=4,
             lessons=[
                 basic_lessons[8]
             ]
