@@ -1,6 +1,6 @@
 import os
 import uuid
-from typing import Dict, List, Tuple
+from typing import List, Tuple
 
 import requests
 from fastapi import Depends, HTTPException, UploadFile
@@ -65,18 +65,6 @@ class AttemptService:
         recording = self._uow.recordings.upsert(Recording(attempt_id=attempt.id, s3_key=s3_key))
         return attempt.id, recording.id
 
-    def extract_poor_phonemes(self, aligned_phonemes: AlignedPhonemes) -> List[Tuple[int, int]]:
-        # returns a list mapping phoneme id to weight
-        
-        # Basic: The weight of a phoneme is the number of occurrences of a mistake
-        # (expected, actual)
-        weights: Dict[int, int] = {}
-        for expected, actual in aligned_phonemes:
-            if expected and expected != actual:
-                # got expected wrong, need to practice it
-                weights[expected.id] = weights.get(expected.id, 0) + 1
-        return list(weights.items())
-
     async def post_exercise_attempt(
         self,
         audio_file: UploadFile,
@@ -102,11 +90,16 @@ class AttemptService:
         uow.exercise_attempts.upsert(ExerciseAttempt(id=attempt_id, user_id=user.id, exercise_id=exercise_id))
         uow.commit()
 
-        # 3b. Link challenging phonemes to this exercise attempt
-        poor_phonemes = self.extract_poor_phonemes(aligned_phonemes)
-        for phoneme_id, weight in poor_phonemes:
+        # 3b. Link aligned phonemes to attempt
+        for index, aligned in enumerate(aligned_phonemes):
+            expected, actual = aligned
             uow.exercise_attempt_phonemes.upsert(
-                ExerciseAttemptPhonemeLink(exercise_attempt_id=attempt_id, phoneme_id=phoneme_id, weight=weight)
+                ExerciseAttemptPhonemeLink(
+                    exercise_attempt_id=attempt_id,
+                    expected_phoneme_id=expected.id if expected else None,
+                    actual_phoneme_id=actual.id if actual else None,
+                    index=index
+                )
             )
             uow.commit()
 

@@ -1,4 +1,4 @@
-from typing import Sequence, Tuple
+from typing import List, Optional, Sequence, Tuple
 
 from sqlmodel import Session, select
 
@@ -21,11 +21,26 @@ class ExerciseAttemptRepository(GenericRepository[ExerciseAttempt]):
         )
         return self._session.exec(stmt).all()
 
-    def get_phoneme_difficulties(self, attempt_id: int) -> Sequence[Tuple[Phoneme, int]]:
-        stmt = (
-            select(Phoneme, ExerciseAttemptPhonemeLink.weight)
-            .join(ExerciseAttemptPhonemeLink)
-            .join(ExerciseAttempt)
-            .where(ExerciseAttemptPhonemeLink.exercise_attempt_id == attempt_id)
+    def get_aligned_phonemes(self, exercise_attempt: ExerciseAttempt) -> List[Tuple[Optional[Phoneme], Optional[Phoneme]]]:
+        links_query = select(ExerciseAttemptPhonemeLink).where(
+            ExerciseAttemptPhonemeLink.exercise_attempt_id == exercise_attempt.id
         )
-        return self._session.exec(stmt).all()
+        links = self._session.exec(links_query).all()
+        
+        # For each link, fetch the expected and actual phonemes
+        phoneme_pairs = []
+        for link in links:
+            expected_phoneme = None
+            actual_phoneme = None
+            
+            if link.expected_phoneme_id:
+                expected_query = select(Phoneme).where(Phoneme.id == link.expected_phoneme_id)
+                expected_phoneme = self._session.exec(expected_query).first()
+                
+            if link.actual_phoneme_id:
+                actual_query = select(Phoneme).where(Phoneme.id == link.actual_phoneme_id)
+                actual_phoneme = self._session.exec(actual_query).first()
+                
+            phoneme_pairs.append((expected_phoneme, actual_phoneme))
+        
+        return phoneme_pairs

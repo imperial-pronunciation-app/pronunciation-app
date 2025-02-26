@@ -35,33 +35,35 @@ class UnitService:
     def generate_recap_lesson(self, unit: Unit, user: User) -> None:
         # Precondition: all exercises in the unit have been attempted at least once
         """
-            For each BasicLesson in the Unit, for each Exercise in the BasicLesson, for each ExerciseAttempt for the Exercise, retrieve the incorrect phonemes
+            For each BasicLesson in the Unit, for each Exercise in the BasicLesson, for each ExerciseAttempt for the Exercise, retrieve the phoneme performance
 
-            Use the top five/ten
-
-            Find words containing them
+            Collate performance across the entire unit
         """
         # 1. For each BasicLesson in the Unit, for each Exercise in the BasicLesson, for each exercise attempt, join with phonemes
         # on the exercise attempt phoneme link table, and return the phoneme and weight
-        phoneme_difficulties: Dict[int, int] = {}
+        phoneme_difficulties: Dict[int, float] = {}
         for basic_lesson in unit.lessons:
             lesson = self._uow.lessons.get_by_id(basic_lesson.id)
             for exercise in lesson.exercises:
                 exercise_attempts = self._uow.exercise_attempts.find_by_user_id_and_exercise_id(user.id, exercise.id)
                 for attempt in exercise_attempts:
-                    for phoneme, weight in self._uow.exercise_attempts.get_phoneme_difficulties(attempt.id):
-                        if phoneme.id in phoneme_difficulties:
-                            phoneme_difficulties[phoneme.id] += weight
-                        else:
-                            phoneme_difficulties[phoneme.id] = weight
+                    aligned = self._uow.exercise_attempts.get_aligned_phonemes(attempt)
+                    for expected, actual in aligned:
+                        # Scoring:
+                        # Got a phoneme wrong - +1
+                        # Added a phoneme - +0.5
+                        # Got a phoneme right - -1
+                        if expected:
+                            score = 1 if expected == actual else -1
+                            phoneme_difficulties[expected.id] = phoneme_difficulties.get(expected.id, 0) + score
+                        if not expected and actual:
+                            phoneme_difficulties[actual.id] = phoneme_difficulties.get(actual.id, 0) + 0.5
         
-        # TODO: Save all phonemes, good ones get negative weight
-        
-        worst_phonemes = sorted(phoneme_difficulties.items(), key=lambda x: x[1])[:10]
+        worst_phonemes = sorted(phoneme_difficulties.items(), key=lambda x: x[1], reverse=True)[:10]
         
         # 2. For each phoneme, find a word containing that phoneme
         words = []
-        for phoneme_id, weight in worst_phonemes:
+        for phoneme_id, _ in worst_phonemes:
             phoneme = self._uow.phonemes.get_by_id(phoneme_id)
             if phoneme.words:
                 words.append(choice(phoneme.words))
