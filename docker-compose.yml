@@ -26,6 +26,20 @@ services:
       - default
       - parrot-network
   
+  cron:
+    build:
+      context: .
+      dockerfile: Dockerfile.cron
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    depends_on:
+      - db
+      - redis
+    restart: unless-stopped
+    profiles:
+      - dev
+      - prod
+
   db:
     image: postgres:15
     volumes:
