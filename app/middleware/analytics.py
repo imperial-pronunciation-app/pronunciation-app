@@ -36,16 +36,19 @@ class AnalyticsMiddleware:
         # Calculate duration
         duration = (datetime.now() - start_time).total_seconds()
 
-        # Record analytics
-        analytics = EndpointAnalytics(
-            endpoint=request.url.path,
-            method=request.method,
-            status_code=response_info["status_code"],
-            duration=duration,
-            timestamp=start_time,
-        )
+        try:
+            # Record analytics
+            analytics = EndpointAnalytics(
+                endpoint=request.url.path,
+                method=request.method,
+                status_code=response_info["status_code"],
+                duration=duration,
+                timestamp=start_time,
+            )
 
-        # Save to database
-        with Session(engine) as session:
-            session.add(analytics)
-            session.commit()
+            # Save to database
+            with Session(engine) as session:
+                session.add(analytics)
+                session.commit()
+        except Exception as e:
+            print(f"Error saving analytics: {e}")
