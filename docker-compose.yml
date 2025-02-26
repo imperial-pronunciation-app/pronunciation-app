@@ -13,6 +13,8 @@ services:
       - MODEL_API_URL=${MODEL_API_URL}
       - ADMIN_USERNAME=${ADMIN_USERNAME}
       - ADMIN_PASSWORD_HASH=${ADMIN_PASSWORD_HASH}
+      - ROLLBAR_ENVIRONMENT=${ROLLBAR_ENVIRONMENT}
+      - ROLLBAR_ACCESS_TOKEN=${ROLLBAR_ACCESS_TOKEN}
     depends_on:
       - db
       - redis
@@ -52,6 +54,8 @@ services:
       - MODEL_API_URL=http://test-model-api.com
       - ADMIN_USERNAME=foobarbaz
       - ADMIN_PASSWORD_HASH=foobarbaz
+      - ROLLBAR_ENVIRONMENT=testing
+      - ROLLBAR_ACCESS_TOKEN=""
     profiles:
       - test
     networks:

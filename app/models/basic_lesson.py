@@ -6,7 +6,7 @@ from app.models.id_model import IdModel
 
 
 if TYPE_CHECKING:
-  from app.models.unit import Unit
+    from app.models.unit import Unit
 
 
 class BasicLesson(IdModel, table=True):

@@ -10,7 +10,7 @@ from app.models.basic_lesson import BasicLesson  # noqa: F401
 from app.models.exercise import Exercise
 from app.models.exercise_attempt import ExerciseAttempt  # noqa: F401
 from app.models.exercise_attempt_phoneme_link import ExerciseAttemptPhonemeLink  # noqa: F401
-from app.models.leaderboard_user_link import LeaderboardUserLink  # noqa: F401
+from app.models.leaderboard_user_link import LeaderboardUserLink, League  # noqa: F401
 from app.models.lesson import Lesson
 from app.models.phoneme import Phoneme
 from app.models.recap_lesson import RecapLesson  # noqa: F401
@@ -35,70 +35,47 @@ class WordEntry(TypedDict):
     phonemes: List[str]
 
 
-word_data: List[WordEntry] = [
-    {"word": "software", "phonemes": ["s", "oʊ", "f", "t", "w", "ɛ", "r"]},
-    {"word": "hardware", "phonemes": ["h", "ɑː", "ɹ", "d", "w", "ɛ", "ɹ"]},
-    {"word": "computer", "phonemes": ["k", "ə", "m", "p", "j", "uː", "t", "ə"]},
-    {"word": "compilers", "phonemes": ["k", "ə", "m", "p", "aɪ", "l", "ə", "r"]},
-    {"word": "keyboard", "phonemes": ["k", "iː", "b", "ɔː", "d"]},
-    {"word": "mouse", "phonemes": ["m", "aʊ", "s"]},
-    {"word": "parrot", "phonemes": ["p", "æ", "r", "ə", "t"]},
-    {"word": "chocolate", "phonemes": ["tʃ", "ɒ", "k", "l", "ə", "t"]},
-    {"word": "cat", "phonemes": ["k", "æ", "t"]},
-    {"word": "cut", "phonemes": ["k", "ʌ", "t"]},
-    {"word": "hat", "phonemes": ["h", "æ", "t"]},
-    {"word": "hut", "phonemes": ["h", "ʌ", "t"]},
-    {"word": "bat", "phonemes": ["b", "æ", "t"]},
-    {"word": "bet", "phonemes": ["b", "ɛ", "t"]},
-    {"word": "pan", "phonemes": ["p", "æ", "n"]},
-    {"word": "pen", "phonemes": ["p", "ɛ", "n"]},
-    {"word": "man", "phonemes": ["m", "æ", "n"]},
-    {"word": "bag", "phonemes": ["b", "æ", "ɡ"]},
-    {"word": "cap", "phonemes": ["k", "æ", "p"]},
-    {"word": "sat", "phonemes": ["s", "æ", "t"]},
-    {"word": "dad", "phonemes": ["d", "æ", "d"]},
-    {"word": "jam", "phonemes": ["dʒ", "æ", "m"]},
-    {"word": "map", "phonemes": ["m", "æ", "p"]},
-    {"word": "nap", "phonemes": ["n", "æ", "p"]},
-    {"word": "pat", "phonemes": ["p", "æ", "t"]},
-    {"word": "pot", "phonemes": ["p", "ɒ", "t"]},
-    {"word": "pig", "phonemes": ["p", "ɪ", "ɡ"]},
-    {"word": "pop", "phonemes": ["p", "ɒ", "p"]},
-    {"word": "pet", "phonemes": ["p", "ɛ", "t"]},
-    {"word": "pit", "phonemes": ["p", "ɪ", "t"]},
-    {"word": "pin", "phonemes": ["p", "ɪ", "n"]},
-    {"word": "pack", "phonemes": ["p", "æ", "k"]},
-    {"word": "puff", "phonemes": ["p", "ʌ", "f"]},
-    {"word": "pair", "phonemes": ["p", "ɛ", "ə", "ɹ"]},
-    {"word": "page", "phonemes": ["p", "eɪ", "dʒ"]},
-    {"word": "pine", "phonemes": ["p", "aɪ", "n"]},
-    {"word": "see", "phonemes": ["s", "iː"]},
-    {"word": "sit", "phonemes": ["s", "ɪ", "t"]},
-    {"word": "feel", "phonemes": ["f", "iː", "l"]},
-    {"word": "fill", "phonemes": ["f", "ɪ", "l"]},
-    {"word": "sheep", "phonemes": ["ʃ", "iː", "p"]},
-    {"word": "ship", "phonemes": ["ʃ", "ɪ", "p"]},
-    {"word": "heel", "phonemes": ["h", "iː", "l"]},
-    {"word": "hill", "phonemes": ["h", "ɪ", "l"]},
-    {"word": "tree", "phonemes": ["t", "r", "iː"]},
-    {"word": "keep", "phonemes": ["k", "iː", "p"]},
-    {"word": "tea", "phonemes": ["t", "iː"]},
-    {"word": "free", "phonemes": ["f", "r", "iː"]},
-    {"word": "pea", "phonemes": ["p", "iː"]},
-    {"word": "neat", "phonemes": ["n", "iː", "t"]},
-    {"word": "green", "phonemes": ["ɡ", "r", "iː", "n"]},
-    {"word": "heat", "phonemes": ["h", "iː", "t"]},
-]
+word_data = json.load(open("app/resources/word_data.json"))
 
 
 def seed(session: Session) -> None:
     print("👤 Inserting Users...")
     users = [
-        User(email="user1@example.com", hashed_password=password_helper.hash("password")),
-        User(email="user2@example.com", hashed_password=password_helper.hash("password")),
+        User(email="john.doe@example.com", hashed_password=password_helper.hash("password")),
+        User(email="emma.smith@example.com", hashed_password=password_helper.hash("password")),
+        User(email="liam.johnson@example.com", hashed_password=password_helper.hash("password")),
+        User(email="olivia.brown@example.com", hashed_password=password_helper.hash("password")),
+        User(email="noah.williams@example.com", hashed_password=password_helper.hash("password")),
+        User(email="ava.jones@example.com", hashed_password=password_helper.hash("password")),
+        User(email="sophia.miller@example.com", hashed_password=password_helper.hash("password")),
+        User(email="mason.davis@example.com", hashed_password=password_helper.hash("password")),
+        User(email="isabella.garcia@example.com", hashed_password=password_helper.hash("password")),
+        User(email="logan.martinez@example.com", hashed_password=password_helper.hash("password")),
+        User(email="lucas.anderson@example.com", hashed_password=password_helper.hash("password")),
+        User(email="mia.thomas@example.com", hashed_password=password_helper.hash("password")),
+        User(email="harper.taylor@example.com", hashed_password=password_helper.hash("password")),
+        User(email="elijah.moore@example.com", hashed_password=password_helper.hash("password")),
+        User(email="amelia.white@example.com", hashed_password=password_helper.hash("password")),
+        User(email="james.harris@example.com", hashed_password=password_helper.hash("password")),
+        User(email="charlotte.clark@example.com", hashed_password=password_helper.hash("password")),
+        User(email="benjamin.lewis@example.com", hashed_password=password_helper.hash("password")),
+        User(email="henry.walker@example.com", hashed_password=password_helper.hash("password")),
+        User(email="evelyn.hall@example.com", hashed_password=password_helper.hash("password")),
     ]
     session.add_all(users)
     session.commit()
+
+    print("🏆 Inserting Leaderboard...")
+    xps = [1200, 1650, 3280, 4090, 4650, 6400, 7250, 8630, 9480, 9610] * 2
+    leagues = [League.BRONZE] * 10 + [League.SILVER] * 10
+    leaderboard_users = [
+        LeaderboardUserLink(user_id=user.id, xp=xp, league=league) for user, xp, league in zip(users, xps, leagues)
+    ]
+    session.add_all(leaderboard_users)
+    session.commit()
+    LRedis.clear()
+    LRedis.create_entries_from_users(League.BRONZE, leaderboard_users[:10])
+    LRedis.create_entries_from_users(League.SILVER, leaderboard_users[10:])
 
     print("📝 Inserting Words...")
     words = {w["word"]: Word(text=w["word"]) for w in word_data}
@@ -111,11 +88,19 @@ def seed(session: Session) -> None:
     session.commit()
 
     print("🔗 Linking Words and Phonemes...")
+
     word_phoneme_links = []
     for word_entry in word_data:
         word_obj = words[word_entry["word"]]
         for index, ipa in enumerate(word_entry["phonemes"]):
-            word_phoneme_links.append(WordPhonemeLink(word_id=word_obj.id, phoneme_id=phonemes[ipa].id, index=index))
+            # This is helpful incase when we add new words, we don't have the
+            # phoneme in the database and need to add them
+            try:
+                word_phoneme_links.append(
+                    WordPhonemeLink(word_id=word_obj.id, phoneme_id=phonemes[ipa].id, index=index)
+                )
+            except Exception as e:
+                print(f"Error, when inserting {ipa} for {word_obj}: {e}")
     session.add_all(word_phoneme_links)
     session.commit()
 
@@ -217,6 +202,9 @@ def seed(session: Session) -> None:
         BasicLesson(id=lessons[7].id, index=1),
         BasicLesson(id=lessons[8].id, index=0),
     ]
+    
+    session.add_all(lessons)
+    session.commit()
 
     units = [
         Unit(
@@ -265,9 +253,9 @@ def seed(session: Session) -> None:
         )
     ]
     session.add_all(basic_lessons)
+    session.add_all(basic_lessons)
     session.add_all(units)
     session.commit()
-    LRedis.clear()
 
     print("🎉✅ Database seeding completed successfully!")
 

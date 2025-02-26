@@ -55,10 +55,13 @@ class AttemptService:
         aligned_phonemes, score = PronunciationService(self._uow).evaluate_pronunciation(word, inferred_phoneme_strings)
         return aligned_phonemes, score
 
+        return aligned_phonemes, score
+
     def save_to_s3(self, wav_file: str) -> str:
         s3_key = upload_wav_to_s3(wav_file)
         os.remove(wav_file)
         return s3_key
+
 
     def create_attempt_and_recording(self, user: User, score: int, s3_key: str) -> Tuple[int, int]:
         attempt = self._uow.attempts.upsert(Attempt(user_id=user.id, score=score))
@@ -76,7 +79,10 @@ class AttemptService:
         if not exercise:
             raise HTTPException(status_code=404, detail="Exercise not found")
 
+
         # 1. Send .wav file to model for response
+        wav_file = await self.create_wav_file(audio_file)
+        aligned_phonemes, score = self.get_attempt_feedback(wav_file, exercise.word)
         wav_file = await self.create_wav_file(audio_file)
         aligned_phonemes, score = self.get_attempt_feedback(wav_file, exercise.word)
         user_service = UserService(uow)
