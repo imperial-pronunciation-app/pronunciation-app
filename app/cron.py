@@ -1,8 +1,4 @@
-from contextlib import asynccontextmanager
-from typing import AsyncGenerator
-
-from apscheduler.schedulers.background import BackgroundScheduler
-from fastapi import FastAPI
+from apscheduler.schedulers.blocking import BlockingScheduler
 from sqlmodel import Session
 
 from app.crud.unit_of_work import UnitOfWork
@@ -23,14 +19,8 @@ def _weekly_cron_callback() -> None:
         LeaderboardService(uow).reset_leaderboard()
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    # Before app startup
-    scheduler = BackgroundScheduler()
+if __name__ == "__main__":
+    scheduler = BlockingScheduler()
     scheduler.add_job(_daily_cron_callback, "cron", hour=0, timezone="UTC")
     scheduler.add_job(_weekly_cron_callback, "cron", day_of_week="sun", hour=0, timezone="UTC")
     scheduler.start()
-    yield
-
-    # After app shutdown
-    scheduler.shutdown()
