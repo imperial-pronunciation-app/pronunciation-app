@@ -5,15 +5,18 @@ from httpx import Response
 
 
 TEST_EMAIL = "newuser@example.com"
+TEST_DISPLAY_NAME = "New User"
 TEST_PASSWORD = "SecurePass123"
 REGISTER_ENDPOINT = "/users/register"
 LOGIN_ENDPOINT = "/auth/jwt/login"
 
-def register_user(client: TestClient, email: Optional[str] = TEST_EMAIL, password: Optional[str] = TEST_PASSWORD) -> Response:
+def register_user(client: TestClient, email: Optional[str] = TEST_EMAIL, display_name: Optional[str] = TEST_DISPLAY_NAME, password: Optional[str] = TEST_PASSWORD) -> Response:
     """Helper function to create a new user for testing."""
     body = {}
     if email:
         body["email"] = email
+    if display_name:
+        body["display_name"] = display_name
     if password:
         body["password"] = password
 

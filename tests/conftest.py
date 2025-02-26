@@ -49,7 +49,8 @@ def client(session: Session) -> Iterator[TestClient]:
 @pytest.fixture
 def test_user(session: Session, client: TestClient) -> User:
     email = "test@example.com"
-    register_user(client, email, "password")
+    display_name = "Test User"
+    register_user(client, email, display_name, "password")
     return session.exec(select(User).filter(User.email == email)).one()
 
 
