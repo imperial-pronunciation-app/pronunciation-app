@@ -39,33 +39,44 @@ word_data = json.load(open("app/resources/word_data.json"))
 
 def seed(session: Session) -> None:
     print("👤 Inserting Users...")
+    user_emails = [
+        "john.doe@example.com",
+        "emma.smith@example.com",
+        "liam.johnson@example.com",
+        "olivia.brown@example.com",
+        "noah.williams@example.com",
+        "ava.jones@example.com",
+        "sophia.miller@example.com",
+        "mason.davis@example.com",
+        "isabella.garcia@example.com",
+        "logan.martinez@example.com",
+        "lucas.anderson@example.com",
+        "mia.thomas@example.com",
+        "harper.taylor@example.com",
+        "elijah.moore@example.com",
+        "amelia.white@example.com",
+        "james.harris@example.com",
+        "charlotte.clark@example.com",
+        "benjamin.lewis@example.com",
+        "henry.walker@example.com",
+        "evelyn.hall@example.com",
+    ]
+
+    xps = [1200, 1650, 3280, 4090, 4650, 6400, 7250, 8630, 9480, 9610] * 2
+
     users = [
-        User(email="john.doe@example.com", hashed_password=password_helper.hash("password")),
-        User(email="emma.smith@example.com", hashed_password=password_helper.hash("password")),
-        User(email="liam.johnson@example.com", hashed_password=password_helper.hash("password")),
-        User(email="olivia.brown@example.com", hashed_password=password_helper.hash("password")),
-        User(email="noah.williams@example.com", hashed_password=password_helper.hash("password")),
-        User(email="ava.jones@example.com", hashed_password=password_helper.hash("password")),
-        User(email="sophia.miller@example.com", hashed_password=password_helper.hash("password")),
-        User(email="mason.davis@example.com", hashed_password=password_helper.hash("password")),
-        User(email="isabella.garcia@example.com", hashed_password=password_helper.hash("password")),
-        User(email="logan.martinez@example.com", hashed_password=password_helper.hash("password")),
-        User(email="lucas.anderson@example.com", hashed_password=password_helper.hash("password")),
-        User(email="mia.thomas@example.com", hashed_password=password_helper.hash("password")),
-        User(email="harper.taylor@example.com", hashed_password=password_helper.hash("password")),
-        User(email="elijah.moore@example.com", hashed_password=password_helper.hash("password")),
-        User(email="amelia.white@example.com", hashed_password=password_helper.hash("password")),
-        User(email="james.harris@example.com", hashed_password=password_helper.hash("password")),
-        User(email="charlotte.clark@example.com", hashed_password=password_helper.hash("password")),
-        User(email="benjamin.lewis@example.com", hashed_password=password_helper.hash("password")),
-        User(email="henry.walker@example.com", hashed_password=password_helper.hash("password")),
-        User(email="evelyn.hall@example.com", hashed_password=password_helper.hash("password")),
+        User(
+            email=email,
+            display_name=" ".join(email.split("@")[0].split(".")).title(),
+            hashed_password=password_helper.hash("password"),
+            xp_total=xp,
+        )
+        for email, xp in zip(user_emails, xps)
     ]
     session.add_all(users)
     session.commit()
 
     print("🏆 Inserting Leaderboard...")
-    xps = [1200, 1650, 3280, 4090, 4650, 6400, 7250, 8630, 9480, 9610] * 2
     leagues = [League.BRONZE] * 10 + [League.SILVER] * 10
     leaderboard_users = [
         LeaderboardUserLink(user_id=user.id, xp=xp, league=league) for user, xp, league in zip(users, xps, leagues)

@@ -8,7 +8,7 @@ from app.models.leaderboard_user_link import LeaderboardUserLink, League
 from app.models.user import User
 from app.services.leaderboard import LeaderboardService
 from app.services.user import UserService
-from tests.fixtures.leaderboard_data import TEST_EMAILS, TEST_XPS
+from tests.fixtures.leaderboard_data import TEST_DISPLAY_NAMES, TEST_XPS
 
 
 def test_update_xp_existing_record(test_user: User, uow: UnitOfWork) -> None:
@@ -45,7 +45,7 @@ def test_reset_leaderboard(test_user: User, auth_client: TestClient, uow: UnitOf
     assert response.status_code == 200
     json = response.json()
     assert json["league"] == League.SILVER # Promotion
-    assert json["leaders"] == json["user_position"] == [{"rank": 1, "username": test_user.email, "xp": expected_xp}]
+    assert json["leaders"] == json["user_position"] == [{"rank": 1, "display_name": test_user.display_name, "xp": expected_xp}]
 
 
 def test_get_leaderboard(test_user: User, auth_client: TestClient, sample_leaderboard_users_bronze: List[LeaderboardUserLink]) -> None:
@@ -57,14 +57,14 @@ def test_get_leaderboard(test_user: User, auth_client: TestClient, sample_leader
     json = response.json()
     assert json["league"] == League.BRONZE
     assert json["leaders"] == [
-        {"rank": 1, "username": TEST_EMAILS[0], "xp": TEST_XPS[0]},
-        {"rank": 2, "username": TEST_EMAILS[1], "xp": TEST_XPS[1]},
-        {"rank": 3, "username": TEST_EMAILS[2], "xp": TEST_XPS[2]},
+        {"rank": 1, "display_name": TEST_DISPLAY_NAMES[0], "xp": TEST_XPS[0]},
+        {"rank": 2, "display_name": TEST_DISPLAY_NAMES[1], "xp": TEST_XPS[1]},
+        {"rank": 3, "display_name": TEST_DISPLAY_NAMES[2], "xp": TEST_XPS[2]},
     ]
     assert json["user_position"] == [
-        {"rank": 4, "username": TEST_EMAILS[3], "xp": TEST_XPS[3]},
-        {"rank": 5, "username": TEST_EMAILS[4], "xp": TEST_XPS[4]},
-        {"rank": 6, "username": test_user.email, "xp": 0},
+        {"rank": 4, "display_name": TEST_DISPLAY_NAMES[3], "xp": TEST_XPS[3]},
+        {"rank": 5, "display_name": TEST_DISPLAY_NAMES[4], "xp": TEST_XPS[4]},
+        {"rank": 6, "display_name": test_user.display_name, "xp": 0},
     ]
 
 
