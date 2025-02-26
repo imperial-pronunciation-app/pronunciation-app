@@ -5,3 +5,9 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dev
+
+  cron:
+    image: pronunciation-app-cron-dev
+    build:
+      context: .
+      dockerfile: Dockerfile.cron
