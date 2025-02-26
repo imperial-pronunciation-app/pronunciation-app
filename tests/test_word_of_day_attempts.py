@@ -48,7 +48,7 @@ def test_word_of_day_attempts(
     phonemes = uow.phonemes.upsert_all([Phoneme(ipa=p, respelling=p) for p in test_word_phonemes])
     session.add_all([WordPhonemeLink(word_id=word.id, phoneme_id=p.id, index=i) for i, p in enumerate(phonemes)])
     session.commit()
-    unit = uow.units.upsert(Unit(name="test", description="test", order=1))
+    unit = uow.units.upsert(Unit(name="test", description="test", index=0))
     lesson = uow.lessons.upsert(Lesson(title="test", unit_id=unit.id, order=1))
     uow.exercises.upsert(Exercise(lesson_id=lesson.id, word_id=word.id, index=0))
     uow.commit()
