@@ -5,6 +5,7 @@ from starlette.types import Receive, Scope, Send
 
 from app.crud.analysis_repository import AnalyticsRepository
 from app.models.analytics import EndpointAnalytics
+from app.models.http_method import HTTPMethod
 
 
 class AnalyticsMiddleware:
@@ -36,10 +37,11 @@ class AnalyticsMiddleware:
         duration = (datetime.now() - start_time).total_seconds()
 
         try:
+            method_enum = HTTPMethod(request.method)
             AnalyticsRepository().upsert_analytics(
                 EndpointAnalytics(
                     endpoint=request.url.path,
-                    method=request.method,
+                    method=method_enum,
                     status_code=response_info["status_code"],
                     duration=duration,
                 )

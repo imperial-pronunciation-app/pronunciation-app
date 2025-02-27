@@ -26,7 +26,7 @@ app = FastAPI(lifespan=lifespan)
 app.add_middleware(AnalyticsMiddleware)
 rollbar_add_to(app)
 
-base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+base_dir = os.path.join(os.path.dirname(__file__), "..")
 templates_dir = os.path.join(base_dir, "app", "admin", "templates")
 admin = Admin(app, engine, authentication_backend=AdminAuth(), templates_dir=templates_dir)
 
