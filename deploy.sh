@@ -6,6 +6,7 @@ set -e  # Exit on any error
 : "${DOCKERHUB_USERNAME:?Must set DOCKERHUB_USERNAME}"
 : "${DOCKERHUB_ACCESS_TOKEN:?Must set DOCKERHUB_ACCESS_TOKEN}"
 : "${IMAGE_NAME:?Must set IMAGE_NAME}"
+: "${IMAGE_NAME_CRON:?Must set IMAGE_NAME_CRON}"
 : "${IMAGE_TAG:?Must set IMAGE_TAG}"
 : "${POSTGRES_DB:?Must set POSTGRES_DB}"
 : "${POSTGRES_USER:?Must set POSTGRES_USER}"
@@ -33,6 +34,9 @@ echo "$DOCKERHUB_ACCESS_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --passwor
 
 echo "⬇️ Pulling image ${IMAGE_NAME}:${IMAGE_TAG}..."
 docker pull "${IMAGE_NAME}:${IMAGE_TAG}"
+
+echo "⬇️ Pulling image ${IMAGE_NAME_CRON}:${IMAGE_TAG}..."
+docker pull "${IMAGE_NAME_CRON}:${IMAGE_TAG}"
 
 echo "🛑 Stopping existing container..."
 # docker stop "$CONTAINER_NAME" || true
