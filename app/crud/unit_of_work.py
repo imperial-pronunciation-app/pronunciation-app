@@ -40,7 +40,9 @@ class UnitOfWork:
         self.word_of_day_attempts = WordOfDayAttemptRepository(self._session)
         self.word_of_day = WordOfDayRepository(self._session)
         self.exercise_attempt_phonemes = ExerciseAttemptPhonemeRepository(self._session)
-
+        # Note: AnalyticsRepository is not present as it sits outside the scope of the UnitOfWork
+        # due to it not having access to UOW as it is part of the admin dashboard
+        
     def __enter__(self) -> Self:
         return self
 
