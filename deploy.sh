@@ -6,6 +6,7 @@ set -e  # Exit on any error
 : "${DOCKERHUB_USERNAME:?Must set DOCKERHUB_USERNAME}"
 : "${DOCKERHUB_ACCESS_TOKEN:?Must set DOCKERHUB_ACCESS_TOKEN}"
 : "${IMAGE_NAME:?Must set IMAGE_NAME}"
+: "${IMAGE_NAME_CRON:?Must set IMAGE_NAME_CRON}"
 : "${IMAGE_TAG:?Must set IMAGE_TAG}"
 : "${POSTGRES_DB:?Must set POSTGRES_DB}"
 : "${POSTGRES_USER:?Must set POSTGRES_USER}"
@@ -18,6 +19,8 @@ set -e  # Exit on any error
 : "${MODEL_API_URL:?Must set MODEL_API_URL}"
 : "${ADMIN_USERNAME:?Must set ADMIN_USERNAME}"
 : "${ADMIN_PASSWORD_HASH:?Must set ADMIN_PASSWORD_HASH}"
+: "${ROLLBAR_ENVIRONMENT:?Must set ROLLBAR_ENVIRONMENT}"
+: "${ROLLBAR_ACCESS_TOKEN:?Must set ROLLBAR_ACCESS_TOKEN}"
 
 # Optional configuration with defaults
 # CONTAINER_NAME=${CONTAINER_NAME:-"flask-api"}
@@ -31,6 +34,9 @@ echo "$DOCKERHUB_ACCESS_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --passwor
 
 echo "⬇️ Pulling image ${IMAGE_NAME}:${IMAGE_TAG}..."
 docker pull "${IMAGE_NAME}:${IMAGE_TAG}"
+
+echo "⬇️ Pulling image ${IMAGE_NAME_CRON}:${IMAGE_TAG}..."
+docker pull "${IMAGE_NAME_CRON}:${IMAGE_TAG}"
 
 echo "🛑 Stopping existing container..."
 # docker stop "$CONTAINER_NAME" || true

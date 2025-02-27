@@ -2,7 +2,7 @@ from typing import List, Optional, Tuple
 
 from app.crud.unit_of_work import UnitOfWork
 from app.models.word import Word
-from app.schemas.phoneme import PhonemePublic
+from app.schemas.aligned_phonemes import AlignedPhonemes
 from app.services.phoneme import PhonemeService
 from app.utils.compute_alignment import compute_alignment
 from app.utils.phoneme_similarity import phoneme_similarity
@@ -18,7 +18,7 @@ class PronunciationService:
 
     def evaluate_pronunciation(
         self, word: Word, pronounced_phonemes: List[str]
-    ) -> Tuple[List[Tuple[Optional[PhonemePublic], Optional[PhonemePublic]]], int]:
+    ) -> Tuple[AlignedPhonemes, int]:
         """
         Aligns phonemes and scores pronunciation based on phoneme similarity.
 
@@ -33,7 +33,7 @@ class PronunciationService:
     
     def convert_alignment_to_phoneme_public(
         self, alignment: List[Tuple[Optional[str], Optional[str]]]
-    ) -> List[Tuple[Optional[PhonemePublic], Optional[PhonemePublic]]]:
+    ) -> AlignedPhonemes:
         phoneme_service = PhonemeService(self._uow)
         return [
             (

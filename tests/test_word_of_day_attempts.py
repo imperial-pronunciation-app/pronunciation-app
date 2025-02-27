@@ -11,7 +11,6 @@ from app.models.unit import Unit
 from app.models.word import Word
 from app.models.word_of_day import WordOfDay
 from app.models.word_phoneme_link import WordPhonemeLink
-from app.schemas.attempt import AttemptResponse
 from app.services.attempts import AttemptService
 
 
@@ -49,20 +48,18 @@ def test_word_of_day_attempts(
     phonemes = uow.phonemes.upsert_all([Phoneme(ipa=p, respelling=p) for p in test_word_phonemes])
     session.add_all([WordPhonemeLink(word_id=word.id, phoneme_id=p.id, index=i) for i, p in enumerate(phonemes)])
     session.commit()
-    unit = uow.units.upsert(Unit(name="test", description="test", order=1))
+    unit = uow.units.upsert(Unit(name="test", description="test", index=0))
     lesson = uow.lessons.upsert(Lesson(title="test", unit_id=unit.id, order=1))
     uow.exercises.upsert(Exercise(lesson_id=lesson.id, word_id=word.id, index=0))
     uow.commit()
 
     wav_file_path = f"tests/assets/{test_word}.wav"
-    print(AttemptResponse.schema())
     with open(wav_file_path, "rb") as f:
         files = {"audio_file": f}
 
-        recording_response = auth_client.post("/api/v1/word_of_day", files=files)
+        recording_response = auth_client.post("/api/v1/word_of_day/attempts", files=files)
     assert recording_response.status_code == 200
     data = recording_response.json()
-    print(f"\nThe data is: {data}")
     assert data["score"] == similarity
     assert data["xp_gain"] == 1.5 * similarity
     assert data["recording_id"] == recording_id

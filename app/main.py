@@ -9,7 +9,6 @@ from sqladmin import Admin
 from app.admin import views
 from app.admin.auth import AdminAuth
 from app.config import get_settings
-from app.cron import lifespan
 from app.database import engine
 from app.middleware.analytics import AnalyticsMiddleware
 from app.routers import routers
