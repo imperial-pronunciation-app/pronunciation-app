@@ -3,11 +3,15 @@ from typing import List
 
 from fastapi.testclient import TestClient
 
+from app.crud.unit_of_work import UnitOfWork
 from app.models.basic_lesson import BasicLesson
 from app.models.exercise import Exercise
+from app.models.exercise_attempt_phoneme_link import ExerciseAttemptPhonemeLink
 from app.models.lesson import Lesson
 from app.models.unit import Unit
 from app.models.user import User
+from app.models.word import Word
+from app.services.unit import UnitService
 
 
 UNITS_ENDPOINT = "/api/v1/units"
@@ -52,3 +56,16 @@ def test_get_units_unauthorized(client: TestClient) -> None:
     response = client.get(UNITS_ENDPOINT)
 
     assert response.status_code == 401
+
+def test_generate_recap_lesson(
+    uow: UnitOfWork,
+    sample_words: List[Word],
+    sample_user: User,
+    sample_unit: Unit,
+    sample_attempt_phoneme_links: List[ExerciseAttemptPhonemeLink]
+    ) -> None:
+    service = UnitService(uow)
+    service.generate_recap_lesson(sample_unit, sample_user)
+    
+    recap = uow.recap_lessons.find_recap_by_user_id_and_unit_id(sample_user.id, sample_unit.id)
+    assert recap is not None
