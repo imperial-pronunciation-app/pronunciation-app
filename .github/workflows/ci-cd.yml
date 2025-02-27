@@ -8,6 +8,7 @@ on:
 env:
   REGISTRY: docker.io/${{ vars.DOCKERHUB_USERNAME }}
   IMAGE_NAME: ${{ vars.DOCKERHUB_IMAGE }}
+  IMAGE_NAME_CRON: ${{ vars.DOCKERHUB_IMAGE }}-cron
 
 jobs:
   ci:
@@ -64,6 +65,17 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           target: prod
+      
+      - name: Build and Push Docker image for cron
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.cron
+          push: true
+          load: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_CRON }}:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_CRON }}:latest
 
       - name: Checkout code
         uses: actions/checkout@v3
@@ -92,11 +104,11 @@ jobs:
         run: |
           scp ./deploy.sh cloud-vm:~/deploy.sh
           scp ./docker-compose.yml cloud-vm:~/docker-compose.yml
-          scp ./Dockerfile.cron cloud-vm:~/Dockerfile.cron
           ssh cloud-vm "chmod +x ~/deploy.sh && \
                         DOCKERHUB_USERNAME='${{ vars.DOCKERHUB_USERNAME }}' \
                         DOCKERHUB_ACCESS_TOKEN='${{ secrets.DOCKERHUB_ACCESS_TOKEN }}' \
                         IMAGE_NAME='${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}' \
+                        IMAGE_NAME_CRON='${{ env.REGISTRY }}/${{ env.IMAGE_NAME_CRON }}' \
                         IMAGE_TAG='${{ github.sha }}' \
                         POSTGRES_USER='${{ secrets.POSTGRES_USER }}' \
                         POSTGRES_PASSWORD='${{ secrets.POSTGRES_PASSWORD }}' \

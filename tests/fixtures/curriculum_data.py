@@ -20,7 +20,7 @@ from app.models.word_phoneme_link import WordPhonemeLink
 @pytest.fixture
 def sample_unit(session: Session) -> Unit:
     """Fixture to create a unit for lessons."""
-    unit = Unit(name="Test Unit", description="Test Description", order=0)
+    unit = Unit(name="Test Unit", description="Test Description", index=0)
     session.add(unit)
     session.commit()
     session.refresh(unit)

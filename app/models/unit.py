@@ -10,5 +10,5 @@ if TYPE_CHECKING:
 
 
 class Unit(UnitBase, table=True):
-    order: int
+    index: int
     lessons: List["BasicLesson"] = Relationship(back_populates="unit", cascade_delete=True)

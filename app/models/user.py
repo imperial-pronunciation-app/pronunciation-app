@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from app.models.leaderboard_user_link import LeaderboardUserLink
 
 class User(IdModel, SQLModelBaseUserDB, table=True):
+    display_name: str
     login_streak: int = Field(default=1)
     last_login_date: date = Field(default_factory=date.today)
     xp_total: int = Field(default=0)

@@ -1,3 +1,4 @@
+import os
 from typing import Dict
 
 import rollbar
@@ -9,6 +10,7 @@ from app.admin import views
 from app.admin.auth import AdminAuth
 from app.config import get_settings
 from app.database import engine
+from app.middleware.analytics import AnalyticsMiddleware
 from app.routers import routers
 
 
@@ -20,9 +22,14 @@ rollbar.init(
 )
 
 app = FastAPI()
+app.add_middleware(AnalyticsMiddleware)
 rollbar_add_to(app)
 
-admin = Admin(app, engine, authentication_backend=AdminAuth())
+base_dir = os.path.join(os.path.dirname(__file__), "..")
+templates_dir = os.path.join(base_dir, "app", "admin", "templates")
+admin = Admin(app, engine, authentication_backend=AdminAuth(), templates_dir=templates_dir)
+
+
 for view in views:
     admin.add_view(view)
 
