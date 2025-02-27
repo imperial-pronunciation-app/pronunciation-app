@@ -21,7 +21,7 @@ rollbar.init(
     include_request_body=True,
 )
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI()
 app.add_middleware(AnalyticsMiddleware)
 rollbar_add_to(app)
 
