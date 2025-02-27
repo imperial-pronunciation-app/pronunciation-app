@@ -24,6 +24,9 @@ def sample_users(client: TestClient, uow: UnitOfWork, emails: List[str] = TEST_E
         register_user(client, email, display_name)
     return [uow.users.get_by_email(email) for email in emails]
 
+@pytest.fixture
+def sample_user(sample_users: List[User]) -> User:
+    return sample_users[0]
 
 @pytest.fixture
 def sample_leaderboard_users_no_xp(sample_users: List[User]) -> List[LeaderboardUserLink]:
