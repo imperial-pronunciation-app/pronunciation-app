@@ -38,6 +38,7 @@ def test_word_of_day_attempts(
     mocker.patch("app.routers.attempts.AttemptService", return_value=mock_service)
     phonemes = uow.phonemes.upsert_all([Phoneme(ipa=p, respelling=p) for p in test_word_phonemes])
     mock_service.post_word_of_day_attempt.return_value = {
+        "success": True,
         "score": similarity,
         "xp_gain": 1.5 * similarity,
         "recording_id": recording_id,
