@@ -12,4 +12,4 @@ class AttemptResponse(BaseModel):
     xp_gain: int
 
 class ExerciseAttemptResponse(AttemptResponse):
-    exercise_is_complete: bool
+    exercise_is_completed: bool

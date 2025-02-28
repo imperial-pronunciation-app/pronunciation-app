@@ -121,7 +121,7 @@ class AttemptService:
             score=score,
             phonemes=aligned_phonemes,
             xp_gain=xp_gain,
-            exercise_is_complete=ExerciseService(uow).is_completed_by(exercise, user)
+            exercise_is_completed=ExerciseService(uow).is_completed_by(exercise, user)
         )
 
     async def post_word_of_day_attempt(
