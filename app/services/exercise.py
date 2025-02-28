@@ -13,7 +13,8 @@ class ExerciseService:
     def to_response(self, exercise: Exercise, user: User) -> ExerciseResponse:
         return ExerciseResponse(
             id=exercise.id,
-            word=WordService(self._uow).to_public_with_phonemes(exercise.word)
+            word=WordService(self._uow).to_public_with_phonemes(exercise.word),
+            is_completed=self.is_completed_by(exercise, user)
         )
 
     def is_completed_by(self, exercise: Exercise, user: User) -> bool:
