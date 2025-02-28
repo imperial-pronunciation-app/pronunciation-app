@@ -25,6 +25,7 @@ def test_successful_request(uow: UnitOfWork) -> None:
 
     test_word_phonemes = ["s", "oʊ", "f", "t", "w", "ɛ", "r"]
     test_wav_filename = "tests/assets/software.wav"
+    test_word = "software"
 
     rsp = responses.Response(
         method="POST",
@@ -33,5 +34,5 @@ def test_successful_request(uow: UnitOfWork) -> None:
     )
     responses.add(rsp)
 
-    assert AttemptService(uow).dispatch_to_model(test_wav_filename) == test_word_phonemes
+    assert AttemptService(uow).dispatch_to_model(test_wav_filename, test_word) == test_word_phonemes
 
