@@ -39,7 +39,6 @@ class AttemptService:
     def dispatch_to_model(self, wav_file: str, attempt_word: str) -> List[str]:
         with open(wav_file, "rb") as f:
             files = {"audio_file": f}
-            
             data = {"attempt_word": attempt_word}
             model_response = requests.post(f"{get_settings().MODEL_API_URL}/api/v1/eng/infer_phonemes", files=files, data=data)
 
