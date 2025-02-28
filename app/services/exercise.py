@@ -1,26 +1,20 @@
-from typing import Optional
 
 from app.crud.unit_of_work import UnitOfWork
 from app.models.exercise import Exercise
 from app.models.user import User
+from app.schemas.exercise import ExerciseResponse
+from app.services.word import WordService
 
 
 class ExerciseService:
     def __init__(self, uow: UnitOfWork):
         self._uow = uow
 
-    def previous_exercise(self, exercise: Exercise) -> Optional[Exercise]:
-        """Returns the previous exercise within the lesson, or None if it's the first exercise."""
-        return exercise.lesson.exercises[exercise.index - 1] if exercise.index > 0 else None
-
-    def next_exercise(self, exercise: Exercise) -> Optional[Exercise]:
-        """Returns the next exercise within the lesson, or None if it's the last exercise."""
-        return exercise.lesson.exercises[exercise.index + 1] if exercise.index < len(exercise.lesson.exercises) - 1 else None
-    
-    def _is_last_exercise(self, exercise: Exercise) -> bool:
-        """Returns True if this is the last exercise within the lesson."""
-        return exercise.index == len(exercise.lesson.exercises) - 1
-
+    def to_response(self, exercise: Exercise, user: User) -> ExerciseResponse:
+        return ExerciseResponse(
+            id=exercise.id,
+            word=WordService(self._uow).to_public_with_phonemes(exercise.word)
+        )
 
     def is_completed_by(self, exercise: Exercise, user: User) -> bool:
         """Returns True if the user has completed this exercise. i.e. if exercise was attempted"""

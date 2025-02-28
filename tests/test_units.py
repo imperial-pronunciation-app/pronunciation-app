@@ -38,7 +38,6 @@ def test_get_units_success(test_user: User, auth_client: TestClient, sample_unit
     assert "lessons" in unit_data
     lesson_data = unit_data["lessons"][0]
     assert lesson_data["title"] == sample_lesson.title
-    assert lesson_data["first_exercise_id"] == sample_lesson.exercises[0].id
     assert not lesson_data["is_completed"] # No exercises have been attempted yet
 
 def test_get_units_no_units(auth_client: TestClient) -> None:
