@@ -1,8 +1,15 @@
 [
-    "software", "hardware", "computer", "compilers", "keyboard", "mouse", "parrot", "chocolate", "cat", "cut",
+    "software", "hardware", "computer", "compiler", "keyboard", "mouse", "parrot", "chocolate", "cat", "cut",
     "hat", "hut", "bat", "bet", "pan", "pen", "man", "bag", "cap", "sat",
     "dad", "jam", "map", "nap", "pat", "pot", "pig", "pop", "pet", "pit",
     "pin", "pack", "puff", "pair", "page", "pine", "see", "sit", "feel", "fill",
     "sheep", "ship", "heel", "hill", "tree", "keep", "tea", "free", "pea", "neat",
-    "green", "heat"
+    "green", "heat", "strength", "sixth", "breadth", "clothes", "though", "thought",
+    "three", "this", "rural", "regularly", "particularly", "literature", "psychology",
+    "knife", "pneumonia", "debt", "algorithm", "variable", "function", "database",
+    "repository", "interface", "beautiful", "queue", "business", "through", "weird", "thorough",
+    "isthmus", "months", "squirrel", "world", "pronunciation", "february", "wednesday", "rhythm",
+    "specifically", "mischievous", "hierarchy", "colonel", "comfortable", "development",
+    "phenomenon", "photography", "immediately", "necessarily", "massachusetts", "entrepreneurship",
+    "international", "simultaneously", "statistics", "enthusiastically"
 ]

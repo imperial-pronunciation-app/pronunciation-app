@@ -18,3 +18,4 @@ sqladmin
 itsdangerous
 numpy
 rollbar
+bs4
