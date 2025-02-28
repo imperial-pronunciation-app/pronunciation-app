@@ -48,9 +48,7 @@ class AttemptService:
 
         return model_data.phonemes
 
-    def get_attempt_feedback(
-        self, wav_file: str, word: Word
-    ) -> Tuple[AlignedPhonemes, int]:
+    def get_attempt_feedback(self, wav_file: str, word: Word) -> Tuple[AlignedPhonemes, int]:
         inferred_phoneme_strings = self.dispatch_to_model(wav_file)
         aligned_phonemes, score = PronunciationService(self._uow).evaluate_pronunciation(word, inferred_phoneme_strings)
         return aligned_phonemes, score
@@ -59,7 +57,6 @@ class AttemptService:
         s3_key = upload_wav_to_s3(wav_file)
         os.remove(wav_file)
         return s3_key
-
 
     def create_attempt_and_recording(self, user: User, score: int, s3_key: str) -> Tuple[int, int]:
         attempt = self._uow.attempts.upsert(Attempt(user_id=user.id, score=score))
@@ -76,7 +73,6 @@ class AttemptService:
         exercise = uow.exercises.find_by_id(id=exercise_id)
         if not exercise:
             raise HTTPException(status_code=404, detail="Exercise not found")
-
 
         # 1. Send .wav file to model for response
         wav_file = await self.create_wav_file(audio_file)
@@ -100,7 +96,7 @@ class AttemptService:
                     exercise_attempt_id=attempt_id,
                     expected_phoneme_id=expected.id if expected else None,
                     actual_phoneme_id=actual.id if actual else None,
-                    index=index
+                    index=index,
                 )
             )
             uow.commit()
@@ -114,7 +110,9 @@ class AttemptService:
         ):
             unit_service.generate_recap_lesson(unit, user)
 
-        return AttemptResponse(recording_id=recording_id, score=score, phonemes=aligned_phonemes, xp_gain=xp_gain)
+        return AttemptResponse(
+            recording_id=recording_id, score=score, phonemes=aligned_phonemes, xp_gain=xp_gain, s3_key=s3_key
+        )
 
     async def post_word_of_day_attempt(
         self,
@@ -138,4 +136,6 @@ class AttemptService:
         uow.word_of_day_attempts.upsert(WordOfDayAttempt(id=attempt_id, user_id=user.id, word_of_day_id=word_of_day_id))
         uow.commit()
 
-        return AttemptResponse(recording_id=recording_id, score=score, phonemes=aligned_phonemes, xp_gain=xp_gain)
+        return AttemptResponse(
+            recording_id=recording_id, score=score, phonemes=aligned_phonemes, xp_gain=xp_gain, s3_key=s3_key
+        )

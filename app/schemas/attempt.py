@@ -10,3 +10,4 @@ class AttemptResponse(BaseModel):
     score: int
     phonemes: List[Tuple[Optional[PhonemePublic], Optional[PhonemePublic]]]
     xp_gain: int
+    s3_key: str
