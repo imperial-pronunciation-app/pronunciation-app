@@ -185,8 +185,39 @@ def seed(session: Session) -> None:
             Exercise(index=6, word_id=words["green"].id),
             Exercise(index=7, word_id=words["heat"].id),
         ]),
+        Lesson(title="Silent Consonants", exercises=[
+            Exercise(index=0, word_id=words["knife"].id),
+            Exercise(index=1, word_id=words["psychology"].id),
+            Exercise(index=2, word_id=words["debt"].id),
+            Exercise(index=3, word_id=words["pneumonia"].id),
+        ]),
+        Lesson(title="Silent Vowels", exercises=[
+            Exercise(index=0, word_id=words["queue"].id),
+            Exercise(index=1, word_id=words["beautiful"].id),
+            Exercise(index=2, word_id=words["business"].id),
+        ]),
+        Lesson(title="Challenging Clusters", exercises=[
+            Exercise(index=0, word_id=words["strength"].id),
+            Exercise(index=1, word_id=words["sixth"].id),
+            Exercise(index=2, word_id=words["breadth"].id),
+        ]),
+        Lesson(title="Complex Endings", exercises=[
+            Exercise(index=0, word_id=words["isthmus"].id),
+            Exercise(index=1, word_id=words["clothes"].id),
+            Exercise(index=2, word_id=words["months"].id),
+        ]),
+        Lesson(title="Tricky Spellings", exercises=[
+            Exercise(index=0, word_id=words["colonel"].id),
+            Exercise(index=1, word_id=words["comfortable"].id),
+            Exercise(index=2, word_id=words["mischievous"].id),
+        ]),
+        Lesson(title="Calendar Words", exercises=[
+            Exercise(index=0, word_id=words["february"].id),
+            Exercise(index=1, word_id=words["wednesday"].id),
+            Exercise(index=2, word_id=words["specifically"].id),
+        ]),
         Lesson(title="Programming Terms", exercises=[
-            Exercise(index=0, word_id=words["compilers"].id),
+            Exercise(index=0, word_id=words["compiler"].id),
             Exercise(index=1, word_id=words["hardware"].id),
             Exercise(index=2, word_id=words["software"].id)
         ]),
@@ -213,6 +244,12 @@ def seed(session: Session) -> None:
         BasicLesson(id=lessons[6].id, index=0),
         BasicLesson(id=lessons[7].id, index=1),
         BasicLesson(id=lessons[8].id, index=0),
+        BasicLesson(id=lessons[9].id, index=1),
+        BasicLesson(id=lessons[10].id, index=0),
+        BasicLesson(id=lessons[11].id, index=1),
+        BasicLesson(id=lessons[12].id, index=0),
+        BasicLesson(id=lessons[13].id, index=1),
+        BasicLesson(id=lessons[14].id, index=0),
     ]
     
     session.add_all(lessons)
@@ -247,8 +284,8 @@ def seed(session: Session) -> None:
             ]
         ),
         Unit(
-            name="Advanced Topics",
-            description="More complex topics",
+            name="Silent Letters",
+            description="Focus on silent consonants and vowels",
             index=3,
             lessons=[
                 basic_lessons[6],
@@ -256,11 +293,38 @@ def seed(session: Session) -> None:
             ]
         ),
         Unit(
-            name="Short Unit",
-            description="Short unit",
+            name="Difficult Consonant Clusters",
+            description="Focus on /str/, /sks/, /θs/",
             index=4,
             lessons=[
-                basic_lessons[8]
+                basic_lessons[8],
+                basic_lessons[9]
+            ]
+        ),
+        Unit(
+            name="Commonly Mispronounced Words",
+            description="Focus on spelling-pronunciation mismatches",
+            index=5,
+            lessons=[
+                basic_lessons[10],
+                basic_lessons[11]
+            ]
+        ),
+        Unit(
+            name="Tech Teminology",
+            description="Terms used in the tech industry",
+            index=6,
+            lessons=[
+                basic_lessons[12],
+                basic_lessons[13]
+            ]
+        ),
+        Unit(
+            name="Short Unit",
+            description="Short unit",
+            index=7,
+            lessons=[
+                basic_lessons[14]
             ]
         )
     ]

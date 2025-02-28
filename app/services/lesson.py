@@ -1,9 +1,10 @@
 from typing import Optional
 
 from app.crud.unit_of_work import UnitOfWork
+from app.models.exercise import Exercise
 from app.models.lesson import Lesson
 from app.models.user import User
-from app.schemas.lesson import LessonResponse
+from app.schemas.lesson import LessonResponse, ListedLessonResponse
 from app.services.exercise import ExerciseService
 
 
@@ -11,16 +12,32 @@ class LessonService:
     def __init__(self, uow: UnitOfWork):
         self._uow = uow
     
-    def to_response(self, lesson: Lesson, user: User, prev_lesson: Optional[Lesson] = None) -> LessonResponse:
+    def to_listed_response(self, lesson: Lesson, user: User, prev_lesson: Optional[Lesson] = None) -> ListedLessonResponse:
         is_completed = self._is_completed_by(lesson, user)
-        return LessonResponse(
+        return ListedLessonResponse(
             id=lesson.id,
             title=lesson.title,
             is_completed=is_completed,
-            first_exercise_id=lesson.exercises[0].id,
             is_locked=prev_lesson is not None and not self._is_completed_by(prev_lesson, user),
             stars=self._stars_for(lesson, user) if is_completed else None
         )
+    
+    def to_response(self, lesson: Lesson, user: User) -> LessonResponse:
+        exercise_service = ExerciseService(self._uow)
+        current_exercise = self._first_unattempted_exercise(lesson, user)
+        return LessonResponse(
+            id=lesson.id,
+            title=lesson.title,
+            exercises=[exercise_service.to_response(exercise, user) for exercise in lesson.exercises],
+            current_exercise_index=current_exercise.index if current_exercise is not None else 0
+        )
+    
+    def _first_unattempted_exercise(self, lesson: Lesson, user: User) -> Optional[Exercise]:
+        exercise_service = ExerciseService(self._uow)
+        for exercise in lesson.exercises:
+            if not exercise_service.is_completed_by(exercise, user):
+                return exercise
+        return None
     
     def _stars_for(self, lesson: Lesson, user: User) -> int:
         """Returns the number of stars (0 to 3) earned by the user for this lesson."""
