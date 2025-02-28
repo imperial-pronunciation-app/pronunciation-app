@@ -11,7 +11,7 @@ router = APIRouter()
 
 
 @router.get("/api/v1/lessons/{lesson_id}", response_model=LessonResponse)
-async def get_exercise(lesson_id: int, uow: UnitOfWork = Depends(get_unit_of_work), user: User = Depends(current_active_user)) -> LessonResponse:
+async def get_lesson(lesson_id: int, uow: UnitOfWork = Depends(get_unit_of_work), user: User = Depends(current_active_user)) -> LessonResponse:
     lesson = uow.lessons.find_by_id(lesson_id)
     if not lesson:
         raise HTTPException(status_code=404, detail="Lesson not found")
