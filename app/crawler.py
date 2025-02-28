@@ -65,9 +65,11 @@ class CrawlingService:
         for word in words:
             try:
                 res = requests.get(self.url + word, headers=self.headers)
-                bs4 = BeautifulSoup(res.text, "html.parser")
-                ipa = bs4.find("span", class_="ipa").text
-                ipa_data.append({"word": word, "ipa": ipa})
+                soup = BeautifulSoup(res.text, "html.parser")
+                us_ipa = soup.select_one('span[data-pron-region="US"] span.ipa')
+                if us_ipa is not None:
+                    ipa = us_ipa.text
+                    ipa_data.append({"word": word, "ipa": ipa})
                 # time.sleep(1)  # Dont want to piss off the server (specified in the robots.txt)
             except requests.exceptions.RequestException as e:
                 print(e)
