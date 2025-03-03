@@ -2,7 +2,7 @@ from fastapi import Request
 from fastapi.responses import HTMLResponse
 from sqladmin import BaseView, expose
 
-from app.services.analytics import AnalyticsService
+from app.services.analytics.analytics import AnalyticsService
 
 
 class AnalyticsDashboard(BaseView):

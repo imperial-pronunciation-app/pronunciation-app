@@ -3,9 +3,9 @@ from datetime import datetime
 from fastapi import FastAPI, Request
 from starlette.types import Receive, Scope, Send
 
-from app.crud.analysis_repository import AnalyticsRepository
-from app.models.analytics import EndpointAnalytics
-from app.models.http_method import HTTPMethod
+from app.crud.analytics.analysis_repository import AnalyticsRepository
+from app.models.analytics.analytics import EndpointAnalytics
+from app.models.analytics.http_method import HTTPMethod
 
 
 class AnalyticsMiddleware:
