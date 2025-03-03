@@ -1,14 +1,13 @@
-from typing import List, Optional, Tuple
-
 from pydantic import BaseModel
 
-from app.schemas.phoneme import PhonemePublic
+from app.schemas.aligned_phonemes import AlignedPhonemes
 
 
 class AttemptResponse(BaseModel):
+    success: bool
     recording_id: int
     score: int
-    phonemes: List[Tuple[Optional[PhonemePublic], Optional[PhonemePublic]]]
+    phonemes: AlignedPhonemes
     xp_gain: int
 
 class ExerciseAttemptResponse(AttemptResponse):
