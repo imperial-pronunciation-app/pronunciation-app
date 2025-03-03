@@ -22,3 +22,19 @@ class AnalyticsRepository:
         with Session(engine) as session:
             session.add(analytics)
             session.commit()
+
+    def get_exercise_analytics(self) -> Sequence[Tuple[str, int]]:
+        with Session(engine) as session:
+            stmt = (
+                select(
+                    EndpointAnalytics.endpoint,
+                    func.count(EndpointAnalytics.endpoint).label("count"),
+                )
+                .where(EndpointAnalytics.endpoint.contains("exercise"))
+                .where(~EndpointAnalytics.endpoint.contains("admin"))
+                .group_by(EndpointAnalytics.endpoint)
+                .order_by(func.count(EndpointAnalytics.endpoint).desc())
+            )
+
+            result = session.exec(stmt).fetchall()
+            return result

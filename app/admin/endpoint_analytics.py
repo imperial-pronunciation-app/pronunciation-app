@@ -13,5 +13,7 @@ class AnalyticsDashboard(BaseView):
     async def analytics(self, request: Request) -> HTMLResponse:
         chart_data: dict = AnalyticsService().get_chart_data()
         return await self.templates.TemplateResponse(
-            request, "admin/analytics.jinja2", context={"chart_data": chart_data}
+            request,
+            "admin/analytics.jinja2",
+            context={"chart_data": chart_data, "chart_title": "API Analytics", "chart_x_label": "Endpoints"},
         )

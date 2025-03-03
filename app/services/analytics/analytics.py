@@ -3,7 +3,6 @@ from app.crud.analytics.analysis_repository import AnalyticsRepository
 
 class AnalyticsService:
     def get_chart_data(self) -> dict:
-        
         # Sadly, we can't use the UnitOfWork pattern here, as this service is called from the admin panel
         results = AnalyticsRepository().get_count_of_endpoint_and_response_time()
 
@@ -43,3 +42,27 @@ class AnalyticsService:
             ],
         }
         return chart_data
+
+    def get_exercise_analytics(self) -> dict:
+        results = AnalyticsRepository().get_exercise_analytics()
+
+        # Filter to only get attempts to exercise endpoints
+        results = [r for r in results if r[0].endswith("attempts")]
+
+        results = results = [(x[0].split("/")[-2], x[1]) for x in results]
+
+        endpoints: list[str] = [str(r[0]) for r in results]
+        counts: list[int] = [int(r[1]) for r in results]
+
+        return {
+            "labels": endpoints,
+            "datasets": [
+                {
+                    "label": "# time exercise was attempted",
+                    "data": counts,
+                    "backgroundColor": "rgba(255, 99, 132, 0.5)",
+                    "borderColor": "rgb(255, 99, 132)",
+                    "borderWidth": 1,
+                },
+            ],
+        }

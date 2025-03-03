@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
             plugins: {
                 title: {
                     display: true,
-                    text: 'API Endpoint Analytics'
+                    text: {{ chart_title | tojson | safe }}
                 },
                 tooltip: {
                     callbacks: {
@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 x: {
                     title: {
                         display: true,
-                        text: 'Endpoints'
+                        text: {{ chart_x_label | tojson | safe }}
                     }
                 },
                 y: {
