@@ -33,7 +33,7 @@ class AnalyticsRepository:
                 .where(EndpointAnalytics.endpoint.contains("exercise"))  # type: ignore[attr-defined]
                 .where(~EndpointAnalytics.endpoint.contains("admin"))  # type: ignore[attr-defined]
                 .group_by(EndpointAnalytics.endpoint)
-                .order_by(func.count(EndpointAnalytics.endpoint).desc())  # type: ignore[arg-type]
+                .order_by("count")  # type: ignore[arg-type]
             )
 
             result = session.exec(stmt).fetchall()
