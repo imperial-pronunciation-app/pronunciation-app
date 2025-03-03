@@ -15,8 +15,9 @@ from app.models.user import User
 from app.models.word import Word
 from app.models.word_of_day_attempt import WordOfDayAttempt
 from app.schemas.aligned_phonemes import AlignedPhonemes
-from app.schemas.attempt import AttemptResponse
+from app.schemas.attempt import AttemptResponse, ExerciseAttemptResponse
 from app.schemas.model_api import InferPhonemesResponse
+from app.services.exercise import ExerciseService
 from app.services.pronunciation import PronunciationService
 from app.services.unit import UnitService
 from app.services.user import UserService
@@ -76,7 +77,7 @@ class AttemptService:
         exercise_id: int,
         uow: UnitOfWork = Depends(get_unit_of_work),
         user: User = Depends(current_active_user),
-    ) -> AttemptResponse:
+    ) -> ExerciseAttemptResponse:
         exercise = uow.exercises.find_by_id(id=exercise_id)
         if not exercise:
             raise HTTPException(status_code=404, detail="Exercise not found")
@@ -87,7 +88,7 @@ class AttemptService:
         feedback = self.get_attempt_feedback(wav_file, exercise.word)
         if not feedback:
             os.remove(wav_file)
-            return AttemptResponse(success=False, recording_id=-1, score=-1, phonemes=[], xp_gain=-1)
+            return ExerciseAttemptResponse(success=False, recording_id=-1, score=-1, phonemes=[], xp_gain=-1, exercise_is_completed=False)
         
         aligned_phonemes, score = feedback
         user_service = UserService(uow)
@@ -98,7 +99,8 @@ class AttemptService:
 
         # 3. Create attempt and recording entries
         attempt_id, recording_id = self.create_attempt_and_recording(user, score, s3_key)
-        uow.exercise_attempts.upsert(ExerciseAttempt(id=attempt_id, user_id=user.id, exercise_id=exercise_id))
+        exercise_attempt = ExerciseAttempt(id=attempt_id, user_id=user.id, exercise_id=exercise_id)
+        uow.exercise_attempts.upsert(exercise_attempt)
         uow.commit()
 
         # 3b. Link aligned phonemes to attempt
@@ -123,7 +125,14 @@ class AttemptService:
         ):
             unit_service.generate_recap_lesson(unit, user)
 
-        return AttemptResponse(success=True, recording_id=recording_id, score=score, phonemes=aligned_phonemes, xp_gain=xp_gain)
+        return ExerciseAttemptResponse(
+            success=True,
+            recording_id=recording_id,
+            score=score,
+            phonemes=aligned_phonemes,
+            xp_gain=xp_gain,
+            exercise_is_completed=ExerciseService(uow).is_completed_by(exercise, user)
+        )
 
     async def post_word_of_day_attempt(
         self,

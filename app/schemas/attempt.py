@@ -9,3 +9,6 @@ class AttemptResponse(BaseModel):
     score: int
     phonemes: AlignedPhonemes
     xp_gain: int
+
+class ExerciseAttemptResponse(AttemptResponse):
+    exercise_is_completed: bool

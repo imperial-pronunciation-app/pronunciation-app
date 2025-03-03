@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING
 
 from sqlmodel import Field, Relationship
 
+from app.models.attempt import Attempt
 from app.models.id_model import IdModel
 
 
@@ -12,3 +13,4 @@ class ExerciseAttempt(IdModel, table=True):
   id: int = Field(primary_key=True, foreign_key="attempt.id")
   exercise_id: int = Field(foreign_key="exercise.id")
   exercise: "Exercise" = Relationship(back_populates="attempts")
+  attempt: Attempt = Relationship()

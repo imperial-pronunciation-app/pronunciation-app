@@ -14,11 +14,8 @@ def test_get_lesson_success(auth_client: TestClient, sample_exercises: List[Exer
     assert response.status_code == 200
     data = response.json()
 
-    assert "exercises" in data
+    assert "exercise_ids" in data
     assert data["current_exercise_index"] == 0
-
-    assert data["exercises"][0]["word"]["phonemes"] == [{ "id": p.id, "ipa": p.ipa, "respelling": p.respelling } for p in lesson.exercises[0].word.phonemes]
-
 
 def test_get_lesson_not_found(auth_client: TestClient) -> None:
     """Test fetching an lesson that does not exist."""

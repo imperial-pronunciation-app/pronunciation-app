@@ -13,9 +13,13 @@ class ExerciseService:
     def to_response(self, exercise: Exercise, user: User) -> ExerciseResponse:
         return ExerciseResponse(
             id=exercise.id,
-            word=WordService(self._uow).to_public_with_phonemes(exercise.word)
+            word=WordService(self._uow).to_public_with_phonemes(exercise.word),
+            is_completed=self.is_completed_by(exercise, user)
         )
 
     def is_completed_by(self, exercise: Exercise, user: User) -> bool:
-        """Returns True if the user has completed this exercise. i.e. if exercise was attempted"""
-        return self._uow.exercise_attempts.find_by_user_id_and_exercise_id(user.id, exercise.id) != []
+        exercise_attempts = self._uow.exercise_attempts.find_by_user_id_and_exercise_id(user.id, exercise.id)
+        if exercise_attempts == []:
+            return False
+        best_attempt = max(exercise_attempts, key=lambda exercise_attempt: exercise_attempt.attempt.score)
+        return best_attempt.attempt.score >= 50 or len(exercise_attempts) > 1

@@ -23,12 +23,11 @@ class LessonService:
         )
     
     def to_response(self, lesson: Lesson, user: User) -> LessonResponse:
-        exercise_service = ExerciseService(self._uow)
         current_exercise = self._first_unattempted_exercise(lesson, user)
         return LessonResponse(
             id=lesson.id,
             title=lesson.title,
-            exercises=[exercise_service.to_response(exercise, user) for exercise in lesson.exercises],
+            exercise_ids=[exercise.id for exercise in lesson.exercises],
             current_exercise_index=current_exercise.index if current_exercise is not None else 0
         )
     

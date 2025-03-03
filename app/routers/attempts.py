@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, UploadFile
 
 from app.crud.unit_of_work import UnitOfWork, get_unit_of_work
 from app.models.user import User
-from app.schemas.attempt import AttemptResponse
+from app.schemas.attempt import AttemptResponse, ExerciseAttemptResponse
 from app.services.attempts import AttemptService
 from app.users import current_active_user
 
@@ -10,13 +10,13 @@ from app.users import current_active_user
 router = APIRouter()
 
 
-@router.post("/api/v1/exercises/{exercise_id}/attempts", response_model=AttemptResponse)
+@router.post("/api/v1/exercises/{exercise_id}/attempts", response_model=ExerciseAttemptResponse)
 async def post_exercise_attempt(
     exercise_id: int,
     audio_file: UploadFile,
     uow: UnitOfWork = Depends(get_unit_of_work),
     user: User = Depends(current_active_user),
-) -> AttemptResponse:
+) -> ExerciseAttemptResponse:
     attempt_service = AttemptService(uow)
     resp = await attempt_service.post_exercise_attempt(audio_file, exercise_id, uow, user)
     return resp
