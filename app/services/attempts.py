@@ -88,7 +88,7 @@ class AttemptService:
         feedback = self.get_attempt_feedback(wav_file, exercise.word)
         if not feedback:
             os.remove(wav_file)
-            return AttemptResponse(success=False, recording_id=-1, score=-1, phonemes=[], xp_gain=-1)
+            return ExerciseAttemptResponse(success=False, recording_id=-1, score=-1, phonemes=[], xp_gain=-1, exercise_is_completed=False)
         
         aligned_phonemes, score = feedback
         user_service = UserService(uow)
@@ -125,7 +125,7 @@ class AttemptService:
         ):
             unit_service.generate_recap_lesson(unit, user)
 
-        return AttemptResponse(
+        return ExerciseAttemptResponse(
             success=True,
             recording_id=recording_id,
             score=score,
