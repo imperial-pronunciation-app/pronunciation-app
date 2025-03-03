@@ -11,7 +11,7 @@ class ExerciseAnalyticsDashboard(BaseView):
 
     @expose("/exercise-analytics", methods=["GET"])
     async def exercise_analytics(self, request: Request) -> HTMLResponse:
-        exercise_data: list[dict] = AnalyticsService().get_exercise_analytics()
+        exercise_data: dict = AnalyticsService().get_exercise_analytics()
         return await self.templates.TemplateResponse(
             request,
             "admin/analytics.jinja2",

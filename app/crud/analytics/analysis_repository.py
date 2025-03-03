@@ -11,7 +11,7 @@ class AnalyticsRepository:
         with Session(engine) as session:
             stmt = select(
                 EndpointAnalytics.endpoint,
-                func.count().label("count"),
+                func.count(EndpointAnalytics.endpoint).label("count"),  # type: ignore[arg-type]
                 func.avg(EndpointAnalytics.duration).label("avg_response_time"),
             ).group_by(EndpointAnalytics.endpoint)
 
@@ -28,12 +28,12 @@ class AnalyticsRepository:
             stmt = (
                 select(
                     EndpointAnalytics.endpoint,
-                    func.count(EndpointAnalytics.endpoint).label("count"),
+                    func.count(EndpointAnalytics.endpoint).label("count"),  # type: ignore[arg-type]
                 )
-                .where(EndpointAnalytics.endpoint.contains("exercise"))
-                .where(~EndpointAnalytics.endpoint.contains("admin"))
+                .where(EndpointAnalytics.endpoint.contains("exercise"))  # type: ignore[attr-defined]
+                .where(~EndpointAnalytics.endpoint.contains("admin"))  # type: ignore[attr-defined]
                 .group_by(EndpointAnalytics.endpoint)
-                .order_by(func.count(EndpointAnalytics.endpoint).desc())
+                .order_by(func.count(EndpointAnalytics.endpoint).desc())  # type: ignore[arg-type]
             )
 
             result = session.exec(stmt).fetchall()
