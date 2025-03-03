@@ -3,7 +3,7 @@ from typing import Any, Sequence, Tuple
 from sqlmodel import Session, func, select
 
 from app.database import engine
-from app.models.analytics import EndpointAnalytics
+from app.models.analytics.analytics import EndpointAnalytics
 
 
 class AnalyticsRepository:

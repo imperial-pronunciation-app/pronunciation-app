@@ -1,6 +1,6 @@
 from sqladmin import ModelView
 
-from app.models.analytics import EndpointAnalytics
+from app.models.analytics.analytics import EndpointAnalytics
 
 
 class EndpointAnalyticsAdmin(ModelView, model=EndpointAnalytics):  # type: ignore[call-arg]

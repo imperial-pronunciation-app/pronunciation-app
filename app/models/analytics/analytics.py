@@ -2,7 +2,7 @@ from datetime import datetime
 
 from sqlmodel import Field
 
-from app.models.http_method import HTTPMethod
+from app.models.analytics.http_method import HTTPMethod
 from app.models.id_model import IdModel
 
 
