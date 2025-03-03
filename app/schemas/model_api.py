@@ -5,3 +5,4 @@ from pydantic import BaseModel
 
 class InferPhonemesResponse(BaseModel):
     phonemes: List[str]
+    success: bool

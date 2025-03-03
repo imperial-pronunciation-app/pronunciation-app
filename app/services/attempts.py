@@ -1,6 +1,6 @@
 import os
 import uuid
-from typing import List, Tuple
+from typing import Optional, Tuple
 
 import requests
 from fastapi import Depends, HTTPException, UploadFile
@@ -36,7 +36,7 @@ class AttemptService:
             f.write(audio_bytes)
         return filename
 
-    def dispatch_to_model(self, wav_file: str, attempt_word: str) -> List[str]:
+    def dispatch_to_model(self, wav_file: str, attempt_word: str) -> InferPhonemesResponse:
         with open(wav_file, "rb") as f:
             files = {"audio_file": f}
             data = {"attempt_word": attempt_word}
@@ -46,14 +46,18 @@ class AttemptService:
 
         model_data = InferPhonemesResponse.model_validate(model_response.json())
 
-        return model_data.phonemes
+        return model_data
 
     def get_attempt_feedback(
         self, wav_file: str, word: Word
-    ) -> Tuple[AlignedPhonemes, int]:
-        inferred_phoneme_strings = self.dispatch_to_model(wav_file, word.text)
+    ) -> Optional[Tuple[AlignedPhonemes, int]]:
+        model_response = self.dispatch_to_model(wav_file, word.text)
+        if not model_response.success:
+            return None
+        inferred_phoneme_strings = model_response.phonemes
         aligned_phonemes, score = PronunciationService(self._uow).evaluate_pronunciation(word, inferred_phoneme_strings)
         return aligned_phonemes, score
+        
 
     def save_to_s3(self, wav_file: str) -> str:
         s3_key = upload_wav_to_s3(wav_file)
@@ -80,7 +84,12 @@ class AttemptService:
 
         # 1. Send .wav file to model for response
         wav_file = await self.create_wav_file(audio_file)
-        aligned_phonemes, score = self.get_attempt_feedback(wav_file, exercise.word)
+        feedback = self.get_attempt_feedback(wav_file, exercise.word)
+        if not feedback:
+            os.remove(wav_file)
+            return AttemptResponse(success=False, recording_id=-1, score=-1, phonemes=[], xp_gain=-1)
+        
+        aligned_phonemes, score = feedback
         user_service = UserService(uow)
         xp_gain = user_service.update_xp_with_boost(user, score)
 
@@ -114,7 +123,7 @@ class AttemptService:
         ):
             unit_service.generate_recap_lesson(unit, user)
 
-        return AttemptResponse(recording_id=recording_id, score=score, phonemes=aligned_phonemes, xp_gain=xp_gain)
+        return AttemptResponse(success=True, recording_id=recording_id, score=score, phonemes=aligned_phonemes, xp_gain=xp_gain)
 
     async def post_word_of_day_attempt(
         self,
@@ -128,7 +137,12 @@ class AttemptService:
             raise HTTPException(status_code=404, detail="Word of the day not found")
 
         wav_file = await self.create_wav_file(audio_file)
-        aligned_phonemes, score = self.get_attempt_feedback(wav_file, word_of_day.word)
+        feedback = self.get_attempt_feedback(wav_file, word_of_day.word)
+        if feedback is None:
+            os.remove(wav_file)
+            return AttemptResponse(success=False, recording_id=-1, score=-1, phonemes=[], xp_gain=-1)
+        
+        aligned_phonemes, score = feedback
         user_service = UserService(uow)
         xp_gain = user_service.update_xp_with_boost(user, score)
 
@@ -138,4 +152,4 @@ class AttemptService:
         uow.word_of_day_attempts.upsert(WordOfDayAttempt(id=attempt_id, user_id=user.id, word_of_day_id=word_of_day_id))
         uow.commit()
 
-        return AttemptResponse(recording_id=recording_id, score=score, phonemes=aligned_phonemes, xp_gain=xp_gain)
+        return AttemptResponse(success=True, recording_id=recording_id, score=score, phonemes=aligned_phonemes, xp_gain=xp_gain)
