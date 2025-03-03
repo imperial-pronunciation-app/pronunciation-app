@@ -88,7 +88,7 @@ class AttemptService:
         feedback = self.get_attempt_feedback(wav_file, exercise.word)
         if not feedback:
             os.remove(wav_file)
-            return ExerciseAttemptResponse(success=False, recording_id=-1, score=-1, phonemes=[], xp_gain=-1, exercise_is_completed=False)
+            return ExerciseAttemptResponse(success=False, recording_id=None, score=None, phonemes=None, xp_gain=None, exercise_is_completed=None)
         
         aligned_phonemes, score = feedback
         user_service = UserService(uow)
@@ -149,7 +149,7 @@ class AttemptService:
         feedback = self.get_attempt_feedback(wav_file, word_of_day.word)
         if feedback is None:
             os.remove(wav_file)
-            return AttemptResponse(success=False, recording_id=-1, score=-1, phonemes=[], xp_gain=-1)
+            return AttemptResponse(success=False, recording_id=None, score=None, phonemes=None, xp_gain=None)
         
         aligned_phonemes, score = feedback
         user_service = UserService(uow)
