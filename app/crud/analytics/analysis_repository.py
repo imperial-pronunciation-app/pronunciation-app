@@ -1,6 +1,6 @@
 from typing import Any, Sequence, Tuple
 
-from sqlmodel import Session, func, select
+from sqlmodel import Session, col, func, select
 
 from app.database import engine
 from app.models.analytics.analytics import EndpointAnalytics
@@ -11,7 +11,7 @@ class AnalyticsRepository:
         with Session(engine) as session:
             stmt = select(
                 EndpointAnalytics.endpoint,
-                func.count(EndpointAnalytics.endpoint).label("count"),  # type: ignore[arg-type]
+                func.count(col(EndpointAnalytics.endpoint)).label("count"),
                 func.avg(EndpointAnalytics.duration).label("avg_response_time"),
             ).group_by(EndpointAnalytics.endpoint)
 
@@ -28,10 +28,10 @@ class AnalyticsRepository:
             stmt = (
                 select(
                     EndpointAnalytics.endpoint,
-                    func.count(EndpointAnalytics.endpoint).label("count"),  # type: ignore[arg-type]
+                    func.count(col(EndpointAnalytics.endpoint)).label("count"),
                 )
-                .where(EndpointAnalytics.endpoint.contains("exercise"))  # type: ignore[attr-defined]
-                .where(~EndpointAnalytics.endpoint.contains("admin"))  # type: ignore[attr-defined]
+                .where(col(EndpointAnalytics.endpoint).contains("exercise"))
+                .where(~col(EndpointAnalytics.endpoint).contains("admin"))
                 .group_by(EndpointAnalytics.endpoint)
                 .order_by("count")  # type: ignore[arg-type]
             )
