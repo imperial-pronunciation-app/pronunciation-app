@@ -136,6 +136,7 @@ class AnalyticsService:
         for phoneme_id in phonemes_dict.keys():
             phone = phonemes_dict[phoneme_id]
             total = phone["correct"] + phone["incorrect"] + phone["none"] + phone["inserted"]
+            # I want to change the values in place, so I'm disabling the type check here
             phone["correct"] = phone["correct"] / total  # type: ignore
             phone["incorrect"] = phone["incorrect"] / total  # type: ignore
             phone["none"] = phone["none"] / total  # type: ignore
