@@ -9,6 +9,7 @@ from app.crud.basic_lesson_repository import BasicLessonRepository
 from app.crud.exercise_attempt_phoneme_repository import ExerciseAttemptPhonemeRepository
 from app.crud.exercise_attempt_repository import ExerciseAttemptRepository
 from app.crud.exercise_repository import ExerciseRepository
+from app.crud.language_repository import LanguageRepository
 from app.crud.leaderboard_user_repository import LeaderboardUserRepository
 from app.crud.lesson_repository import LessonRepository
 from app.crud.phoneme_repository import PhonemeRepository
@@ -40,6 +41,7 @@ class UnitOfWork:
         self.word_of_day_attempts = WordOfDayAttemptRepository(self._session)
         self.word_of_day = WordOfDayRepository(self._session)
         self.exercise_attempt_phonemes = ExerciseAttemptPhonemeRepository(self._session)
+        self.languages = LanguageRepository(self._session)
         # Note: AnalyticsRepository is not present as it sits outside the scope of the UnitOfWork
         # due to it not having access to UOW as it is part of the admin dashboard
         

@@ -2,8 +2,8 @@ from typing import List
 
 from app.crud.unit_of_work import UnitOfWork
 from app.models.word import Word
-from app.schemas.phoneme import PhonemePublic
 from app.schemas.word import WordPublicWithPhonemes
+from app.services.phoneme import PhonemeService
 
 
 class WordService:
@@ -42,8 +42,9 @@ class WordService:
         
         
     def to_public_with_phonemes(self, word: Word) -> WordPublicWithPhonemes:
+        phoneme_service = PhonemeService(self._uow)
         return WordPublicWithPhonemes(
             id=word.id,
             text=word.text,
-            phonemes=[PhonemePublic(id=p.id, ipa=p.ipa, respelling=p.respelling) for p in word.phonemes]
+            phonemes=[phoneme_service.to_phoneme_public(p, word.language_id) for p in word.phonemes]
         )

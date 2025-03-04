@@ -22,7 +22,7 @@ class UnitService:
         recap_lesson_service = RecapLessonService(self._uow)
         recap_lesson = self._uow.recap_lessons.find_recap_by_user_id_and_unit_id(user.id, unit.id)
 
-        is_locked = not (unit.index == 0 or self._is_completed_by(self._uow.units.all_ordered()[unit.index - 1], user))
+        is_locked = not (unit.index == 0 or self._is_completed_by(self._uow.units.for_language(unit.language_id)[unit.index - 1], user))
 
         return UnitPublicWithLessons(
             id=unit.id,
@@ -36,7 +36,10 @@ class UnitService:
 
     def _is_completed_by(self, unit: Unit, user: User) -> bool:
         lesson_service = LessonService(self._uow)
-        return all(lesson_service._is_completed_by(self._uow.lessons.get_by_id(basic_lesson.id), user) for basic_lesson in unit.lessons)
+        recap_lesson = self._uow.recap_lessons.find_recap_by_user_id_and_unit_id(user.id, unit.id)
+        return all(
+            lesson_service._is_completed_by(self._uow.lessons.get_by_id(basic_lesson.id), user) for basic_lesson in unit.lessons
+        ) and recap_lesson is not None and lesson_service._is_completed_by(self._uow.lessons.get_by_id(recap_lesson.id), user)
         
 
     def generate_recap_lesson(self, unit: Unit, user: User) -> None:

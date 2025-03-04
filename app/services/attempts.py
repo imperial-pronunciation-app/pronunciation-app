@@ -10,6 +10,7 @@ from app.crud.unit_of_work import UnitOfWork, get_unit_of_work
 from app.models.attempt import Attempt
 from app.models.exercise_attempt import ExerciseAttempt
 from app.models.exercise_attempt_phoneme_link import ExerciseAttemptPhonemeLink
+from app.models.language import Language
 from app.models.recording import Recording
 from app.models.user import User
 from app.models.word import Word
@@ -38,10 +39,10 @@ class AttemptService:
             f.write(audio_bytes)
         return filename
 
-    def dispatch_to_model(self, wav_file: str) -> InferWordPhonemesResponse:
+    def dispatch_to_model(self, wav_file: str, lang: Language) -> InferWordPhonemesResponse:
         with open(wav_file, "rb") as f:
             files = {"audio_file": f}
-            model_response = requests.post(f"{get_settings().MODEL_API_URL}/api/v1/eng/infer_word_phonemes", files=files)
+            model_response = requests.post(f"{get_settings().MODEL_API_URL}/api/v1/{lang.name}/infer_phonemes", files=files)
 
         model_response.raise_for_status()
 
@@ -52,7 +53,7 @@ class AttemptService:
     def get_attempt_feedback(
         self, wav_file: str, word: Word
     ) -> Optional[Tuple[AlignedPhonemes, int]]:
-        model_response = self.dispatch_to_model(wav_file)
+        model_response = self.dispatch_to_model(wav_file, word.language)
         if not model_response.success:
             return None
         inferred_words = model_response.words

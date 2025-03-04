@@ -4,6 +4,7 @@ from .exercise import Exercise
 from .leaderboard_user_link import LeaderboardUserLink
 from .lesson import Lesson
 from .phoneme import Phoneme
+from .phoneme_respelling import PhonemeRespelling
 from .recording import Recording
 from .unit import Unit
 from .user import User
@@ -24,4 +25,5 @@ __all__ = [
     "Recording",
     "LeaderboardUserLink",
     "WordOfDay",
+    "PhonemeRespelling"
 ]

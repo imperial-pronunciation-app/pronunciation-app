@@ -1,5 +1,7 @@
 import json
-from typing import List, TypedDict
+import os
+import random
+from typing import Any, Dict, List
 
 from fastapi_users.password import PasswordHelper
 from sqlmodel import Session, SQLModel, text
@@ -11,9 +13,11 @@ from app.models.basic_lesson import BasicLesson  # noqa: F401
 from app.models.exercise import Exercise
 from app.models.exercise_attempt import ExerciseAttempt  # noqa: F401
 from app.models.exercise_attempt_phoneme_link import ExerciseAttemptPhonemeLink  # noqa: F401
+from app.models.language import Language
 from app.models.leaderboard_user_link import LeaderboardUserLink, League  # noqa: F401
 from app.models.lesson import Lesson
 from app.models.phoneme import Phoneme
+from app.models.phoneme_respelling import PhonemeRespelling
 from app.models.recap_lesson import RecapLesson  # noqa: F401
 from app.models.recording import Recording  # noqa: F401
 from app.models.unit import Unit
@@ -25,22 +29,205 @@ from app.models.word_phoneme_link import WordPhonemeLink
 from app.redis import LRedis
 
 
-password_helper = PasswordHelper()
+class DatabaseSeeder:
+    def __init__(self, session: Session, password_helper: PasswordHelper):
+        self.session = session
+        self.password_helper = password_helper
 
-with open("app/resources/phoneme_respellings.json") as f:
-    ipa_to_respelling = json.load(f)
+    def load_json_data(self, filepath: str) -> Dict[str, Any]:
+        try:
+            with open(filepath, "r", encoding="utf-8") as file:
+                return json.load(file) # type: ignore
+        except (IOError, json.JSONDecodeError) as e:
+            print(f"Error loading JSON from {filepath}: {e}")
+            raise
 
+    def seed_users(self, user_emails: List[str]) -> List[User]:
+        print("👤 Inserting Users...")
+        
+        num_users = len(user_emails)
+        xps = [random.randint(1000, 10000) for _ in range(num_users)]
 
-class WordEntry(TypedDict):
-    word: str
-    phonemes: List[str]
+        users = [
+            User(
+                email=email,
+                display_name=" ".join(email.split("@")[0].split(".")).title(),
+                hashed_password=self.password_helper.hash("password"),
+                xp_total=xp,
+            )
+            for email, xp in zip(user_emails, xps)
+        ]
+        self.session.add_all(users)
+        self.session.commit()
 
+        return users
 
-word_data = json.load(open("app/resources/word_data.json"))
+    def seed_leaderboard(self, users: List[User]) -> None:
+        print("🏆 Inserting Leaderboard...")
+        num_users = len(users)
+        half_users = num_users // 2
+        
+        leagues = [League.BRONZE] * half_users + [League.SILVER] * (num_users - half_users)
+        xps = [user.xp_total for user in users]
+        
+        leaderboard_users = [
+            LeaderboardUserLink(user_id=user.id, xp=xp, league=league)
+            for user, xp, league in zip(users, xps, leagues)
+        ]
+        
+        self.session.add_all(leaderboard_users)
+        self.session.commit()
+        
+        LRedis.clear()
+        LRedis.create_entries_from_users(League.BRONZE, leaderboard_users[:half_users])
+        LRedis.create_entries_from_users(League.SILVER, leaderboard_users[half_users:])
 
+    def seed_languages(self, data_directory: str) -> None:
+        print("🗂 Processing Language Data...")
+        
+        existing_phonemes: Dict[str, Phoneme] = {}
 
-def seed(session: Session) -> None:
-    print("👤 Inserting Users...")
+        for filename in sorted(os.listdir(data_directory)):
+            if filename.endswith(".json"):
+                filepath = os.path.join(data_directory, filename)
+                self._seed_language(filepath, existing_phonemes)
+
+    def _seed_language(self, filepath: str, existing_phonemes: Dict[str, Phoneme]) -> None:
+        data = self.load_json_data(filepath)
+        language_name = os.path.splitext(os.path.basename(filepath))[0]
+
+        print(f"🌍 Inserting Language: {language_name}")
+        language = Language(name=language_name)
+        self.session.add(language)
+        self.session.commit()
+
+        self._seed_phonemes(data, language, existing_phonemes)
+
+        words = self._seed_words(data, language)
+        
+        self._link_words_phonemes(data, words, existing_phonemes)
+
+        self._seed_word_of_day(data, words)
+
+        self._seed_units_and_lessons(data, language, words)
+
+    def _seed_phonemes(self, data: Dict, language: Language, existing_phonemes: Dict[str, Phoneme]) -> None:
+        print("🔤 Adding Phoneme Respellings...")
+        phoneme_respellings = []
+        
+        for ipa, respelling in data["respellings"].items():
+            if ipa not in existing_phonemes:
+                phoneme = Phoneme(ipa=ipa)
+                self.session.add(phoneme)
+                self.session.commit()
+                existing_phonemes[ipa] = phoneme
+
+            phoneme_respellings.append(
+                PhonemeRespelling(
+                    phoneme_id=existing_phonemes[ipa].id, 
+                    language_id=language.id, 
+                    respelling=respelling
+                )
+            )
+
+        self.session.add_all(phoneme_respellings)
+        self.session.commit()
+
+    def _seed_words(self, data: Dict, language: Language) -> Dict[str, Word]:
+        print("📝 Inserting Words...")
+        words = {word: Word(text=word, language_id=language.id) for word in data["words"].keys()}
+        self.session.add_all(words.values())
+        self.session.commit()
+        return words
+
+    def _link_words_phonemes(self, data: Dict, words: Dict[str, Word], existing_phonemes: Dict[str, Phoneme]) -> None:
+        print("🔗 Linking Words and Phonemes...")
+        word_phoneme_links = []
+        
+        for word_text, phoneme_list in data["words"].items():
+            word_obj = words[word_text]
+            for index, ipa in enumerate(phoneme_list):
+                if ipa not in existing_phonemes:
+                    raise ValueError(f"Phoneme {ipa} not found for word {word_text}")
+                
+                word_phoneme_links.append(
+                    WordPhonemeLink(
+                        word_id=word_obj.id, 
+                        phoneme_id=existing_phonemes[ipa].id, 
+                        index=index
+                    )
+                )
+
+        self.session.add_all(word_phoneme_links)
+        self.session.commit()
+
+    def _seed_word_of_day(self, data: Dict, words: Dict[str, Word]) -> None:
+        print("📅 Inserting Word of the Day...")
+        word_of_day_word = words[data["word_of_day"]]
+        word_of_day = WordOfDay(word_id=word_of_day_word.id)
+        word_of_day_word.word_of_day_last_used = word_of_day.date
+        
+        self.session.add(word_of_day)
+        self.session.commit()
+
+    def _seed_units_and_lessons(self, data: Dict, language: Language, words: Dict[str, Word]) -> None:
+        print("📚 Inserting Units with Lessons...")
+
+        for index, unit_data in enumerate(data["units"]):
+            unit = Unit(
+                name=unit_data["name"],
+                description=unit_data["description"],
+                index=index,
+                language_id=language.id,
+            )
+            self.session.add(unit)
+            self.session.commit()
+
+            for index, lesson_data in enumerate(unit_data["lessons"]):
+                lesson =  Lesson(
+                    title=lesson_data["title"], 
+                    exercises=[
+                        Exercise(index=i, word_id=words[word].id) 
+                        for i, word in enumerate(lesson_data["exercises"])
+                    ]
+                )
+
+                self.session.add(lesson)
+                self.session.commit()
+
+                basic_lesson = BasicLesson(
+                    id=lesson.id,
+                    index=index,
+                    unit_id=unit.id
+                )
+                
+                self.session.add(basic_lesson)
+                self.session.commit()
+
+def seed_database(user_emails: List[str], data_directory: str) -> None:
+    """Main seeding function."""
+    print("🔄 Resetting database schema...")
+    with engine.begin() as conn:
+        conn.execute(text("DROP SCHEMA public CASCADE; CREATE SCHEMA public;"))
+    
+    SQLModel.metadata.create_all(engine)
+    
+    password_helper = PasswordHelper()
+    
+    with Session(engine) as session:
+        seeder = DatabaseSeeder(session, password_helper)
+        
+        try:
+            users = seeder.seed_users(user_emails)
+            seeder.seed_leaderboard(users)
+            seeder.seed_languages(data_directory)
+            print("🎉✅ Database seeding completed successfully!")
+        except Exception as e:
+            print(f"Seeding failed: {e}")
+            session.rollback()
+            raise
+
+if __name__ == "__main__":
     user_emails = [
         "john.doe@example.com",
         "emma.smith@example.com",
@@ -64,282 +251,4 @@ def seed(session: Session) -> None:
         "evelyn.hall@example.com",
     ]
 
-    xps = [1200, 1650, 3280, 4090, 4650, 6400, 7250, 8630, 9480, 9610] * 2
-
-    users = [
-        User(
-            email=email,
-            display_name=" ".join(email.split("@")[0].split(".")).title(),
-            hashed_password=password_helper.hash("password"),
-            xp_total=xp,
-        )
-        for email, xp in zip(user_emails, xps)
-    ]
-    session.add_all(users)
-    session.commit()
-
-    print("🏆 Inserting Leaderboard...")
-    leagues = [League.BRONZE] * 10 + [League.SILVER] * 10
-    leaderboard_users = [
-        LeaderboardUserLink(user_id=user.id, xp=xp, league=league) for user, xp, league in zip(users, xps, leagues)
-    ]
-    session.add_all(leaderboard_users)
-    session.commit()
-    LRedis.clear()
-    LRedis.create_entries_from_users(League.BRONZE, leaderboard_users[:10])
-    LRedis.create_entries_from_users(League.SILVER, leaderboard_users[10:])
-
-    print("📝 Inserting Words...")
-    words = {w["word"]: Word(text=w["word"]) for w in word_data}
-    session.add_all(words.values())
-    session.commit()
-
-    print("🔤 Inserting Phonemes...")
-    phonemes = {ipa: Phoneme(ipa=ipa, respelling=respelling) for ipa, respelling in ipa_to_respelling.items()}
-    session.add_all(phonemes.values())
-    session.commit()
-
-    print("🔗 Linking Words and Phonemes...")
-
-    word_phoneme_links = []
-    for word_entry in word_data:
-        word_obj = words[word_entry["word"]]
-        for index, ipa in enumerate(word_entry["phonemes"]):
-            # This is helpful incase when we add new words, we don't have the
-            # phoneme in the database and need to add them
-            try:
-                word_phoneme_links.append(
-                    WordPhonemeLink(word_id=word_obj.id, phoneme_id=phonemes[ipa].id, index=index)
-                )
-            except Exception as e:
-                print(f"Error, when inserting {ipa} for {word_obj}: {e}")
-    session.add_all(word_phoneme_links)
-    session.commit()
-
-    print("📅 Inserting Word of the Day...")
-    word = words["software"]
-    word_of_day = WordOfDay(word_id=word.id)
-    word.word_of_day_last_used = word_of_day.date
-    session.add(word_of_day)
-    session.commit()
-
-    print("📚 Inserting Units with Lessons...")
-    lessons = [
-        Lesson(title="Listening Discrimination Pairs", exercises=[
-            Exercise(index=0, word_id=words["cat"].id),
-            Exercise(index=1, word_id=words["cut"].id),
-            Exercise(index=2, word_id=words["hat"].id),
-            Exercise(index=3, word_id=words["hut"].id),
-            Exercise(index=4, word_id=words["bat"].id),
-            Exercise(index=5, word_id=words["bet"].id),
-            Exercise(index=6, word_id=words["pan"].id),
-            Exercise(index=7, word_id=words["pen"].id),
-        ]),
-        Lesson(title="Repetition Practice Words", exercises=[
-            Exercise(index=0, word_id=words["man"].id),
-            Exercise(index=1, word_id=words["bag"].id),
-            Exercise(index=2, word_id=words["cap"].id),
-            Exercise(index=3, word_id=words["sat"].id),
-            Exercise(index=4, word_id=words["dad"].id),
-            Exercise(index=5, word_id=words["jam"].id),
-            Exercise(index=6, word_id=words["map"].id),
-            Exercise(index=7, word_id=words["nap"].id),
-        ]),
-        Lesson(title="Sound Isolation Words", exercises=[
-            Exercise(index=0, word_id=words["pat"].id),
-            Exercise(index=1, word_id=words["pot"].id),
-            Exercise(index=2, word_id=words["pig"].id),
-            Exercise(index=3, word_id=words["pan"].id),
-            Exercise(index=4, word_id=words["pen"].id),
-            Exercise(index=5, word_id=words["pop"].id),
-            Exercise(index=6, word_id=words["pet"].id),
-            Exercise(index=7, word_id=words["pit"].id),
-        ]),
-        Lesson(title="Repetition Practice Words", exercises=[
-            Exercise(index=0, word_id=words["pen"].id),
-            Exercise(index=1, word_id=words["pin"].id),
-            Exercise(index=2, word_id=words["pack"].id),
-            Exercise(index=3, word_id=words["puff"].id),
-            Exercise(index=4, word_id=words["pit"].id),
-            Exercise(index=5, word_id=words["pair"].id),
-            Exercise(index=6, word_id=words["page"].id),
-            Exercise(index=7, word_id=words["pine"].id),
-        ]),
-        Lesson(title="Listening Discrimination Pairs", exercises=[
-            Exercise(index=0, word_id=words["see"].id),
-            Exercise(index=1, word_id=words["sit"].id),
-            Exercise(index=2, word_id=words["feel"].id),
-            Exercise(index=3, word_id=words["fill"].id),
-            Exercise(index=4, word_id=words["sheep"].id),
-            Exercise(index=5, word_id=words["ship"].id),
-            Exercise(index=6, word_id=words["heel"].id),
-            Exercise(index=7, word_id=words["hill"].id),
-        ]),
-        Lesson(title="Repetition Practice Words", exercises=[
-            Exercise(index=0, word_id=words["tree"].id),
-            Exercise(index=1, word_id=words["keep"].id),
-            Exercise(index=2, word_id=words["tea"].id),
-            Exercise(index=3, word_id=words["free"].id),
-            Exercise(index=4, word_id=words["pea"].id),
-            Exercise(index=5, word_id=words["neat"].id),
-            Exercise(index=6, word_id=words["green"].id),
-            Exercise(index=7, word_id=words["heat"].id),
-        ]),
-        Lesson(title="Silent Consonants", exercises=[
-            Exercise(index=0, word_id=words["knife"].id),
-            Exercise(index=1, word_id=words["psychology"].id),
-            Exercise(index=2, word_id=words["debt"].id),
-            Exercise(index=3, word_id=words["pneumonia"].id),
-        ]),
-        Lesson(title="Silent Vowels", exercises=[
-            Exercise(index=0, word_id=words["queue"].id),
-            Exercise(index=1, word_id=words["beautiful"].id),
-            Exercise(index=2, word_id=words["business"].id),
-        ]),
-        Lesson(title="Challenging Clusters", exercises=[
-            Exercise(index=0, word_id=words["strength"].id),
-            Exercise(index=1, word_id=words["sixth"].id),
-            Exercise(index=2, word_id=words["breadth"].id),
-        ]),
-        Lesson(title="Complex Endings", exercises=[
-            Exercise(index=0, word_id=words["isthmus"].id),
-            Exercise(index=1, word_id=words["clothes"].id),
-            # Exercise(index=2, word_id=words["months"].id),
-        ]),
-        Lesson(title="Tricky Spellings", exercises=[
-            Exercise(index=0, word_id=words["colonel"].id),
-            Exercise(index=1, word_id=words["comfortable"].id),
-            Exercise(index=2, word_id=words["mischievous"].id),
-        ]),
-        Lesson(title="Calendar Words", exercises=[
-            Exercise(index=0, word_id=words["february"].id),
-            Exercise(index=1, word_id=words["wednesday"].id),
-            Exercise(index=2, word_id=words["specifically"].id),
-        ]),
-        Lesson(title="Programming Terms", exercises=[
-            Exercise(index=0, word_id=words["compiler"].id),
-            Exercise(index=1, word_id=words["hardware"].id),
-            Exercise(index=2, word_id=words["software"].id)
-        ]),
-        Lesson(title="Computer Accessories", exercises=[
-            Exercise(index=0, word_id=words["keyboard"].id),
-            Exercise(index=1, word_id=words["mouse"].id),
-            Exercise(index=2, word_id=words["computer"].id)
-        ]),
-        Lesson(title="Short Lesson", exercises=[
-            Exercise(index=0, word_id=words["parrot"].id)
-        ])
-    ]
-    
-    session.add_all(lessons)
-    session.commit()
-    
-    basic_lessons = [
-        BasicLesson(id=lessons[0].id, index=0),
-        BasicLesson(id=lessons[1].id, index=1),
-        BasicLesson(id=lessons[2].id, index=0),
-        BasicLesson(id=lessons[3].id, index=1),
-        BasicLesson(id=lessons[4].id, index=0),
-        BasicLesson(id=lessons[5].id, index=1),
-        BasicLesson(id=lessons[6].id, index=0),
-        BasicLesson(id=lessons[7].id, index=1),
-        BasicLesson(id=lessons[8].id, index=0),
-        BasicLesson(id=lessons[9].id, index=1),
-        BasicLesson(id=lessons[10].id, index=0),
-        BasicLesson(id=lessons[11].id, index=1),
-        BasicLesson(id=lessons[12].id, index=0),
-        BasicLesson(id=lessons[13].id, index=1),
-        BasicLesson(id=lessons[14].id, index=0),
-    ]
-    
-    session.add_all(lessons)
-    session.commit()
-
-    units = [
-        Unit(
-            name="Short Vowel Sound",
-            description="Focus on /æ/",
-            index=0,
-            lessons=[
-                basic_lessons[0],
-                basic_lessons[1]
-            ]
-        ),
-        Unit(
-            name="Consonant Sound",
-            description="Focus on /p/",
-            index=1,
-            lessons=[
-                basic_lessons[2],
-                basic_lessons[3]
-            ]
-        ),
-        Unit(
-            name="Long Vowel Sound",
-            description="Focus on /iː/",
-            index=2,
-            lessons=[
-                basic_lessons[4],
-                basic_lessons[5]
-            ]
-        ),
-        Unit(
-            name="Silent Letters",
-            description="Focus on silent consonants and vowels",
-            index=3,
-            lessons=[
-                basic_lessons[6],
-                basic_lessons[7]
-            ]
-        ),
-        Unit(
-            name="Difficult Consonant Clusters",
-            description="Focus on /str/, /sks/, /θs/",
-            index=4,
-            lessons=[
-                basic_lessons[8],
-                basic_lessons[9]
-            ]
-        ),
-        Unit(
-            name="Commonly Mispronounced Words",
-            description="Focus on spelling-pronunciation mismatches",
-            index=5,
-            lessons=[
-                basic_lessons[10],
-                basic_lessons[11]
-            ]
-        ),
-        Unit(
-            name="Tech Teminology",
-            description="Terms used in the tech industry",
-            index=6,
-            lessons=[
-                basic_lessons[12],
-                basic_lessons[13]
-            ]
-        ),
-        Unit(
-            name="Short Unit",
-            description="Short unit",
-            index=7,
-            lessons=[
-                basic_lessons[14]
-            ]
-        )
-    ]
-    session.add_all(basic_lessons)
-    session.add_all(units)
-    session.commit()
-
-    print("🎉✅ Database seeding completed successfully!")
-
-
-# To seed inside a container
-# docker exec -it <container_id> python -m app.seed
-if __name__ == "__main__":
-    print("🔄 Resetting database schema...")
-    with engine.begin() as conn:
-        conn.execute(text("DROP SCHEMA public CASCADE; CREATE SCHEMA public;"))
-    SQLModel.metadata.create_all(engine)
-    seed(Session(engine))
+    seed_database(user_emails, "data/languages")

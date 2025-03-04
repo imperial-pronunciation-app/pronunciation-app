@@ -1,4 +1,6 @@
-from sqlmodel import Session, col
+from typing import Sequence
+
+from sqlmodel import Session, col, select
 
 from app.crud.generic_repository import GenericRepository
 from app.models.unit import Unit
@@ -9,6 +11,9 @@ class UnitRepository(GenericRepository[Unit]):
     def __init__(self, session: Session) -> None:
         super().__init__(session, Unit)
 
-    def all_ordered(self) -> list[Unit]:
-        return self._session.query(Unit).order_by(col(Unit.index)).all()
+    def for_language(self, language_id: int) -> Sequence[Unit]:
+        return self._session.exec(
+            select(Unit).where(Unit.language_id == language_id)
+                        .order_by(col(Unit.index))
+        ).all()
     
