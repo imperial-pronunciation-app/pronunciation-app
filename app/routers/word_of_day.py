@@ -16,7 +16,7 @@ async def get_word_of_day(
     uow: UnitOfWork = Depends(get_unit_of_work),
     user: User = Depends(current_active_user)
 ) -> WordPublicWithPhonemes:
-    language = uow.languages.get_by_name(lang)
+    language = uow.languages.find_by_name(lang)
     if not language:
         raise HTTPException(status_code=404, detail="Invalid language")
     today_word = uow.word_of_day.get_word_of_day(language.id)

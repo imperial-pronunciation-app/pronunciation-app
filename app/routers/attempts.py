@@ -29,7 +29,7 @@ async def post_word_of_day_attempt(
     uow: UnitOfWork = Depends(get_unit_of_work),
     user: User = Depends(current_active_user),
 ) -> AttemptResponse:
-    language = uow.languages.get_by_name(lang)
+    language = uow.languages.find_by_name(lang)
     if not language:
         raise HTTPException(status_code=404, detail="Invalid language")
     attempt_service = AttemptService(uow)
