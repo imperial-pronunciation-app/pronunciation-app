@@ -1,0 +1,68 @@
+{
+  "word_of_day": "computador",
+  "words": {
+    "computador": ["k", "o", "m", "p", "u", "t̪", "a", "d̪", "o", "ʁ"]
+  },
+  "units": [
+    {
+      "name": "Learning Portuguese",
+      "description": "Computing Vocabulary",
+      "lessons": [
+        {
+          "title": "One word challenge!",
+          "exercises": ["computador"]
+        }
+      ]
+    }
+  ],
+  "respellings": {
+    "a": "a",
+    "b": "b",
+    "d̪": "d",
+    "e": "e",
+    "f": "f",
+    "i": "i",
+    "i̯": "i",
+    "j": "j",
+    "k": "k",
+    "l": "l",
+    "l̪ˠ": "l",
+    "m": "m",
+    "n": "n",
+    "n̪": "n",
+    "o": "o",
+    "p": "p",
+    "r": "r",
+    "s": "s",
+    "s̪": "s",
+    "s̻": "s",
+    "t̪": "t",
+    "u": "u",
+    "u̯": "u",
+    "v": "v",
+    "w": "w",
+    "x": "x",
+    "z": "z",
+    "z̪": "z",
+    "z̻": "z",
+    "ŋ": "ng",
+    "ɐ": "a",
+    "ɐ̃": "ã",
+    "ɔ": "ó",
+    "ə": "e",
+    "ɛ": "é",
+    "ɡ": "g",
+    "ɣ": "gh",
+    "ɪ̯": "i",
+    "ɫ": "l",
+    "ɯ": "u",
+    "ɱ": "m",
+    "ɲ": "nh",
+    "ɾ": "r",
+    "ʁ": "rr",
+    "ʃ": "x",
+    "ʊ̯": "u",
+    "ʎ": "lh",
+    "ʒ": "j"
+  }
+}
