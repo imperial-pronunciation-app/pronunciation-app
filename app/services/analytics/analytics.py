@@ -132,6 +132,15 @@ class AnalyticsService:
             else:
                 raise ValueError(f"Unexpected case {expected_phoneme_id} {actual_phoneme_id}")
 
+        # Average out the values
+        for phoneme_id in phonemes_dict.keys():
+            phone = phonemes_dict[phoneme_id]
+            total = phone["correct"] + phone["incorrect"] + phone["none"] + phone["inserted"]
+            phone["correct"] = phone["correct"] / total  # type: ignore
+            phone["incorrect"] = phone["incorrect"] / total  # type: ignore
+            phone["none"] = phone["none"] / total  # type: ignore
+            phone["inserted"] = phone["inserted"] / total  # type: ignore
+
         phonemes_ids = list(phonemes_dict.keys())
         phonemes_mapping = AnalyticsRepository().get_phoneme_names()
         phonemes = []
