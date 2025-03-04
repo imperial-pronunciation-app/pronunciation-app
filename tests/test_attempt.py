@@ -21,8 +21,8 @@ def test_successful_request(uow: UnitOfWork, make_word: WordFactory) -> None:
 
     rsp = responses.Response(
         method="POST",
-        url=f"{os.environ.get('MODEL_API_URL', '')}/api/v1/eng/infer_phonemes",
-        json={"success": True, "phonemes": phonemes},
+        url=f"{os.environ.get('MODEL_API_URL', '')}/api/v1/eng/infer_word_phonemes",
+        json={"success": True, "phonemes": phonemes, "words": [word.text]},
     )
     responses.add(rsp)
 

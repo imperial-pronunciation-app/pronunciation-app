@@ -42,7 +42,7 @@ class AttemptService:
     def dispatch_to_model(self, wav_file: str, lang: Language) -> InferWordPhonemesResponse:
         with open(wav_file, "rb") as f:
             files = {"audio_file": f}
-            model_response = requests.post(f"{get_settings().MODEL_API_URL}/api/v1/{lang.name}/infer_phonemes", files=files)
+            model_response = requests.post(f"{get_settings().MODEL_API_URL}/api/v1/{lang.name}/infer_word_phonemes", files=files)
 
         model_response.raise_for_status()
 
