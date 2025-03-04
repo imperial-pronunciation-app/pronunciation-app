@@ -1,14 +1,12 @@
-from typing import List
 
 from fastapi.testclient import TestClient
 
-from app.models.exercise import Exercise
-from app.models.lesson import Lesson
+from tests.factories.lesson import LessonFactory
 
 
-def test_get_lesson_success(auth_client: TestClient, sample_exercises: List[Exercise]) -> None:
-    """Test retrieving an lesson and ensuring phonemes are correctly included."""
-    lesson = sample_exercises[0].lesson
+def test_get_lesson_success(auth_client: TestClient, make_lesson: LessonFactory) -> None:
+    """Test fetching an lesson that exists."""
+    lesson = make_lesson()
     response = auth_client.get(f"/api/v1/lessons/{lesson.id}")
 
     assert response.status_code == 200
@@ -25,8 +23,9 @@ def test_get_lesson_not_found(auth_client: TestClient) -> None:
     assert response.json()["detail"] == "Lesson not found"
 
 
-def test_get_lesson_unauthorized(client: TestClient, sample_lesson: Lesson) -> None:
+def test_get_lesson_unauthorized(client: TestClient, make_lesson: LessonFactory) -> None:
     """Test that unauthorized requests get a 401 error."""
-    response = client.get(f"/api/v1/lessons/{sample_lesson.id}")
+    lesson = make_lesson()
+    response = client.get(f"/api/v1/lessons/{lesson.id}")
 
     assert response.status_code == 401

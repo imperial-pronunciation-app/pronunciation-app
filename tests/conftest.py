@@ -2,6 +2,7 @@ from typing import Iterator
 
 import pytest
 from fastapi.testclient import TestClient
+from httpx import Headers
 from sqlmodel import Session, SQLModel, create_engine, select
 from sqlmodel.pool import StaticPool
 
@@ -15,11 +16,17 @@ from .utils import login_user, register_user
 
 
 pytest_plugins = [
-    "tests.fixtures.curriculum_data",
-    "tests.fixtures.leaderboard_data",
-    "tests.fixtures.word_of_day_data",
-    "tests.fixtures.pronunciation_data",
-    "tests.fixtures.attempt_data",
+    "tests.factories.language",
+    "tests.factories.phoneme",
+    "tests.factories.user",
+    "tests.factories.word",
+    "tests.factories.leaderboard_user",
+    "tests.factories.unit",
+    "tests.factories.basic_lesson",
+    "tests.factories.lesson",
+    "tests.factories.exercise",
+    "tests.factories.exercise_attempt",
+    "tests.factories.word_of_day"
 ]
 
 
@@ -52,14 +59,14 @@ def test_user(session: Session, client: TestClient) -> User:
     email = "test@example.com"
     display_name = "Test User"
     register_user(client, email, display_name, "password")
-    return session.exec(select(User).filter(User.email == email)).one()
+    return session.exec(select(User).where(User.email == email)).one()
 
 
 @pytest.fixture
 def auth_client(client: TestClient, test_user: User) -> TestClient:
     """Returns a TestClient with a seeded user token"""
     user_token = login_user(client, test_user.email, "password").json()["access_token"]
-    client.headers = {"Authorization": f"Bearer {user_token}"}
+    client.headers = Headers({"Authorization": f"Bearer {user_token}"})
     return client
 
 
