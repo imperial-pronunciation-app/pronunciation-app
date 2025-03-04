@@ -22,7 +22,6 @@ from app.services.exercise import ExerciseService
 from app.services.pronunciation import PronunciationService
 from app.services.unit import UnitService
 from app.services.user import UserService
-from app.services.word import WordService
 from app.users import current_active_user
 from app.utils.s3 import upload_wav_to_s3
 
@@ -58,10 +57,8 @@ class AttemptService:
             return None
         inferred_words = model_response.words
         inferred_phoneme_strings = model_response.phonemes
-        aligned_phonemes, phonemes_score = PronunciationService(self._uow).evaluate_pronunciation(word, inferred_phoneme_strings)
-        words_score = WordService(self._uow).word_similarity(word, inferred_words)
-        combined_score = (words_score + phonemes_score * 2) // 3
-        return aligned_phonemes, combined_score
+        aligned_phonemes, score = PronunciationService(self._uow).evaluate_pronunciation(word, inferred_phoneme_strings, inferred_words)
+        return aligned_phonemes, score
         
 
     def save_to_s3(self, wav_file: str) -> str:

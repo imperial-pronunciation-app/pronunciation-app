@@ -17,7 +17,7 @@ class PronunciationService:
         self.insertion_penalty = insertion_penalty
 
     def evaluate_pronunciation(
-        self, word: Word, pronounced_phonemes: List[str]
+        self, word: Word, pronounced_phonemes: List[str], pronounced_words: List[str]
     ) -> Tuple[AlignedPhonemes, int]:
         """
         Aligns phonemes and scores pronunciation based on phoneme similarity.
@@ -27,7 +27,9 @@ class PronunciationService:
         :return: Tuple of aligned phonemes and a pronunciation score (0-100).
         """
         expected = list(map(lambda x: x.ipa, self._uow.phonemes.find_phonemes_by_word(word.id)))
-        alignment, score = compute_alignment(expected, pronounced_phonemes, phoneme_similarity, self.deletion_penalty, self.insertion_penalty)
+        alignment, phoneme_score = compute_alignment(expected, pronounced_phonemes, phoneme_similarity, self.deletion_penalty, self.insertion_penalty)
+        _, word_score = compute_alignment(list(word.text), list(" ".join(pronounced_words)), str.__eq__, self.deletion_penalty, self.insertion_penalty)
+        score = (phoneme_score * 2 + word_score) // 3
 
         return self.convert_alignment_to_phoneme_public(alignment, word.language_id), score
     
