@@ -3,6 +3,7 @@ from typing import List
 from pydantic import BaseModel
 
 
-class InferPhonemesResponse(BaseModel):
+class InferWordPhonemesResponse(BaseModel):
+    words: List[str]
     phonemes: List[str]
     success: bool

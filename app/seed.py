@@ -250,4 +250,5 @@ if __name__ == "__main__":
         "henry.walker@example.com",
         "evelyn.hall@example.com",
     ]
+
     seed_database(user_emails, "data/languages")
