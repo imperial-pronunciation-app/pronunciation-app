@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, UploadFile
+from fastapi import APIRouter, Depends, HTTPException, UploadFile
 
 from app.crud.unit_of_work import UnitOfWork, get_unit_of_work
 from app.models.user import User
@@ -22,13 +22,17 @@ async def post_exercise_attempt(
     return resp
 
 
-@router.post("/api/v1/word_of_day/attempts", response_model=AttemptResponse)
+@router.post("/api/v1/{lang}/word_of_day/attempts", response_model=AttemptResponse)
 async def post_word_of_day_attempt(
+    lang: str,
     audio_file: UploadFile,
     uow: UnitOfWork = Depends(get_unit_of_work),
     user: User = Depends(current_active_user),
 ) -> AttemptResponse:
+    language = uow.languages.get_by_name(lang)
+    if not language:
+        raise HTTPException(status_code=404, detail="Invalid language")
     attempt_service = AttemptService(uow)
-    word_of_day_id = uow.word_of_day.get_word_of_day().id
+    word_of_day_id = uow.word_of_day.get_word_of_day(language.id).id
     resp = await attempt_service.post_word_of_day_attempt(audio_file, word_of_day_id, uow, user)
     return resp

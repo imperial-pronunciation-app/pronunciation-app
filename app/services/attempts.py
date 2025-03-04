@@ -37,11 +37,11 @@ class AttemptService:
             f.write(audio_bytes)
         return filename
 
-    def dispatch_to_model(self, wav_file: str, attempt_word: str) -> InferPhonemesResponse:
+    def dispatch_to_model(self, wav_file: str, word: Word) -> InferPhonemesResponse:
         with open(wav_file, "rb") as f:
             files = {"audio_file": f}
-            data = {"attempt_word": attempt_word}
-            model_response = requests.post(f"{get_settings().MODEL_API_URL}/api/v1/eng/infer_phonemes", files=files, data=data)
+            data = {"attempt_word": word.text}
+            model_response = requests.post(f"{get_settings().MODEL_API_URL}/api/v1/{word.language.name}/infer_phonemes", files=files, data=data)
 
         model_response.raise_for_status()
 
@@ -52,7 +52,7 @@ class AttemptService:
     def get_attempt_feedback(
         self, wav_file: str, word: Word
     ) -> Optional[Tuple[AlignedPhonemes, int]]:
-        model_response = self.dispatch_to_model(wav_file, word.text)
+        model_response = self.dispatch_to_model(wav_file, word)
         if not model_response.success:
             return None
         inferred_phoneme_strings = model_response.phonemes
