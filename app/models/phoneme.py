@@ -8,10 +8,10 @@ from .word_phoneme_link import WordPhonemeLink
 
 
 if TYPE_CHECKING:
+    from app.models.phoneme_respelling import PhonemeRespelling
+
     from .word import Word
 
-# Possible phoneme in each words
-# ipa is the International Phonetic Alphabet representation of the phoneme
-# respelling is a common respelling of the phoneme (wiki respelling)
 class Phoneme(PhonemeBase, table=True):
     words: List["Word"] = Relationship(back_populates="phonemes", link_model=WordPhonemeLink)
+    respellings: List["PhonemeRespelling"] = Relationship(back_populates="phoneme")

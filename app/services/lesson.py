@@ -41,11 +41,11 @@ class LessonService:
     def _stars_for(self, lesson: Lesson, user: User) -> int:
         """Returns the number of stars (0 to 3) earned by the user for this lesson."""
         average_score = self._uow.exercise_attempts.average_max_score_for_lesson(user.id, lesson.id)
-        if average_score >= 0.9:
+        if average_score >= 90:
             return 3
-        elif average_score >= 0.7:
+        elif average_score >= 70:
             return 2
-        elif average_score >= 0.5:
+        elif average_score >= 50:
             return 1
         else:
             return 0

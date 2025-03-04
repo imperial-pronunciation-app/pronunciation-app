@@ -29,16 +29,20 @@ class PronunciationService:
         expected = list(map(lambda x: x.ipa, self._uow.phonemes.find_phonemes_by_word(word.id)))
         alignment, score = compute_alignment(expected, pronounced_phonemes, phoneme_similarity, self.deletion_penalty, self.insertion_penalty)
 
-        return self.convert_alignment_to_phoneme_public(alignment), score
+        return self.convert_alignment_to_phoneme_public(alignment, word.language_id), score
     
     def convert_alignment_to_phoneme_public(
-        self, alignment: List[Tuple[Optional[str], Optional[str]]]
+        self, alignment: List[Tuple[Optional[str], Optional[str]]], language_id: int
     ) -> AlignedPhonemes:
         phoneme_service = PhonemeService(self._uow)
         return [
             (
-                phoneme_service.to_phoneme_public(exp) if exp else None,
-                phoneme_service.to_phoneme_public(act) if act else None
+                phoneme_service.to_phoneme_public(
+                    self._uow.phonemes.get_phoneme_by_ipa(exp), language_id
+                ) if exp else None,
+                phoneme_service.to_phoneme_public(
+                    self._uow.phonemes.get_phoneme_by_ipa(act), language_id
+                ) if act else None
             )
             for exp, act in alignment
         ]

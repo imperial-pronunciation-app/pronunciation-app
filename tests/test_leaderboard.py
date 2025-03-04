@@ -1,14 +1,14 @@
 import math
-from typing import List, Sequence
 
 from fastapi.testclient import TestClient
 
 from app.crud.unit_of_work import UnitOfWork
-from app.models.leaderboard_user_link import LeaderboardUserLink, League
+from app.models.leaderboard_user_link import League
 from app.models.user import User
 from app.services.leaderboard import LeaderboardService
 from app.services.user import UserService
-from tests.fixtures.leaderboard_data import TEST_DISPLAY_NAMES, TEST_EMAILS, TEST_XPS
+from tests.factories.leaderboard_user import DEFAULT_USER_DETAILS as user_details
+from tests.factories.leaderboard_user import LeaderboardUsersFactory
 
 
 def test_update_xp_existing_record(test_user: User, uow: UnitOfWork) -> None:
@@ -48,7 +48,10 @@ def test_reset_leaderboard(test_user: User, auth_client: TestClient, uow: UnitOf
     assert json["leaders"] == json["user_position"] == [{"id": test_user.id, "rank": 1, "display_name": test_user.display_name, "xp": expected_xp}]
 
 
-def test_get_leaderboard(test_user: User, auth_client: TestClient, sample_leaderboard_users_bronze: List[LeaderboardUserLink]) -> None:
+def test_get_leaderboard(test_user: User, auth_client: TestClient, make_leaderboard_users: LeaderboardUsersFactory) -> None:
+    # Setup
+    leaderboard_users = make_leaderboard_users()
+
     # When
     response = auth_client.get("/api/v1/leaderboard/global")
     # Then
@@ -56,23 +59,24 @@ def test_get_leaderboard(test_user: User, auth_client: TestClient, sample_leader
     json = response.json()
     assert json["league"] == League.BRONZE
 
-    email_to_id = {link.user.email: link.user_id for link in sample_leaderboard_users_bronze}
+    email_to_id = {link.user.email: link.user_id for link in leaderboard_users}
 
     assert json["leaders"] == [
-        {"id": email_to_id[TEST_EMAILS[0]], "rank": 1, "display_name": TEST_DISPLAY_NAMES[0], "xp": TEST_XPS[0]},
-        {"id": email_to_id[TEST_EMAILS[1]], "rank": 2, "display_name": TEST_DISPLAY_NAMES[1], "xp": TEST_XPS[1]},
-        {"id": email_to_id[TEST_EMAILS[2]], "rank": 3, "display_name": TEST_DISPLAY_NAMES[2], "xp": TEST_XPS[2]},
+        {"id": email_to_id[user_details[0]["email"]], "rank": 1, "display_name": user_details[0]["display_name"], "xp": user_details[0]["xp"]},
+        {"id": email_to_id[user_details[1]["email"]], "rank": 2, "display_name": user_details[1]["display_name"], "xp": user_details[1]["xp"]},
+        {"id": email_to_id[user_details[2]["email"]], "rank": 3, "display_name": user_details[2]["display_name"], "xp": user_details[2]["xp"]},
     ]
     assert json["user_position"] == [
-        {"id": email_to_id[TEST_EMAILS[3]], "rank": 4, "display_name": TEST_DISPLAY_NAMES[3], "xp": TEST_XPS[3]},
-        {"id": email_to_id[TEST_EMAILS[4]], "rank": 5, "display_name": TEST_DISPLAY_NAMES[4], "xp": TEST_XPS[4]},
+        {"id": email_to_id[user_details[3]["email"]], "rank": 4, "display_name": user_details[3]["display_name"], "xp": user_details[3]["xp"]},
+        {"id": email_to_id[user_details[4]["email"]], "rank": 5, "display_name": user_details[4]["display_name"], "xp": user_details[4]["xp"]},
         {"id": test_user.id, "rank": 6, "display_name": test_user.display_name, "xp": 0},
     ]
 
 
-def test_promotion_demotion(uow: UnitOfWork, sample_leaderboard_users_silver: Sequence[LeaderboardUserLink]) -> None:    
+def test_promotion_demotion(uow: UnitOfWork, make_leaderboard_users: LeaderboardUsersFactory) -> None:    
     # Pre: ensure the sample leaderboard users are in the correct order
-    assert all(sample_leaderboard_users_silver[i].xp >= sample_leaderboard_users_silver[i + 1].xp for i in range(len(sample_leaderboard_users_silver) - 1))
+    silver_leaderboard_users = make_leaderboard_users(league=League.SILVER)
+    assert all(silver_leaderboard_users[i].xp >= silver_leaderboard_users[i + 1].xp for i in range(len(silver_leaderboard_users) - 1))
     
     # When
     leaderboard_service = LeaderboardService(uow)
@@ -89,8 +93,8 @@ def test_promotion_demotion(uow: UnitOfWork, sample_leaderboard_users_silver: Se
     assert len(bronze) == 1
     assert gold[0].xp >= silver[0].xp
     assert bronze[0].xp <= silver[2].xp
-    assert sample_leaderboard_users_silver[0].id == gold[0].id
-    assert sample_leaderboard_users_silver[1].id == silver[0].id
-    assert sample_leaderboard_users_silver[2].id == silver[1].id
-    assert sample_leaderboard_users_silver[3].id == silver[2].id
-    assert sample_leaderboard_users_silver[4].id == bronze[0].id
+    assert silver_leaderboard_users[0].id == gold[0].id
+    assert silver_leaderboard_users[1].id == silver[0].id
+    assert silver_leaderboard_users[2].id == silver[1].id
+    assert silver_leaderboard_users[3].id == silver[2].id
+    assert silver_leaderboard_users[4].id == bronze[0].id

@@ -1,0 +1,226 @@
+{
+  "word_of_day": "software",
+  "words": {
+    "cat": ["k", "æ", "t"],
+    "cut": ["k", "ʌ", "t"],
+    "hat": ["h", "æ", "t"],
+    "hut": ["h", "ʌ", "t"],
+    "bat": ["b", "æ", "t"],
+    "bet": ["b", "ɛ", "t"],
+    "pan": ["p", "æ", "n"],
+    "pen": ["p", "ɛ", "n"],
+    "man": ["m", "æ", "n"],
+    "bag": ["b", "æ", "ɡ"],
+    "cap": ["k", "æ", "p"],
+    "sat": ["s", "æ", "t"],
+    "dad": ["d", "æ", "d"],
+    "jam": ["d͡ʒ", "æ", "m"],
+    "map": ["m", "æ", "p"],
+    "nap": ["n", "æ", "p"],
+    "pat": ["p", "æ", "t"],
+    "pot": ["p", "ɑ", "t"],
+    "pig": ["p", "ɪ", "ɡ"],
+    "pop": ["p", "ɑ", "p"],
+    "pet": ["p", "ɛ", "t"],
+    "pit": ["p", "ɪ", "t"],
+    "pin": ["p", "ɪ", "n"],
+    "pack": ["p", "æ", "k"],
+    "puff": ["p", "ʌ", "f"],
+    "pair": ["p", "ɛ", "ɹ"],
+    "page": ["p", "e", "d͡ʒ"],
+    "pine": ["p", "a", "ɪ", "n"],
+    "see": ["s", "i"],
+    "sit": ["s", "ɪ", "t"],
+    "feel": ["f", "i", "l"],
+    "fill": ["f", "ɪ", "l"],
+    "sheep": ["ʃ", "i", "p"],
+    "ship": ["ʃ", "ɪ", "p"],
+    "heel": ["h", "i", "l"],
+    "hill": ["h", "ɪ", "l"],
+    "tree": ["t", "ɹ", "i"],
+    "keep": ["k", "i", "p"],
+    "tea": ["t", "i"],
+    "free": ["f", "ɹ", "i"],
+    "pea": ["p", "i"],
+    "neat": ["n", "i", "t"],
+    "green": ["ɡ", "ɹ", "i", "n"],
+    "heat": ["h", "i", "t"],
+    "knife": ["n", "ɑ", "f"],
+    "psychology": ["s", "ɑ", "k", "ɑ", "l", "ə", "d͡ʒ", "i"],
+    "debt": ["d", "ɛ", "t"],
+    "pneumonia": ["n", "u", "m", "o", "n", "j", "ə"],
+    "queue": ["k", "j", "u"],
+    "beautiful": ["b", "j", "u", "t", "ɪ", "f", "ə", "l"],
+    "business": ["b", "ɪ", "z", "n", "ɪ", "s"],
+    "strength": ["s", "t", "ɹ", "ɛ", "ŋ", "θ"],
+    "sixth": ["s", "ɪ", "k", "s", "θ"],
+    "breadth": ["b", "ɹ", "ɛ", "d", "θ"],
+    "isthmus": ["ɪ", "s", "θ", "m", "ə", "s"],
+    "clothes": ["k", "l", "o", "ð", "z"],
+    "colonel": ["k", "ɹ̩", "n", "ə", "l"],
+    "comfortable": ["k", "ʌ", "m", "f", "t", "ɹ", "b", "ə", "l"],
+    "mischievous": ["m", "ɪ", "s", "t͡ʃ", "ɪ", "v", "ə", "s"],
+    "february": ["f", "ɛ", "b", "j", "u", "ɛ", "ɹ", "i"],
+    "wednesday": ["w", "ɛ", "n", "z", "d", "e"],
+    "specifically": ["s", "p", "ɪ", "s", "ɪ", "f", "ɪ", "k", "l", "i"],
+    "compiler": ["k", "ə", "m", "p", "ɑ", "ɪ", "l", "ɹ"],
+    "hardware": ["h", "ɑ", "ɹ", "d", "w", "ɛ", "ɹ"],
+    "software": ["s", "ɔ", "f", "t", "w", "ɛ", "ɹ"],
+    "keyboard": ["k", "i", "b", "ɔ", "ɹ", "d"],
+    "mouse": ["m", "ɑ", "ʊ", "s"],
+    "computer": ["k", "ə", "m", "p", "j", "u", "t", "ɹ"],
+    "parrot": ["p", "æ", "ɹ", "ə", "t"]
+  },
+  "units": [
+    {
+      "name": "Short Vowel Sound",
+      "description": "Focus on /æ/",
+      "lessons": [
+        {
+          "title": "Listening Discrimination Pairs",
+          "exercises": ["cat", "cut", "hat", "hut", "bat", "bet", "pan", "pen"]
+        },
+        {
+          "title": "Repetition Practice Words",
+          "exercises": ["man", "bag", "cap", "sat", "dad", "jam", "map", "nap"]
+        }
+      ]
+    },
+    {
+      "name": "Consonant Sound",
+      "description": "Focus on /p/",
+      "lessons": [
+        {
+          "title": "Sound Isolation Words",
+          "exercises": ["pat", "pot", "pig", "pan", "pen", "pop", "pet", "pit"]
+        },
+        {
+          "title": "Repetition Practice Words",
+          "exercises": ["pen", "pin", "pack", "puff", "pit", "pair", "page", "pine"]
+        }
+      ]
+    },
+    {
+      "name": "Long Vowel Sound",
+      "description": "Focus on /iː/",
+      "lessons": [
+        {
+          "title": "Listening Discrimination Pairs",
+          "exercises": ["see", "sit", "feel", "fill", "sheep", "ship", "heel", "hill"]
+        },
+        {
+          "title": "Repetition Practice Words",
+          "exercises": ["tree", "keep", "tea", "free", "pea", "neat", "green", "heat"]
+        }
+      ]
+    },
+    {
+      "name": "Silent Letters",
+      "description": "Focus on silent consonants and vowels",
+      "lessons": [
+        {
+          "title": "Silent Consonants",
+          "exercises": ["knife", "psychology", "debt", "pneumonia"]
+        },
+        {
+          "title": "Silent Vowels",
+          "exercises": ["queue", "beautiful", "business"]
+        }
+      ]
+    },
+    {
+      "name": "Difficult Consonant Clusters",
+      "description": "Focus on /str/, /sks/, /θs/",
+      "lessons": [
+        {
+          "title": "Challenging Clusters",
+          "exercises": ["strength", "sixth", "breadth"]
+        },
+        {
+          "title": "Complex Endings",
+          "exercises": ["isthmus", "clothes"]
+        }
+      ]
+    },
+    {
+      "name": "Commonly Mispronounced Words",
+      "description": "Focus on spelling-pronunciation mismatches",
+      "lessons": [
+        {
+          "title": "Tricky Spellings",
+          "exercises": ["colonel", "comfortable", "mischievous"]
+        },
+        {
+          "title": "Calendar Words",
+          "exercises": ["february", "wednesday", "specifically"]
+        }
+      ]
+    },
+    {
+      "name": "Tech Terminology",
+      "description": "Terms used in the tech industry",
+      "lessons": [
+        {
+          "title": "Programming Terms",
+          "exercises": ["compiler", "hardware", "software"]
+        },
+        {
+          "title": "Computer Accessories",
+          "exercises": ["keyboard", "mouse", "computer"]
+        }
+      ]
+    },
+    {
+      "name": "Short Unit",
+      "description": "Short unit",
+      "lessons": [
+        {
+          "title": "Short Lesson",
+          "exercises": ["parrot"]
+        }
+      ]
+    }
+  ],
+  "respellings": {
+    "a": "ah",
+    "b": "b",
+    "d": "d",
+    "d͡ʒ": "j",
+    "e": "eh",
+    "f": "f",
+    "h": "h",
+    "i": "ee",
+    "j": "y",
+    "k": "k",
+    "l": "l",
+    "m": "m",
+    "n": "n",
+    "o": "oh",
+    "p": "p",
+    "s": "s",
+    "t": "t",
+    "t͡ʃ": "ch",
+    "u": "oo",
+    "v": "v",
+    "w": "w",
+    "z": "z",
+    "æ": "a",
+    "ð": "dh",
+    "ŋ": "ng",
+    "ɑ": "ah",
+    "ɔ": "aw",
+    "ə": "uh",
+    "ɛ": "e",
+    "ɡ": "g",
+    "ɪ": "i",
+    "ɹ": "r",
+    "ɹ̩": "ur",
+    "ʃ": "sh",
+    "ʊ": "oo",
+    "ʌ": "u",
+    "ʒ": "zh",
+    "θ": "th",
+    "aɪ": "eye",
+    "oʊ": "oh"
+  }
+}
