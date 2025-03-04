@@ -1,4 +1,4 @@
-from app.crud.analytics.analysis_repository import AnalyticsRepository
+from app.crud.analytics.analytics_repository import AnalyticsRepository
 
 
 class AnalyticsService:

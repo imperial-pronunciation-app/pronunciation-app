@@ -50,8 +50,8 @@ class AnalyticsRepository:
                     func.avg(Attempt.score).label("average_score"),
                     func.count(col(Attempt.id)).label("attempt_count"),
                 )
-                .join(ExerciseAttempt, ExerciseAttempt.exercise_id == Exercise.id)  # type: ignore[arg-type]
-                .join(Attempt, Attempt.id == ExerciseAttempt.id)  # type: ignore[arg-type]
+                .join(ExerciseAttempt, col(ExerciseAttempt.exercise_id) == col(Exercise.id))
+                .join(Attempt, col(Attempt.id) == col(ExerciseAttempt.id))
                 .group_by(col(Exercise.id))
                 .order_by("average_score")  # Order by difficulty (lower scores first)
             )
