@@ -24,17 +24,17 @@ def test_successful_request(uow: UnitOfWork) -> None:
     """
 
     test_word_phonemes = ["s", "oʊ", "f", "t", "w", "ɛ", "r"]
-    test_wav_filename = "tests/assets/software.wav"
     test_word = "software"
+    test_wav_filename = "tests/assets/software.wav"
 
     rsp = responses.Response(
         method="POST",
-        url=f"{os.environ.get('MODEL_API_URL', '')}/api/v1/eng/infer_phonemes",
-        json={"success": True, "phonemes": test_word_phonemes},
+        url=f"{os.environ.get('MODEL_API_URL', '')}/api/v1/eng/infer_word_phonemes",
+        json={"success": True, "phonemes": test_word_phonemes, "words": [test_word]},
     )
     responses.add(rsp)
 
-    model_response = AttemptService(uow).dispatch_to_model(test_wav_filename, test_word)
+    model_response = AttemptService(uow).dispatch_to_model(test_wav_filename)
     assert model_response.phonemes == test_word_phonemes
 
 @responses.activate
@@ -47,15 +47,14 @@ def test_unsuccessful_request(uow: UnitOfWork) -> None:
     """
 
     test_wav_filename = "tests/assets/software.wav"
-    test_word = "software"
 
     rsp = responses.Response(
         method="POST",
-        url=f"{os.environ.get('MODEL_API_URL', '')}/api/v1/eng/infer_phonemes",
-        json={"success": False, "phonemes": []},
+        url=f"{os.environ.get('MODEL_API_URL', '')}/api/v1/eng/infer_word_phonemes",
+        json={"success": False, "phonemes": [], "words": []},
     )
     responses.add(rsp)
 
-    model_response = AttemptService(uow).dispatch_to_model(test_wav_filename, test_word)
+    model_response = AttemptService(uow).dispatch_to_model(test_wav_filename)
     assert not model_response.success
 

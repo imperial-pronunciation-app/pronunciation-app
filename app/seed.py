@@ -204,7 +204,7 @@ def seed(session: Session) -> None:
         Lesson(title="Complex Endings", exercises=[
             Exercise(index=0, word_id=words["isthmus"].id),
             Exercise(index=1, word_id=words["clothes"].id),
-            Exercise(index=2, word_id=words["months"].id),
+            # Exercise(index=2, word_id=words["months"].id),
         ]),
         Lesson(title="Tricky Spellings", exercises=[
             Exercise(index=0, word_id=words["colonel"].id),

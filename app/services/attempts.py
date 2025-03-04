@@ -16,11 +16,12 @@ from app.models.word import Word
 from app.models.word_of_day_attempt import WordOfDayAttempt
 from app.schemas.aligned_phonemes import AlignedPhonemes
 from app.schemas.attempt import AttemptResponse, ExerciseAttemptResponse
-from app.schemas.model_api import InferPhonemesResponse
+from app.schemas.model_api import InferWordPhonemesResponse
 from app.services.exercise import ExerciseService
 from app.services.pronunciation import PronunciationService
 from app.services.unit import UnitService
 from app.services.user import UserService
+from app.services.word import WordService
 from app.users import current_active_user
 from app.utils.s3 import upload_wav_to_s3
 
@@ -37,27 +38,29 @@ class AttemptService:
             f.write(audio_bytes)
         return filename
 
-    def dispatch_to_model(self, wav_file: str, attempt_word: str) -> InferPhonemesResponse:
+    def dispatch_to_model(self, wav_file: str) -> InferWordPhonemesResponse:
         with open(wav_file, "rb") as f:
             files = {"audio_file": f}
-            data = {"attempt_word": attempt_word}
-            model_response = requests.post(f"{get_settings().MODEL_API_URL}/api/v1/eng/infer_phonemes", files=files, data=data)
+            model_response = requests.post(f"{get_settings().MODEL_API_URL}/api/v1/eng/infer_word_phonemes", files=files)
 
         model_response.raise_for_status()
 
-        model_data = InferPhonemesResponse.model_validate(model_response.json())
+        model_data = InferWordPhonemesResponse.model_validate(model_response.json())
 
         return model_data
 
     def get_attempt_feedback(
         self, wav_file: str, word: Word
     ) -> Optional[Tuple[AlignedPhonemes, int]]:
-        model_response = self.dispatch_to_model(wav_file, word.text)
+        model_response = self.dispatch_to_model(wav_file)
         if not model_response.success:
             return None
+        inferred_words = model_response.words
         inferred_phoneme_strings = model_response.phonemes
-        aligned_phonemes, score = PronunciationService(self._uow).evaluate_pronunciation(word, inferred_phoneme_strings)
-        return aligned_phonemes, score
+        aligned_phonemes, phonemes_score = PronunciationService(self._uow).evaluate_pronunciation(word, inferred_phoneme_strings)
+        words_score = WordService(self._uow).word_similarity(word, inferred_words)
+        combined_score = (words_score + phonemes_score * 2) // 3
+        return aligned_phonemes, combined_score
         
 
     def save_to_s3(self, wav_file: str) -> str:
