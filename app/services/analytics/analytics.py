@@ -72,7 +72,6 @@ class AnalyticsService:
 
         exercise_ids: list[str] = [str(r[0]) for r in results]
         avg_scores: list[float] = [round(float(r[1]), 2) if r[1] is not None else 0.0 for r in results]
-        attempt_counts: list[int] = [int(r[2]) for r in results]
 
         return {
             "labels": exercise_ids,
@@ -83,15 +82,7 @@ class AnalyticsService:
                     "backgroundColor": "rgba(75, 192, 192, 0.5)",
                     "borderColor": "rgb(75, 192, 192)",
                     "borderWidth": 1,
-                    "yAxisID": "score",
-                },
-                {
-                    "label": "Number of Attempts",
-                    "data": attempt_counts,
-                    "backgroundColor": "rgba(255, 99, 132, 0.5)",
-                    "borderColor": "rgb(255, 99, 132)",
-                    "borderWidth": 1,
-                },
+                }
             ],
         }
 

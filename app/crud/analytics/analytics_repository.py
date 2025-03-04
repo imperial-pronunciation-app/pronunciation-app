@@ -44,13 +44,12 @@ class AnalyticsRepository:
             result = session.exec(stmt).fetchall()
             return result
 
-    def get_exercise_difficulty_analytics(self) -> Sequence[Tuple[int, float, int]]:
+    def get_exercise_difficulty_analytics(self) -> Sequence[Tuple[int, float]]:
         with Session(engine) as session:
             stmt = (
                 select(
                     Exercise.id,
                     func.avg(Attempt.score).label("average_score"),
-                    func.count(col(Attempt.id)).label("attempt_count"),
                 )
                 .join(ExerciseAttempt, col(ExerciseAttempt.exercise_id) == col(Exercise.id))
                 .join(Attempt, col(Attempt.id) == col(ExerciseAttempt.id))
