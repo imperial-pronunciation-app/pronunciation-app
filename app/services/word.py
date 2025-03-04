@@ -12,5 +12,5 @@ class WordService:
         return WordPublicWithPhonemes(
             id=word.id,
             text=word.text,
-            phonemes=[PhonemePublic(id=p.id, ipa=p.ipa, respelling=p.respelling) for p in word.phonemes]
+            phonemes=[PhonemePublic(id=p.id, ipa=p.ipa, respelling=p.respelling, cdn_path=p.cdn_path) for p in word.phonemes]
         )

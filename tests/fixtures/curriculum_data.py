@@ -53,7 +53,7 @@ def sample_words(session: Session) -> List[Word]:
     tap = Word(text="tap")
     words = [pat, tap]
 
-    phonemes = [Phoneme(ipa="p", respelling="p"), Phoneme(ipa="a", respelling="a"), Phoneme(ipa="t", respelling="t")]
+    phonemes = [Phoneme(ipa="p", respelling="p", cdn_path="p"), Phoneme(ipa="a", respelling="a", cdn_path="a"), Phoneme(ipa="t", respelling="t", cdn_path="t")]
 
     session.add_all(words)
     session.add_all(phonemes)

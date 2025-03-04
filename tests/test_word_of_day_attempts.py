@@ -24,19 +24,19 @@ def test_word_of_day_attempts(
     similarity = 100
     recording_id = 1
     recording_phonemes = [
-        [{"id": 1, "ipa": "s", "respelling": "s"}, {"id": 1, "ipa": "s", "respelling": "s"}],
-        [{"id": 2, "ipa": "oʊ", "respelling": "oʊ"}, {"id": 2, "ipa": "oʊ", "respelling": "oʊ"}],
-        [{"id": 3, "ipa": "f", "respelling": "f"}, {"id": 3, "ipa": "f", "respelling": "f"}],
-        [{"id": 4, "ipa": "t", "respelling": "t"}, {"id": 4, "ipa": "t", "respelling": "t"}],
-        [{"id": 5, "ipa": "w", "respelling": "w"}, {"id": 5, "ipa": "w", "respelling": "w"}],
-        [{"id": 6, "ipa": "ɛ", "respelling": "ɛ"}, {"id": 6, "ipa": "ɛ", "respelling": "ɛ"}],
-        [{"id": 7, "ipa": "r", "respelling": "r"}, {"id": 7, "ipa": "r", "respelling": "r"}],
+        [{"id": 1, "ipa": "s", "respelling": "s", "cdn_path": "s"}, {"id": 1, "ipa": "s", "respelling": "s", "cdn_path": "s"}],
+        [{"id": 2, "ipa": "oʊ", "respelling": "oʊ", "cdn_path": "oʊ"}, {"id": 2, "ipa": "oʊ", "respelling": "oʊ", "cdn_path": "oʊ"}],
+        [{"id": 3, "ipa": "f", "respelling": "f", "cdn_path": "f"}, {"id": 3, "ipa": "f", "respelling": "f", "cdn_path": "f"}],
+        [{"id": 4, "ipa": "t", "respelling": "t", "cdn_path": "t"}, {"id": 4, "ipa": "t", "respelling": "t", "cdn_path": "t"}],
+        [{"id": 5, "ipa": "w", "respelling": "w", "cdn_path": "w"}, {"id": 5, "ipa": "w", "respelling": "w", "cdn_path": "w"}],
+        [{"id": 6, "ipa": "ɛ", "respelling": "ɛ", "cdn_path": "ɛ"}, {"id": 6, "ipa": "ɛ", "respelling": "ɛ", "cdn_path": "ɛ"}],
+        [{"id": 7, "ipa": "r", "respelling": "r", "cdn_path": "r"}, {"id": 7, "ipa": "r", "respelling": "r", "cdn_path": "r"}],
     ]
 
     # mock_os_remove = mocker.patch("os.remove")
     mock_service = mocker.Mock(spec=AttemptService)
     mocker.patch("app.routers.attempts.AttemptService", return_value=mock_service)
-    phonemes = uow.phonemes.upsert_all([Phoneme(ipa=p, respelling=p) for p in test_word_phonemes])
+    phonemes = uow.phonemes.upsert_all([Phoneme(ipa=p, respelling=p, cdn_path=p) for p in test_word_phonemes])
     mock_service.post_word_of_day_attempt.return_value = {
         "success": True,
         "score": similarity,
@@ -46,7 +46,7 @@ def test_word_of_day_attempts(
     }
 
     word = uow.words.upsert(Word(text=test_word))
-    phonemes = uow.phonemes.upsert_all([Phoneme(ipa=p, respelling=p) for p in test_word_phonemes])
+    phonemes = uow.phonemes.upsert_all([Phoneme(ipa=p, respelling=p, cdn_path=p) for p in test_word_phonemes])
     session.add_all([WordPhonemeLink(word_id=word.id, phoneme_id=p.id, index=i) for i, p in enumerate(phonemes)])
     session.commit()
     unit = uow.units.upsert(Unit(name="test", description="test", index=0))

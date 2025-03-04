@@ -12,5 +12,6 @@ class PhonemeService:
         return PhonemePublic(
             id=phoneme.id,
             ipa=phoneme.ipa,
-            respelling=phoneme.respelling
+            respelling=phoneme.respelling,
+            cdn_path=phoneme.cdn_path,
         )

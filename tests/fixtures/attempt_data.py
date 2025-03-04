@@ -29,9 +29,9 @@ def sample_exercise_attempt(session: Session, sample_exercise: Exercise, sample_
 def sample_phonemes(session: Session) -> List[Phoneme]:
     """Fixture to create sample phonemes."""
     phonemes = [
-      Phoneme(ipa="p", respelling="p"),
-      Phoneme(ipa="a", respelling="a"),
-      Phoneme(ipa="t", respelling="t")
+      Phoneme(ipa="p", respelling="p", cdn_path="p"),
+      Phoneme(ipa="a", respelling="a", cdn_path="a"),
+      Phoneme(ipa="t", respelling="t", cdn_path="t")
     ]
     session.add_all(phonemes)
     session.commit()

@@ -14,7 +14,7 @@ def sample_word_of_day(session: Session) -> WordOfDay:
     tap = Word(text="tap")
     words = [pat, tap]
 
-    phonemes = [Phoneme(ipa="p", respelling="p"), Phoneme(ipa="a", respelling="a"), Phoneme(ipa="t", respelling="t")]
+    phonemes = [Phoneme(ipa="p", respelling="p", cdn_path="p"), Phoneme(ipa="a", respelling="a", cdn_path="a"), Phoneme(ipa="t", respelling="t", cdn_path="t")]
 
     session.add_all(words)
     session.add_all(phonemes)
@@ -54,7 +54,7 @@ def sample_word(session: Session) -> Word:
     """Fixture to add word to database"""
     pat = Word(text="pat")
 
-    phonemes = [Phoneme(ipa="p", respelling="p"), Phoneme(ipa="a", respelling="a"), Phoneme(ipa="t", respelling="t")]
+    phonemes = [Phoneme(ipa="p", respelling="p", cdn_path="p"), Phoneme(ipa="a", respelling="a", cdn_path="a"), Phoneme(ipa="t", respelling="t", cdn_path="t")]
 
     session.add(pat)
     session.add_all(phonemes)

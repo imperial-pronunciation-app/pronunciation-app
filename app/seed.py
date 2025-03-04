@@ -95,7 +95,7 @@ def seed(session: Session) -> None:
     session.commit()
 
     print("🔤 Inserting Phonemes...")
-    phonemes = {ipa: Phoneme(ipa=ipa, respelling=respelling) for ipa, respelling in ipa_to_respelling.items()}
+    phonemes = {ipa: Phoneme(ipa=ipa, respelling=respelling_cdn_path[0], cdn_path=respelling_cdn_path[1]) for ipa, respelling_cdn_path in ipa_to_respelling.items()}
     session.add_all(phonemes.values())
     session.commit()
 
@@ -204,7 +204,7 @@ def seed(session: Session) -> None:
         Lesson(title="Complex Endings", exercises=[
             Exercise(index=0, word_id=words["isthmus"].id),
             Exercise(index=1, word_id=words["clothes"].id),
-            Exercise(index=2, word_id=words["months"].id),
+            # Exercise(index=2, word_id=words["months"].id),
         ]),
         Lesson(title="Tricky Spellings", exercises=[
             Exercise(index=0, word_id=words["colonel"].id),

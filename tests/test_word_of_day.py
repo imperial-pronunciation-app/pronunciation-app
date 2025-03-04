@@ -20,7 +20,7 @@ def test_get_word_of_day(auth_client: TestClient, sample_word_of_day: WordOfDay)
     assert data["text"] == word_of_day.word.text
     assert data["id"] == word_of_day.word_id
     assert data["phonemes"] == [
-        {"id": p.id, "ipa": p.ipa, "respelling": p.respelling} for p in word_of_day.word.phonemes
+        {"id": p.id, "ipa": p.ipa, "respelling": p.respelling, "cdn_path": p.cdn_path} for p in word_of_day.word.phonemes
     ]
 
 

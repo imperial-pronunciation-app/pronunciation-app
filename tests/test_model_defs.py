@@ -1,5 +1,6 @@
 from sqlmodel import SQLModel, create_engine
 
+from app.models.analytics.analytics import EndpointAnalytics  # noqa: F401
 from app.models.attempt import Attempt  # noqa: F401
 from app.models.basic_lesson import BasicLesson  # noqa: F401
 from app.models.exercise import Exercise  # noqa: F401

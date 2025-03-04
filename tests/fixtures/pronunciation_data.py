@@ -11,15 +11,15 @@ from app.models.word_phoneme_link import WordPhonemeLink
 @pytest.fixture
 def sample_pronunciation_phonemes(session: Session) -> List[Phoneme]:
     phonemes = [
-        Phoneme(ipa="t", respelling="t"),
-        Phoneme(ipa="ɛ", respelling="e"),
-        Phoneme(ipa="s", respelling="s"),
-        Phoneme(ipa="p", respelling="p"),
-        Phoneme(ipa="a", respelling="a"),
-        Phoneme(ipa="k", respelling="k"),
-        Phoneme(ipa="x", respelling="x"),
-        Phoneme(ipa="e", respelling="e"),
-        Phoneme(ipa="<unknown>", respelling="unknown"),
+        Phoneme(ipa="t", respelling="t", cdn_path="t"),
+        Phoneme(ipa="ɛ", respelling="e", cdn_path="e"),
+        Phoneme(ipa="s", respelling="s", cdn_path="s"),
+        Phoneme(ipa="p", respelling="p", cdn_path="p"),
+        Phoneme(ipa="a", respelling="a", cdn_path="a"),
+        Phoneme(ipa="k", respelling="k", cdn_path="k"),
+        Phoneme(ipa="x", respelling="x", cdn_path="x"),
+        Phoneme(ipa="e", respelling="e", cdn_path="e"),
+        Phoneme(ipa="<unknown>", respelling="unknown", cdn_path="unknown"),
     ]
 
     session.add_all(phonemes)
