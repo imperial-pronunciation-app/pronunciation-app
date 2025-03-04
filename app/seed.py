@@ -230,6 +230,24 @@ def seed_database(user_emails: List[str], data_directory: str) -> None:
 if __name__ == "__main__":
     user_emails = [
         "john.doe@example.com",
-        # ... rest of the emails ...
+        "emma.smith@example.com",
+        "liam.johnson@example.com",
+        "olivia.brown@example.com",
+        "noah.williams@example.com",
+        "ava.jones@example.com",
+        "sophia.miller@example.com",
+        "mason.davis@example.com",
+        "isabella.garcia@example.com",
+        "logan.martinez@example.com",
+        "lucas.anderson@example.com",
+        "mia.thomas@example.com",
+        "harper.taylor@example.com",
+        "elijah.moore@example.com",
+        "amelia.white@example.com",
+        "james.harris@example.com",
+        "charlotte.clark@example.com",
+        "benjamin.lewis@example.com",
+        "henry.walker@example.com",
+        "evelyn.hall@example.com",
     ]
     seed_database(user_emails, "data/languages")
