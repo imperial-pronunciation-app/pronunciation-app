@@ -94,3 +94,97 @@ class AnalyticsService:
                 },
             ],
         }
+
+    def get_phoneme_difficulty_data(self) -> dict:
+        # Per phoneme we want 4 different bars, we want:
+        # - Correctly identified
+        # - Present but incorrect
+        # - User didn't say anything
+        # - User inserted a phoneme that wasn't present
+
+        results = AnalyticsRepository().get_phoneme_difficulty_analytics()
+
+        phonemes_dict = {}
+
+        for i in range(len(results)):
+            expected_phoneme_id, actual_phoneme_id = results[i]
+
+            if expected_phoneme_id not in phonemes_dict and expected_phoneme_id is not None:
+                phonemes_dict[expected_phoneme_id] = {
+                    "correct": 0,
+                    "incorrect": 0,
+                    "none": 0,
+                    "inserted": 0,
+                }
+
+            if expected_phoneme_id is None and actual_phoneme_id is not None:
+                # Set actual to inserted
+                if actual_phoneme_id not in phonemes_dict:
+                    phonemes_dict[actual_phoneme_id] = {
+                        "correct": 0,
+                        "incorrect": 0,
+                        "none": 0,
+                        "inserted": 1,
+                    }
+                else:
+                    phonemes_dict[actual_phoneme_id]["inserted"] += 1
+
+            elif expected_phoneme_id == actual_phoneme_id:
+                if expected_phoneme_id is not None:
+                    phonemes_dict[expected_phoneme_id]["correct"] += 1
+            elif actual_phoneme_id is None:
+                if expected_phoneme_id is not None:
+                    phonemes_dict[expected_phoneme_id]["none"] += 1
+            elif expected_phoneme_id != actual_phoneme_id:
+                if expected_phoneme_id is not None:
+                    phonemes_dict[expected_phoneme_id]["incorrect"] += 1
+            else:
+                raise ValueError(f"Unexpected case {expected_phoneme_id} {actual_phoneme_id}")
+
+        phonemes_ids = list(phonemes_dict.keys())
+        phonemes_mapping = AnalyticsRepository().get_phoneme_names()
+        phonemes = []
+
+        for p in phonemes_ids:
+            for phoneme_id, ipa, respelling in phonemes_mapping:
+                if p == phoneme_id:
+                    phonemes.append(f"{ipa} ({respelling})")
+
+        correct = [phonemes_dict[p]["correct"] for p in phonemes_ids]
+        incorrect = [phonemes_dict[p]["incorrect"] for p in phonemes_ids]
+        none = [phonemes_dict[p]["none"] for p in phonemes_ids]
+        inserted = [phonemes_dict[p]["inserted"] for p in phonemes_ids]
+
+        return {
+            "labels": phonemes,
+            "datasets": [
+                {
+                    "label": "Correct",
+                    "data": correct,
+                    "backgroundColor": "rgba(75, 192, 192, 0.5)",
+                    "borderColor": "rgb(75, 192, 192)",
+                    "borderWidth": 1,
+                },
+                {
+                    "label": "Incorrect",
+                    "data": incorrect,
+                    "backgroundColor": "rgba(255, 99, 132, 0.5)",
+                    "borderColor": "rgb(255, 99, 132)",
+                    "borderWidth": 1,
+                },
+                {
+                    "label": "None",
+                    "data": none,
+                    "backgroundColor": "rgba(54, 162, 235, 0.5)",
+                    "borderColor": "rgb(54, 162, 235)",
+                    "borderWidth": 1,
+                },
+                {
+                    "label": "Inserted",
+                    "data": inserted,
+                    "backgroundColor": "rgba(255, 206, 86, 0.5)",
+                    "borderColor": "rgb(255, 206, 86)",
+                    "borderWidth": 1,
+                },
+            ],
+        }
