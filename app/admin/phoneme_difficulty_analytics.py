@@ -19,5 +19,6 @@ class PhonemeDifficultyDashboard(BaseView):
                 "chart_data": difficulty_data,
                 "chart_title": "Phoneme Difficulty Analysis",
                 "chart_x_label": "Phoneme IDs",
+                "chart_y_label": "Average Score",
             },
         )

@@ -19,5 +19,6 @@ class ExerciseDifficultyDashboard(BaseView):
                 "chart_data": difficulty_data,
                 "chart_title": "Exercise Difficulty Analysis",
                 "chart_x_label": "Exercise IDs",
+                "chart_y_label": "Average Score",
             },
         )
