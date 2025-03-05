@@ -9,6 +9,7 @@ from app.models.exercise import Exercise
 from app.models.exercise_attempt import ExerciseAttempt
 from app.models.exercise_attempt_phoneme_link import ExerciseAttemptPhonemeLink
 from app.models.phoneme import Phoneme
+from app.models.word import Word
 
 
 class AnalyticsRepository:
@@ -56,6 +57,15 @@ class AnalyticsRepository:
                 .group_by(col(Exercise.id))
                 .order_by("average_score")  # Order by difficulty (lower scores first)
             )
+
+            return session.exec(stmt).fetchall()
+
+    def get_exercise_words(self) -> Sequence[Tuple[int, str]]:
+        with Session(engine) as session:
+            stmt = select(
+                Exercise.id,
+                Word.text,
+            ).join(Word, col(Word.id) == col(Exercise.word_id))
 
             return session.exec(stmt).fetchall()
 

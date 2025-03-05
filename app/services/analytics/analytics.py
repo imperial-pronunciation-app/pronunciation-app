@@ -73,8 +73,13 @@ class AnalyticsService:
         exercise_ids: list[str] = [str(r[0]) for r in results]
         avg_scores: list[float] = [round(float(r[1]), 2) if r[1] is not None else 0.0 for r in results]
 
+        # Replace the exercise ids with the actual words
+        exercise_words = AnalyticsRepository().get_exercise_words()
+        exercise_mapping = {str(exercise_id): word for exercise_id, word in exercise_words}
+        exercise_labels = [f"{exercise_id}: {exercise_mapping[exercise_id]}" for exercise_id in exercise_ids]
+
         return {
-            "labels": exercise_ids,
+            "labels": exercise_labels,
             "datasets": [
                 {
                     "label": "Average Score",
