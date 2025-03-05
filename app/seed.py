@@ -221,9 +221,9 @@ def seed_database(user_emails: List[str], data_directory: str) -> None:
         seeder = DatabaseSeeder(session, password_helper)
         
         try:
+            seeder.seed_languages(data_directory)
             users = seeder.seed_users(user_emails)
             seeder.seed_leaderboard(users)
-            seeder.seed_languages(data_directory)
             print("🎉✅ Database seeding completed successfully!")
         except Exception as e:
             print(f"Seeding failed: {e}")
