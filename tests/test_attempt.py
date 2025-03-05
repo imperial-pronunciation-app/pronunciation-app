@@ -32,7 +32,7 @@ def test_successful_request(uow: UnitOfWork, make_word: WordFactory) -> None:
 
 @responses.activate
 def test_unsuccessful_request(uow: UnitOfWork, make_word: WordFactory) -> None:
-    """Test that a request with unsuccesfull inference returns a 200 status code"""
+    """Test that a request with unsuccesful inference returns a 200 status code"""
     word = make_word()
     test_wav_filename = "tests/assets/software.wav"
 

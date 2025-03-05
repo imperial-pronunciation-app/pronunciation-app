@@ -2,16 +2,18 @@
 from fastapi.testclient import TestClient
 from pytest_mock import MockerFixture
 
+from app.models.user import User
 from app.services.attempts import AttemptService
 from tests.factories.word_of_day import WordOfDayFactory
 
 
 def test_word_of_day_attempts(
-    mocker: MockerFixture, auth_client: TestClient, make_word_of_day: WordOfDayFactory
+    mocker: MockerFixture, auth_client: TestClient, make_word_of_day: WordOfDayFactory, test_user: User
 ) -> None:
     """Test post_word_of_day_attempt"""
+    language = test_user.language
 
-    word_of_day = make_word_of_day(text="software")
+    word_of_day = make_word_of_day(text="software", language=language)
     test_word = word_of_day.word
     similarity = 100
     xp_gain = 1.5 * similarity
@@ -32,7 +34,7 @@ def test_word_of_day_attempts(
     with open(wav_file_path, "rb") as f:
         files = {"audio_file": f}
 
-        recording_response = auth_client.post(f"/api/v1/{test_word.language.name}/word_of_day/attempts", files=files)
+        recording_response = auth_client.post("/api/v1/word_of_day/attempts", files=files)
     assert recording_response.status_code == 200
     data = recording_response.json()
     assert data["score"] == similarity

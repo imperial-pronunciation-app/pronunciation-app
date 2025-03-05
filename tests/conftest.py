@@ -11,6 +11,7 @@ from app.database import get_session
 from app.main import app
 from app.models.user import User
 from app.redis import LRedis
+from tests.factories.language import LanguageFactory
 
 from .utils import login_user, register_user
 
@@ -55,7 +56,8 @@ def client(session: Session) -> Iterator[TestClient]:
 
 
 @pytest.fixture
-def test_user(session: Session, client: TestClient) -> User:
+def test_user(session: Session, client: TestClient, make_language: LanguageFactory) -> User:
+    make_language()
     email = "test@example.com"
     display_name = "Test User"
     register_user(client, email, display_name, "password")

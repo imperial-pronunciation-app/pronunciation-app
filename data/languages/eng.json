@@ -1,4 +1,6 @@
 {
+  "name": "English",
+  "is_default": true,
   "word_of_day": "software",
   "words": {
     "cat": ["k", "æ", "t"],
