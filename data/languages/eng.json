@@ -214,13 +214,11 @@
     "ɡ": {"respelling": "g", "filename": "Voiced_velar_plosive.wav"},
     "ɪ": {"respelling": "i", "filename": "Near-close_near-front_unrounded_vowel.wav"},
     "ɹ": {"respelling": "r", "filename": "Alveolar_approximant.wav"},
-    "ɹ̩": {"respelling": "ur", "filename": null},
+    "ɹ̩": {"respelling": "ur", "filename": "R-coloured-Mid-central_vowel.wav"},
     "ʃ": {"respelling": "sh", "filename": "Voiceless_postalveolar_fricative.wav"},
     "ʊ": {"respelling": "oo", "filename": "Near-close_near-back_rounded_vowel.wav"},
     "ʌ": {"respelling": "u", "filename": "Open-mid_back_unrounded_vowel.wav"},
     "ʒ": {"respelling": "zh", "filename": "Voiced_postalveolar_fricative.wav"},
-    "θ": {"respelling": "th", "filename": "Voiceless_dental_fricative.wav"},
-    "aɪ": {"respelling": "eye", "filename": null},
-    "oʊ": {"respelling": "oh", "filename": null}
+    "θ": {"respelling": "th", "filename": "Voiceless_dental_fricative.wav"}
   }
 }
