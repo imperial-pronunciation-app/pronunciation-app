@@ -121,7 +121,7 @@ class AttemptService:
         unit_service = UnitService(uow)
         unit = uow.basic_lessons.get_by_id(exercise.lesson_id).unit
         if (
-            unit_service._is_completed_by(unit, user)
+            unit_service.basic_lessons_completed_by(unit, user)
             and uow.recap_lessons.find_recap_by_user_id_and_unit_id(user.id, unit.id) is None
         ):
             unit_service.generate_recap_lesson(unit, user)
