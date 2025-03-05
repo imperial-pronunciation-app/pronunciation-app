@@ -25,5 +25,5 @@ __all__ = [
     "Recording",
     "LeaderboardUserLink",
     "WordOfDay",
-    "PhonemeRespelling"
+    "PhonemeRespelling",
 ]

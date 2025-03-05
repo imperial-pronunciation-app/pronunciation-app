@@ -115,9 +115,10 @@ class DatabaseSeeder:
         print("🔤 Adding Phoneme Respellings...")
         phoneme_respellings = []
         
-        for ipa, respelling in data["respellings"].items():
+        for ipa, content in data["respellings"].items():
+            respelling, cdn_path = content["respelling"], content["filename"]
             if ipa not in existing_phonemes:
-                phoneme = Phoneme(ipa=ipa)
+                phoneme = Phoneme(ipa=ipa, cdn_path=cdn_path)
                 self.session.add(phoneme)
                 self.session.commit()
                 existing_phonemes[ipa] = phoneme

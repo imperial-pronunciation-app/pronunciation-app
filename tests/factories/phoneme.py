@@ -11,17 +11,18 @@ from tests.factories.language import LanguageFactory
 
 
 DEFAULT_IPA = "p"
+DEFAULT_PATH = "p.wav"
 
 class PhonemeFactory(Protocol):
-    def __call__(self, ipa: str = DEFAULT_IPA, language: Optional[Language] = None) -> Phoneme:
+    def __call__(self, ipa: str = DEFAULT_IPA, cdn_path: str = DEFAULT_PATH, language: Optional[Language] = None) -> Phoneme:
         ...
 
 @pytest.fixture
 def make_phoneme(session: Session, make_language: LanguageFactory) -> PhonemeFactory:
-    def make(ipa: str = DEFAULT_IPA, language: Optional[Language] = None) -> Phoneme:
+    def make(ipa: str = DEFAULT_IPA, cdn_path: str = DEFAULT_PATH, language: Optional[Language] = None) -> Phoneme:
         if language is None:
             language = make_language()
-        phoneme = Phoneme(ipa=ipa, language_id=language.id)
+        phoneme = Phoneme(ipa=ipa, language_id=language.id, cdn_path=cdn_path)
         session.add(phoneme)
         session.commit()
         session.refresh(phoneme)

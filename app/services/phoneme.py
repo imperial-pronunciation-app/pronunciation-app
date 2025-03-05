@@ -12,5 +12,6 @@ class PhonemeService:
         return PhonemePublic(
             id=phoneme.id,
             ipa=phoneme.ipa,
+            cdn_path=phoneme.cdn_path,
             respelling=next(r for r in phoneme.respellings if r.language_id == language_id).respelling
         )
