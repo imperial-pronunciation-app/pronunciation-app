@@ -50,7 +50,7 @@ def test_reset_leaderboard(test_user: User, auth_client: TestClient, uow: UnitOf
 
 def test_get_leaderboard(test_user: User, auth_client: TestClient, make_leaderboard_users: LeaderboardUsersFactory) -> None:
     # Setup
-    leaderboard_users = make_leaderboard_users()
+    leaderboard_users = make_leaderboard_users(create_language=False)
 
     # When
     response = auth_client.get("/api/v1/leaderboard/global")

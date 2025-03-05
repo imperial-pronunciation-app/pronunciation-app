@@ -15,4 +15,5 @@ class LanguageRepository(GenericRepository[Language]):
     def find_by_name(self, name: str) -> Optional[Language]:
         return self._session.exec(select(Language).where(Language.name == name)).first()
 
-    
+    def get_default(self) -> Language:
+        return self._session.exec(select(Language).where(Language.is_default)).one()

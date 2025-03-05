@@ -6,6 +6,7 @@ from app.crud.unit_of_work import UnitOfWork
 from app.models.leaderboard_user_link import LeaderboardUserLink, League
 from app.services.leaderboard import LeaderboardService
 from app.services.user import UserService
+from tests.factories.language import LanguageFactory
 from tests.factories.user import UserFactory
 
 
@@ -23,17 +24,19 @@ DEFAULT_USER_DETAILS: List[UserDetails] = [
 ]
 
 class LeaderboardUsersFactory(Protocol):
-    def __call__(self, user_details: List[UserDetails] = DEFAULT_USER_DETAILS, league: Optional[League] = None) -> List[LeaderboardUserLink]:
+    def __call__(self, user_details: List[UserDetails] = DEFAULT_USER_DETAILS, league: Optional[League] = None, create_language: bool = True) -> List[LeaderboardUserLink]:
         ...
 
 @pytest.fixture
-def make_leaderboard_users(uow: UnitOfWork, make_user: UserFactory) -> LeaderboardUsersFactory:
-    def make(user_details: List[UserDetails] = DEFAULT_USER_DETAILS, league: Optional[League] = None) -> List[LeaderboardUserLink]:
+def make_leaderboard_users(uow: UnitOfWork, make_user: UserFactory, make_language: LanguageFactory) -> LeaderboardUsersFactory:
+    def make(user_details: List[UserDetails] = DEFAULT_USER_DETAILS, league: Optional[League] = None, create_language: bool = True) -> List[LeaderboardUserLink]:
+        if create_language:
+            make_language()
         user_service = UserService(uow)
         leaderboard_users = []
 
         for user_detail in user_details:
-            user = make_user(email=user_detail["email"], display_name=user_detail["display_name"])
+            user = make_user(email=user_detail["email"], display_name=user_detail["display_name"], create_language=False)
             leaderboard_users.append(user_service.update_xp(user, user_detail["xp"]))
 
         if league:

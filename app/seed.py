@@ -94,10 +94,12 @@ class DatabaseSeeder:
 
     def _seed_language(self, filepath: str, existing_phonemes: Dict[str, Phoneme]) -> None:
         data = self.load_json_data(filepath)
-        language_name = os.path.splitext(os.path.basename(filepath))[0]
+        language_code = os.path.splitext(os.path.basename(filepath))[0]
+        language_name = data["name"]
+        language_is_default = data["is_default"]
 
-        print(f"🌍 Inserting Language: {language_name}")
-        language = Language(name=language_name)
+        print(f"🌍 Inserting Language: {language_name} ({language_code})")
+        language = Language(code=language_code, name=language_name, is_default=language_is_default)
         self.session.add(language)
         self.session.commit()
 

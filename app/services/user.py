@@ -10,7 +10,7 @@ class UserService:
 
     def __init__(self, uow: UnitOfWork) -> None:
         self._uow = uow
-    
+
     def update_xp_with_boost(
         self,
         user: User,
@@ -36,7 +36,7 @@ class UserService:
         self._uow.commit()
         LRedis.update_xp(entry.league, entry.id, xp_gain)
         return xp_gain
-    
+
     def update_xp(self, user: User, xp_gain: int) -> LeaderboardUserLink:
         """Should be used for testing only, as it does not account for boosts, e.g. streaks"""
         assert xp_gain >= 0
@@ -63,7 +63,7 @@ class UserService:
         user = self._uow.users.upsert(user)
         self._uow.commit()
         return user
-    
+
     def disable_new_user_boost(self, boost_duration_days: int = 3) -> None:
         users = self._uow.users.find_by_new_users_created_before(date.today() - timedelta(days=boost_duration_days))
         for user in users:

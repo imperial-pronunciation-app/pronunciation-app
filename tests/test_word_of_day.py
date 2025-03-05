@@ -1,20 +1,19 @@
 from fastapi.testclient import TestClient
 
 from app.crud.unit_of_work import UnitOfWork
+from app.models.user import User
 from app.services.word_of_day import WordOfDayService
-from tests.factories.language import LanguageFactory
 from tests.factories.word import WordFactory
 from tests.factories.word_of_day import WordOfDayFactory
 
 
-def test_get_word_of_day(auth_client: TestClient, make_word_of_day: WordOfDayFactory) -> None:
+def test_get_word_of_day(auth_client: TestClient, make_word_of_day: WordOfDayFactory, test_user: User) -> None:
     """Test retrieving the word of the day with corresponding phonemes."""
 
     # When
-    word_of_day = make_word_of_day()
-    language = word_of_day.word.language
+    word_of_day = make_word_of_day(language=test_user.language)
     assert word_of_day.id is not None
-    response = auth_client.get(f"/api/v1/{language.name}/word_of_day")
+    response = auth_client.get("/api/v1/word_of_day")
 
     # Then
     assert response.status_code == 200
@@ -36,12 +35,11 @@ def test_assign_new_word_of_day(uow: UnitOfWork, make_word: WordFactory) -> None
     assert word_of_day.word_id is word.id
 
 
-def test_get_new_word_unauthorized(client: TestClient, make_language: LanguageFactory) -> None:
+def test_get_new_word_unauthorized(client: TestClient) -> None:
     """Test that unauthorized requests get a 401 error."""
-    language = make_language()
 
     # When
-    response = client.get(f"/api/v1/{language.name}/word_of_day")
+    response = client.get("/api/v1/word_of_day")
 
     # Then
     assert response.status_code == 401

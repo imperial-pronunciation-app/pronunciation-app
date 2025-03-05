@@ -25,16 +25,22 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
     verification_token_secret = secret
 
     def __init__(self, user_db: SQLModelUserDatabase, uow: UnitOfWork) -> None:
-        self.uow = uow
+        self._uow = uow
         super().__init__(user_db)
 
     async def on_after_register(self, user: User, request: Optional[Request] = None) -> None:
-        leaderboard_user = self.uow.leaderboard_users.upsert(LeaderboardUserLink(user_id=user.id)) # Defaults to bronze league and 0 xp
-        self.uow.commit()
+        # Set default language for user
+        user.language_id = self._uow.languages.get_default().id
+        self._uow.users.upsert(user)
+        self._uow.commit()
+
+        # Create leaderboard entry
+        leaderboard_user = self._uow.leaderboard_users.upsert(LeaderboardUserLink(user_id=user.id)) # Defaults to bronze league and 0 xp
+        self._uow.commit()
         LRedis.create_entry_from_user(leaderboard_user)
-    
+
     async def on_after_login(self, user: User, request: Optional[Request] = None, response: Optional[Response] = None) -> None:
-        user_service = UserService(self.uow)
+        user_service = UserService(self._uow)
         user_service.update_login_streak(user)
 
 

@@ -7,13 +7,15 @@ from fastapi.testclient import TestClient
 from app.crud.unit_of_work import UnitOfWork
 from app.models.user import User
 from app.services.user import UserService
+from tests.factories.language import LanguageFactory
 from tests.utils import register_user
 
 
 UPDATE_ENDPOINT = "/users/me"
 
-def test_register_user(client: TestClient) -> None:
+def test_register_user(client: TestClient, make_language: LanguageFactory) -> None:
     """Should successfully register a user."""
+    make_language()
     response = register_user(client)
 
     assert response.status_code == 201, f"Unexpected status: {response.status_code}, response: {response.json()}"

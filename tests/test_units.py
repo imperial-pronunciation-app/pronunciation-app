@@ -3,19 +3,19 @@
 from fastapi.testclient import TestClient
 
 from app.crud.unit_of_work import UnitOfWork
+from app.models.user import User
 from app.services.unit import UnitService
-from tests.factories.language import LanguageFactory
 from tests.factories.unit import UnitFactory
 from tests.factories.user import UserFactory
 
 
-def units_endpoint(language: str) -> str:
-    return f"/api/v1/{language}/units"
+def units_endpoint() -> str:
+    return "/api/v1/units"
 
-def test_get_units_success(auth_client: TestClient, make_unit: UnitFactory) -> None:
+def test_get_units_success(auth_client: TestClient, make_unit: UnitFactory, test_user: User) -> None:
     """Test retrieving units along with their lessons."""
-    unit = make_unit()
-    response = auth_client.get(units_endpoint(unit.language.name))
+    unit = make_unit(language=test_user.language)
+    response = auth_client.get(units_endpoint())
 
     assert response.status_code == 200
     data = response.json()
@@ -27,10 +27,9 @@ def test_get_units_success(auth_client: TestClient, make_unit: UnitFactory) -> N
     assert unit_data["name"] == unit.name
     assert unit_data["description"] == unit.description
 
-def test_get_units_no_units(auth_client: TestClient, make_language: LanguageFactory) -> None:
+def test_get_units_no_units(auth_client: TestClient) -> None:
     """Test retrieving units when there are none."""
-    language = make_language()
-    response = auth_client.get(units_endpoint(language.name))
+    response = auth_client.get(units_endpoint())
 
     assert response.status_code == 200
     data = response.json()
@@ -38,10 +37,9 @@ def test_get_units_no_units(auth_client: TestClient, make_language: LanguageFact
     assert "units" in data
     assert len(data["units"]) == 0
 
-def test_get_units_unauthorized(client: TestClient, make_language: LanguageFactory) -> None:
+def test_get_units_unauthorized(client: TestClient) -> None:
     """Test that unauthorized requests get a 401 error."""
-    language = make_language()
-    response = client.get(units_endpoint(language.name))
+    response = client.get(units_endpoint())
 
     assert response.status_code == 401
 
@@ -51,7 +49,7 @@ def test_generate_recap_lesson(
     make_unit: UnitFactory
     ) -> None:
     user = make_user()
-    unit = make_unit()
+    unit = make_unit(language=user.language)
     service = UnitService(uow)
     service.generate_recap_lesson(unit, user)
     

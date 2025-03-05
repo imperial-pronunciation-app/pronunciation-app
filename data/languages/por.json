@@ -1,4 +1,6 @@
 {
+  "name": "Portuguese",
+  "is_default": false,
   "word_of_day": "computador",
   "words": {
     "computador": ["k", "o", "m", "p", "u", "t̪", "a", "d̪", "o", "ʁ"]
