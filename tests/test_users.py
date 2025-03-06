@@ -136,3 +136,15 @@ def test_get_user_details(auth_client: TestClient, test_user: User) -> None:
     assert json["display_name"] == test_user.display_name
     assert json["language"] == test_user.language.model_dump()
     assert json["league"] == test_user.leaderboard_entry.league
+
+def test_users_me_does_not_expose_password_hash(auth_client: TestClient) -> None:
+    """Should not expose the user's password hash."""
+
+    # When
+    response = auth_client.get("/users/me")
+
+    # Then
+    assert response.status_code == 200
+    json = response.json()
+    assert "password" not in json
+    assert "hashed_password" not in json
