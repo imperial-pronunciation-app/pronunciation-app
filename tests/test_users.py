@@ -104,3 +104,20 @@ def test_unchanged_login_streak(test_user: User, uow: UnitOfWork) -> None:
 
     # Then
     assert updated_user.login_streak == old_login_streak
+
+def test_get_user_details(auth_client: TestClient, test_user: User) -> None:
+    """Should return the user's details."""
+
+    # When
+    response = auth_client.get("/api/v1/user_details")
+
+    # Then
+    assert response.status_code == 200
+    json = response.json()
+    assert json["id"] == test_user.id
+    assert json["login_streak"] == test_user.login_streak
+    assert json["xp_total"] == test_user.xp_total
+    assert json["email"] == test_user.email
+    assert json["display_name"] == test_user.display_name
+    assert json["language"] == test_user.language.model_dump()
+    assert json["league"] == test_user.leaderboard_entry.league
