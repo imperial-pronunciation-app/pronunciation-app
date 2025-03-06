@@ -25,4 +25,5 @@ async def get_user_details(user: User = Depends(current_active_user)) -> UserDet
         display_name=user.display_name,
         language=user.language,
         league=user.leaderboard_entry.league,
+        avatar=user.avatar,
     )

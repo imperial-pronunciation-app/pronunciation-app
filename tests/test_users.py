@@ -5,7 +5,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.crud.unit_of_work import UnitOfWork
-from app.models.user import User
+from app.models.user import Avatar, User
 from app.services.user import UserService
 from tests.factories.language import LanguageFactory
 from tests.utils import register_user
@@ -35,14 +35,29 @@ def test_register_user_invalid_cases(client: TestClient, email: Optional[str], d
 
     assert response.status_code == expected_status, f"Unexpected status: {response.status_code}, response: {response.json()}"
 
-def test_update_user(auth_client: TestClient) -> None:
-    """Should successfully update a user's email."""
+def test_update_user(auth_client: TestClient, make_language: LanguageFactory, uow: UnitOfWork) -> None:
+    """Should successfully update a user's email, language and avatar."""
 
+    # Pre
+    language = make_language(is_default=False)
+    email = "newemail@example.com"
+
+    # When
     response = auth_client.patch(
         UPDATE_ENDPOINT,
-        json={"email": "newemail@example.com"}
+        json={
+            "email": email,
+            "language_id": language.id,
+            "avatar": Avatar.BROWN,
+        }
     )
+
+    # Then
     assert response.status_code == 200
+    user = uow.users.get_by_email(email)
+    assert user.email == email
+    assert user.language_id == language.id
+    assert user.avatar == Avatar.BROWN
 
 def test_update_user_existing_email(client: TestClient, auth_client: TestClient) -> None:
     """Should return 401 when attempting to update user without a token."""
